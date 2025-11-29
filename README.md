@@ -6,6 +6,7 @@ A modern e-commerce application built with Next.js, TypeScript, Tailwind CSS, an
 
 - 🛍️ Product listing with category filtering
 - 🛒 Shopping cart with persistent storage
+- 💳 Visa/Mastercard payment integration (Stripe)
 - 🎨 Modern UI with Tailwind CSS
 - 🌙 Dark mode support
 - 📱 Responsive design
@@ -116,12 +117,19 @@ See `prisma/schema.prisma` for the complete schema.
 
 - `GET /api/products` - Get all products (optional `?category=men|women` filter)
 - `GET /api/products/[id]` - Get a single product by ID
+- `POST /api/payments/create-intent` - Create Stripe payment intent
 
 ## Environment Variables
 
 - `DATABASE_URL` - PostgreSQL connection string (required)
+- `STRIPE_SECRET_KEY` - Stripe secret key for payment processing (required for payments)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Stripe publishable key (required for payments)
 - `NEXT_PUBLIC_API_URL` - API base URL (optional, defaults to localhost:3000)
 - `NEXT_PUBLIC_SHOW_LOGGER` - Enable/disable logger (optional)
+
+### Payment Setup
+
+See [PAYMENT_SETUP_AR.md](./PAYMENT_SETUP_AR.md) for detailed instructions on setting up Stripe payments (in Arabic).
 
 ## Technologies Used
 

@@ -41,3 +41,46 @@ enum ProductCategory {
   women
 }
 
+enum OrderStatus {
+  pending
+  processing
+  shipped
+  delivered
+  cancelled
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  orderNumber     String      @unique @map("order_number")
+  customerName    String      @map("customer_name")
+  customerEmail   String      @map("customer_email")
+  customerAddress String      @map("customer_address") @db.Text
+  customerCity    String      @map("customer_city")
+  customerPostalCode String   @map("customer_postal_code")
+  customerCountry String      @map("customer_country")
+  totalAmount     Decimal     @map("total_amount") @db.Decimal(10, 2)
+  status          OrderStatus @default(pending)
+  stripePaymentIntentId String? @map("stripe_payment_intent_id")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          Int     @id @default(autoincrement())
+  orderId     Int     @map("order_id")
+  productId   Int     @map("product_id")
+  productTitle String @map("product_title")
+  productPrice Decimal @map("product_price") @db.Decimal(10, 2)
+  quantity    Int
+  subtotal    Decimal @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FiX, FiShoppingCart, FiTrash2, FiPlus, FiMinus } from 'react-icons/fi';
 import { useCartStore } from '@/store/cartStore';
 import Image from 'next/image';
@@ -12,6 +13,7 @@ interface CartDrawerProps {
 }
 
 const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
+  const router = useRouter();
   const cartItems = useCartStore((state) => state.cartItems);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
@@ -20,6 +22,11 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
   const getTotal = useCartStore((state) => state.getTotal);
 
   const [slideIn, setSlideIn] = useState(false);
+
+  const handleCheckout = () => {
+    onClose();
+    router.push('/checkout');
+  };
 
   useEffect(() => {
     if (open) {
@@ -47,9 +54,8 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
         onClick={onClose}
       />
       <div
-        className={`absolute right-0 top-0 h-full w-full md:w-[750px] bg-white p-4 md:p-6 shadow-xl transition-transform duration-500 ${
-          slideIn ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`absolute right-0 top-0 h-full w-full md:w-[750px] bg-white p-4 md:p-6 shadow-xl transition-transform duration-500 ${slideIn ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         <button
           onClick={onClose}
@@ -91,11 +97,11 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                       <Image
                         src={
                           item.productimg[0].url.startsWith('http://') ||
-                          item.productimg[0].url.startsWith('https://')
+                            item.productimg[0].url.startsWith('https://')
                             ? item.productimg[0].url
                             : item.productimg[0].url.startsWith('/')
-                            ? item.productimg[0].url
-                            : `/${item.productimg[0].url}`
+                              ? item.productimg[0].url
+                              : `/${item.productimg[0].url}`
                         }
                         alt={item.productTitle}
                         width={50}
@@ -157,7 +163,10 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
 
             <div className="mt-6">
               <div className="flex flex-col md:flex-row gap-2 items-center md:items-start">
-                <button className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition-colors text-sm md:text-base">
+                <button
+                  onClick={handleCheckout}
+                  className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition-colors text-sm md:text-base"
+                >
                   Checkout
                 </button>
                 <p className="text-xl md:text-2xl font-semibold text-center md:text-left mt-2 md:mt-0">
