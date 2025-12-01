@@ -87,6 +87,23 @@ model HeroSlide {
   @@map("hero_slides")
 }
 
+model HeroBanner {
+  id          Int      @id @default(autoincrement())
+  title       String
+  subtitle    String
+  description String
+  buttonText  String   @map("button_text")
+  buttonLink  String   @map("button_link")
+  imageUrl    String   @map("image_url")
+  textColor   String   @default("#2B3445") @map("text_color")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([sortOrder], name: "hero_banners_sort_order_idx")
+  @@map("hero_banners")
+}
+
 enum ProductCategory {
   men
   women

@@ -161,6 +161,29 @@ const heroSlides = [
   },
 ];
 
+const heroBanners = [
+  {
+    title: 'NEW ARRIVALS',
+    subtitle: 'SUMMER',
+    description: 'SALE 20% OFF',
+    buttonText: 'shop now',
+    buttonLink: '#',
+    imageUrl: '/images/banner-17.jpg',
+    textColor: '#2B3445',
+    sortOrder: 1,
+  },
+  {
+    title: 'GAMING 4K',
+    subtitle: 'DESKTOPS &\nLAPTOPS',
+    description: '',
+    buttonText: 'shop now',
+    buttonLink: '#',
+    imageUrl: '/images/banner-16.jpg',
+    textColor: '#FFFFFF',
+    sortOrder: 2,
+  },
+];
+
 async function main() {
   console.log('🌱 Starting seed...');
 
@@ -169,6 +192,8 @@ async function main() {
   // First clear hero slides so constraints don't conflict
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (prisma as any).heroSlide?.deleteMany?.();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (prisma as any).heroBanner?.deleteMany?.();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
 
@@ -204,6 +229,19 @@ async function main() {
     }
   } else {
     console.warn('⚠️ heroSlide model not found on Prisma client. Did you run `npx prisma generate`?');
+  }
+
+  // Seed hero side banners
+  console.log('🖼️ Seeding hero side banners...');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bannerDelegate = (prisma as any).heroBanner;
+  if (bannerDelegate) {
+    for (const banner of heroBanners) {
+      const created = await bannerDelegate.create({ data: banner });
+      console.log(`✅ Created hero banner: ${created.title} (ID: ${created.id})`);
+    }
+  } else {
+    console.warn('⚠️ heroBanner model not found on Prisma client. Did you run `npx prisma generate`?');
   }
 
   console.log('✨ Seed completed successfully!');

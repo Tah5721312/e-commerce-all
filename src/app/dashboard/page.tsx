@@ -1,7 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiPlus, FiEdit, FiTrash2, FiBarChart2, FiPackage, FiDollarSign, FiStar, FiShoppingBag } from 'react-icons/fi';
+import {
+  FiPlus,
+  FiEdit,
+  FiTrash2,
+  FiBarChart2,
+  FiPackage,
+  FiDollarSign,
+  FiStar,
+  FiShoppingBag,
+} from 'react-icons/fi';
 import type { Product } from '@/types/product';
 import ProductModal from '@/components/dashboard/ProductModal';
 import ProductList from '@/components/dashboard/ProductList';
@@ -11,6 +20,7 @@ import OrderList from '@/components/dashboard/OrderList';
 import OrderModal from '@/components/dashboard/OrderModal';
 import OrderStatsCards from '@/components/dashboard/OrderStatsCards';
 import HeroContentTab from '@/components/dashboard/HeroContentTab';
+import HeroBannersTab from '@/components/dashboard/HeroBannersTab';
 
 interface Stats {
   totalProducts: number;
@@ -52,7 +62,9 @@ interface OrderStats {
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'hero'>('products');
+  const [activeTab, setActiveTab] = useState<
+    'products' | 'orders' | 'hero' | 'heroBanners'
+  >('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -281,6 +293,16 @@ export default function DashboardPage() {
             <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
             Hero Slider
           </button>
+          <button
+            onClick={() => setActiveTab('heroBanners')}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'heroBanners'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
+            Hero Side Banners
+          </button>
         </div>
 
         {/* Products Tab */}
@@ -322,6 +344,12 @@ export default function DashboardPage() {
         {activeTab === 'hero' && (
           <div className="mt-8">
             <HeroContentTab />
+          </div>
+        )}
+
+        {activeTab === 'heroBanners' && (
+          <div className="mt-8">
+            <HeroBannersTab />
           </div>
         )}
 

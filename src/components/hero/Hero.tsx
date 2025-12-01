@@ -23,6 +23,17 @@ type HeroSlide = {
   accentColor: string;
 };
 
+type HeroBanner = {
+  id?: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  imageUrl: string;
+  textColor: string;
+};
+
 const fallbackSlides: HeroSlide[] = [
   {
     id: 1,
@@ -50,9 +61,32 @@ const fallbackSlides: HeroSlide[] = [
   },
 ];
 
+const fallbackBanners: HeroBanner[] = [
+  {
+    id: 1,
+    title: 'NEW ARRIVALS',
+    subtitle: 'SUMMER',
+    description: 'SALE 20% OFF',
+    buttonText: 'shop now',
+    buttonLink: '#',
+    imageUrl: '/images/banner-17.jpg',
+    textColor: '#2B3445',
+  },
+  {
+    id: 2,
+    title: 'GAMING 4K',
+    subtitle: 'DESKTOPS &\nLAPTOPS',
+    description: '',
+    buttonText: 'shop now',
+    buttonLink: '#',
+    imageUrl: '/images/banner-16.jpg',
+    textColor: '#FFFFFF',
+  },
+];
+
 const Hero = () => {
   const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
-  const [loading, setLoading] = useState(true);
+  const [banners, setBanners] = useState<HeroBanner[]>(fallbackBanners);
 
   useEffect(() => {
     const fetchSlides = async () => {
@@ -79,12 +113,36 @@ const Hero = () => {
         }
       } catch (error) {
         console.error('Failed to load hero slides', error);
-      } finally {
-        setLoading(false);
+      }
+    };
+
+    const fetchBanners = async () => {
+      try {
+        const response = await fetch('/api/hero-banners', { cache: 'no-store' });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (Array.isArray(data.data) && data.data.length) {
+          setBanners(
+            data.data.map((banner: any) => ({
+              id: banner.id,
+              title: banner.title,
+              subtitle: banner.subtitle,
+              description: banner.description,
+              buttonText: banner.buttonText,
+              buttonLink: banner.buttonLink,
+              imageUrl: banner.imageUrl,
+              textColor: banner.textColor ?? '#2B3445',
+            })),
+          );
+        }
+      } catch (error) {
+        console.error('Failed to load hero banners', error);
       }
     };
 
     fetchSlides();
+    fetchBanners();
   }, []);
 
   return (
@@ -142,56 +200,42 @@ const Hero = () => {
         </Swiper>
 
         <div className="hidden lg:flex lg:flex-col min-w-[30%] space-y-4">
-          <div className="relative h-[220px] rounded-3xl overflow-hidden shadow-lg">
-            <Image
-              src="/images/banner-17.jpg"
-              alt="New Arrivals"
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-1/2 -translate-y-1/2 left-8 text-[#2B3445]">
-              <p className="text-lg font-semibold tracking-wide">NEW ARRIVALS</p>
-              <h6 className="text-3xl font-bold mt-1">SUMMER</h6>
-              <p className="text-sm font-light">SALE 20% OFF</p>
-              <a
-                href="#"
-                className="text-sm flex items-center gap-1 mt-3 hover:text-[#D23F57] transition-colors"
+          {banners.map((banner, index) => (
+            <div
+              key={banner.id ?? index}
+              className="relative h-[220px] rounded-3xl overflow-hidden shadow-lg"
+            >
+              <Image src={banner.imageUrl} alt={banner.title} fill className="object-cover" />
+              <div className="absolute inset-0 bg-black/10" />
+              <div
+                className="absolute top-1/2 -translate-y-1/2 left-8 drop-shadow"
+                style={{ color: banner.textColor }}
               >
-                shop now
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </a>
+                <p className="text-lg font-semibold tracking-wide">{banner.title}</p>
+                {banner.subtitle && (
+                  <h6 className="text-3xl font-bold mt-1 whitespace-pre-line">
+                    {banner.subtitle}
+                  </h6>
+                )}
+                {banner.description && (
+                  <p className="text-sm font-light mt-1">{banner.description}</p>
+                )}
+                <a
+                  href={banner.buttonLink}
+                  className="text-sm flex items-center gap-1 mt-3 hover:text-[#D23F57] transition-colors"
+                >
+                  {banner.buttonText}
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </a>
+              </div>
             </div>
-          </div>
-
-          <div className="relative h-[220px] rounded-3xl overflow-hidden shadow-lg">
-            <Image src="/images/banner-16.jpg" alt="Gaming" fill className="object-cover" />
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-1/2 -translate-y-1/2 left-8 text-white drop-shadow">
-              <p className="text-lg font-light">GAMING 4K</p>
-              <h6 className="text-3xl font-bold mt-1">DESKTOPS &</h6>
-              <h6 className="text-3xl font-bold">LAPTOPS</h6>
-              <a
-                href="#"
-                className="text-sm flex items-center gap-1 mt-3 hover:text-[#D23F57] transition-colors"
-              >
-                shop now
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </a>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
