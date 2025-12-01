@@ -134,11 +134,41 @@ const sampleProducts: ProductData[] = [
   },
 ];
 
+const heroSlides = [
+  {
+    tagLine: 'LIFESTYLE COLLECTION',
+    title: 'MEN',
+    highlight: 'SALE UP TO',
+    saleText: '30% OFF',
+    description: 'Get Free Shipping on orders over $99.00',
+    buttonText: 'shop now',
+    buttonLink: '/shop',
+    imageUrl: '/images/banner-15.jpg',
+    accentColor: '#D23F57',
+    sortOrder: 1,
+  },
+  {
+    tagLine: 'NEVER MISS A DROP',
+    title: 'WOMEN',
+    highlight: 'NEW IN',
+    saleText: '15% OFF',
+    description: 'Fresh arrivals selected weekly just for you.',
+    buttonText: 'discover now',
+    buttonLink: '/shop',
+    imageUrl: '/images/banner-25.jpg',
+    accentColor: '#ff7790',
+    sortOrder: 2,
+  },
+];
+
 async function main() {
   console.log('🌱 Starting seed...');
 
   // Clear existing data
   console.log('🗑️  Clearing existing data...');
+  // First clear hero slides so constraints don't conflict
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (prisma as any).heroSlide?.deleteMany?.();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
 
@@ -161,6 +191,19 @@ async function main() {
       },
     });
     console.log(`✅ Created product: ${product.productTitle} (ID: ${product.id})`);
+  }
+
+  // Seed hero slides
+  console.log('🎞️ Seeding hero slides...');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const heroDelegate = (prisma as any).heroSlide;
+  if (heroDelegate) {
+    for (const slide of heroSlides) {
+      const created = await heroDelegate.create({ data: slide });
+      console.log(`✅ Created hero slide: ${created.title} (ID: ${created.id})`);
+    }
+  } else {
+    console.warn('⚠️ heroSlide model not found on Prisma client. Did you run `npx prisma generate`?');
   }
 
   console.log('✨ Seed completed successfully!');

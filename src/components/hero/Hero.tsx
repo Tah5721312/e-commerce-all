@@ -1,55 +1,139 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
+import { Autoplay, Pagination } from 'swiper/modules';
+
 import 'swiper/css';
 import 'swiper/css/pagination';
-import Image from 'next/image';
+
 import IconSection from './IconSection';
 
-const sliderData = [
-  { text: 'MEN', link: '/images/banner-15.jpg' },
-  { text: 'WOMEN', link: '/images/banner-25.jpg' },
+type HeroSlide = {
+  id?: number;
+  tagLine: string;
+  title: string;
+  highlight: string;
+  saleText: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  imageUrl: string;
+  accentColor: string;
+};
+
+const fallbackSlides: HeroSlide[] = [
+  {
+    id: 1,
+    tagLine: 'LIFESTYLE COLLECTION',
+    title: 'MEN',
+    highlight: 'SALE UP TO',
+    saleText: '30% OFF',
+    description: 'Get Free Shipping on orders over $99.00',
+    buttonText: 'shop now',
+    buttonLink: '/shop',
+    imageUrl: '/images/banner-15.jpg',
+    accentColor: '#D23F57',
+  },
+  {
+    id: 2,
+    tagLine: 'NEVER MISS A DROP',
+    title: 'WOMEN',
+    highlight: 'NEW IN',
+    saleText: '15% OFF',
+    description: 'Fresh arrivals selected weekly just for you.',
+    buttonText: 'discover now',
+    buttonLink: '/shop',
+    imageUrl: '/images/banner-25.jpg',
+    accentColor: '#ff7790',
+  },
 ];
 
 const Hero = () => {
+  const [slides, setSlides] = useState<HeroSlide[]>(fallbackSlides);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const response = await fetch('/api/hero', { cache: 'no-store' });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (Array.isArray(data.data) && data.data.length) {
+          setSlides(
+            data.data.map((slide: any) => ({
+              id: slide.id,
+              tagLine: slide.tagLine,
+              title: slide.title,
+              highlight: slide.highlight,
+              saleText: slide.saleText,
+              description: slide.description,
+              buttonText: slide.buttonText,
+              buttonLink: slide.buttonLink,
+              imageUrl: slide.imageUrl,
+              accentColor: slide.accentColor ?? '#D23F57',
+            })),
+          );
+        }
+      } catch (error) {
+        console.error('Failed to load hero slides', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, []);
+
   return (
     <div className="container mx-auto px-4">
-      <div className="pt-2 mt-2.5 flex items-center gap-2 flex-col md:flex-row">
+      <div className="pt-4 mt-4 flex items-start gap-4 flex-col lg:flex-row">
         <Swiper
-          loop={true}
-          pagination={{ dynamicBullets: true }}
-          modules={[Pagination]}
-          className="mySwiper flex-1 w-full md:w-2/3 rounded-lg overflow-hidden"
-          style={{ height: '400px', minHeight: '400px' }}
+          loop
+          autoplay={{
+            delay: 4500,
+            disableOnInteraction: false,
+          }}
+          pagination={{ clickable: true, dynamicBullets: true }}
+          modules={[Pagination, Autoplay]}
+          className="mySwiper flex-1 w-full lg:w-2/3 rounded-3xl overflow-hidden shadow-lg"
         >
-          {sliderData.map((item) => (
-            <SwiperSlide key={item.link}>
-              <div className="relative w-full h-[400px] md:h-[500px] rounded-lg overflow-hidden">
+          {slides.map((item, index) => (
+            <SwiperSlide key={item.id ?? index}>
+              <div className="relative w-full h-[360px] md:h-[480px]">
                 <Image
-                  src={item.link}
-                  alt={item.text}
+                  src={item.imageUrl}
+                  alt={item.title}
                   fill
                   className="object-cover"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 66vw"
+                  priority={index === 0}
+                  sizes="(max-width: 1024px) 100vw, 66vw"
                 />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
                 <div className="absolute inset-0 flex items-center">
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 p-4 md:left-[10%] text-left z-10">
-                    <h5 className="text-[#222] text-lg md:text-xl">LIFESTYLE COLLECTION</h5>
-                    <h3 className="text-[#222] font-medium my-1 text-2xl md:text-4xl">
-                      {item.text}
-                    </h3>
-                    <div className="flex items-center justify-center md:justify-start">
-                      <h4 className="text-[#333] mr-1 text-xl md:text-2xl">SALE UP TO</h4>
-                      <h4 className="text-[#D23F57] text-xl md:text-2xl">30% OFF</h4>
-                    </div>
-                    <p className="text-black font-light my-1 text-sm md:text-base">
-                      Get Free Shipping on orders over $99.00
+                  <div className="px-6 md:px-12 text-white max-w-xl">
+                    <p className="text-sm md:text-base tracking-[0.3em] text-gray-200">
+                      {item.tagLine}
                     </p>
-                    <button className="px-5 py-1 mt-2 bg-[#454343] text-white rounded hover:bg-[#827a7a] transition-colors shadow-md">
-                      shop now
-                    </button>
+                    <h3 className="text-4xl md:text-6xl font-semibold mt-2">
+                      {item.title}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-2 mt-4 text-xl md:text-2xl">
+                      <span className="text-white">{item.highlight}</span>
+                      <span style={{ color: item.accentColor }}>{item.saleText}</span>
+                    </div>
+                    <p className="text-sm md:text-base text-gray-100 mt-3 leading-relaxed">
+                      {item.description}
+                    </p>
+                    <a
+                      href={item.buttonLink}
+                      className="inline-flex px-6 py-2 mt-6 rounded-full text-sm md:text-base font-semibold shadow-lg"
+                      style={{ backgroundColor: item.accentColor, color: '#111' }}
+                    >
+                      {item.buttonText}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -57,22 +141,22 @@ const Hero = () => {
           ))}
         </Swiper>
 
-        <div className="hidden md:block min-w-[26.6%] space-y-2">
-          <div className="relative">
+        <div className="hidden lg:flex lg:flex-col min-w-[30%] space-y-4">
+          <div className="relative h-[220px] rounded-3xl overflow-hidden shadow-lg">
             <Image
               src="/images/banner-17.jpg"
               alt="New Arrivals"
-              width={300}
-              height={240}
-              className="w-full rounded-lg"
+              fill
+              className="object-cover"
             />
-            <div className="absolute top-1/2 -translate-y-1/2 left-8">
-              <p className="text-[#2B3445] text-lg">NEW ARRIVALS</p>
-              <h6 className="text-[#2B3445] leading-4 mt-1">SUMMER</h6>
-              <h6 className="text-[#2B3445]">SALE 20% OFF</h6>
+            <div className="absolute inset-0 bg-black/10" />
+            <div className="absolute top-1/2 -translate-y-1/2 left-8 text-[#2B3445]">
+              <p className="text-lg font-semibold tracking-wide">NEW ARRIVALS</p>
+              <h6 className="text-3xl font-bold mt-1">SUMMER</h6>
+              <p className="text-sm font-light">SALE 20% OFF</p>
               <a
                 href="#"
-                className="text-[#2B3445] flex items-center gap-1 hover:text-[#D23F57] transition-colors"
+                className="text-sm flex items-center gap-1 mt-3 hover:text-[#D23F57] transition-colors"
               >
                 shop now
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -86,21 +170,16 @@ const Hero = () => {
             </div>
           </div>
 
-          <div className="relative">
-            <Image
-              src="/images/banner-16.jpg"
-              alt="Gaming"
-              width={300}
-              height={240}
-              className="w-full rounded-lg"
-            />
-            <div className="absolute top-1/2 -translate-y-1/2 left-8">
-              <p className="text-[#2B3445] text-lg font-light">GAMING 4K</p>
-              <h6 className="text-[#2B3445] leading-4 mt-1">DESKTOPS &</h6>
-              <h6 className="text-[#2B3445]">LAPTOPS</h6>
+          <div className="relative h-[220px] rounded-3xl overflow-hidden shadow-lg">
+            <Image src="/images/banner-16.jpg" alt="Gaming" fill className="object-cover" />
+            <div className="absolute inset-0 bg-black/10" />
+            <div className="absolute top-1/2 -translate-y-1/2 left-8 text-white drop-shadow">
+              <p className="text-lg font-light">GAMING 4K</p>
+              <h6 className="text-3xl font-bold mt-1">DESKTOPS &</h6>
+              <h6 className="text-3xl font-bold">LAPTOPS</h6>
               <a
                 href="#"
-                className="text-[#2B3445] flex items-center gap-1 hover:text-[#D23F57] transition-colors"
+                className="text-sm flex items-center gap-1 mt-3 hover:text-[#D23F57] transition-colors"
               >
                 shop now
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
