@@ -1,17 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { FiSearch, FiShoppingCart, FiUser, FiSettings } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiUser, FiSettings, FiHeart } from 'react-icons/fi';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
+import { useFavoritesStore } from '@/store/favoritesStore';
 import CartDrawer from '@/components/cart/CartDrawer';
+import FavoritesDrawer from '@/components/favorites/FavoritesDrawer';
 
 const Header2 = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartSource, setCartSource] = useState<'button' | 'icon'>('icon');
-  const [selectedCategory, setSelectedCategory] = useState(0);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(0);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const cartItems = useCartStore((state) => state.cartItems);
+  const favoritesCount = useFavoritesStore((state) => state.favorites.length);
 
   const categories = ['All Categories', 'Car', 'Clothes', 'Electronics'];
 
@@ -55,9 +59,8 @@ const Header2 = () => {
                     setSelectedCategory(index);
                     setIsCategoryMenuOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 ${
-                    selectedCategory === index ? 'bg-gray-50' : ''
-                  }`}
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 ${selectedCategory === index ? 'bg-gray-50' : ''
+                    }`}
                 >
                   {category}
                 </button>
@@ -68,6 +71,22 @@ const Header2 = () => {
       </div>
 
       <div className="flex items-center gap-2">
+        {/* زر المفضلة (يفتح Drawer) */}
+        <button
+          onClick={() => setIsFavoritesOpen(true)}
+          className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="favorites"
+          title="Favorites"
+        >
+          <FiHeart className="w-6 h-6" />
+          {favoritesCount > 0 && (
+            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              {favoritesCount}
+            </span>
+          )}
+        </button>
+
+        {/* زر السلة */}
         <button
           onClick={() => {
             setIsCartOpen(true);
@@ -78,7 +97,7 @@ const Header2 = () => {
         >
           <FiShoppingCart className="w-6 h-6" />
           {cartItems.length > 0 && (
-            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
               {cartItems.length}
             </span>
           )}
@@ -104,6 +123,7 @@ const Header2 = () => {
         onClose={() => setIsCartOpen(false)}
         cartSource={cartSource}
       />
+      <FavoritesDrawer open={isFavoritesOpen} onClose={() => setIsFavoritesOpen(false)} />
     </div>
   );
 };

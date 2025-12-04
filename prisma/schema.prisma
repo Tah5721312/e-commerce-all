@@ -16,6 +16,7 @@ model Product {
   category           ProductCategory
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
+  colors             ProductColor[]
   images             ProductImage[]
 
   @@map("products")
@@ -31,6 +32,34 @@ model ProductImage {
 
   @@index([productId])
   @@map("product_images")
+}
+
+model ProductColor {
+  id        Int              @id @default(autoincrement())
+  productId Int              @map("product_id")
+  colorName String           @map("color_name") @db.VarChar(100)
+  colorCode String           @map("color_code") @db.VarChar(7)
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variants  ProductVariant[]
+
+  @@index([productId])
+  @@map("product_colors")
+}
+
+model ProductVariant {
+  id             Int          @id @default(autoincrement())
+  productColorId Int          @map("product_color_id")
+  size           ProductSize
+  quantity       Int          @default(0)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  productColor   ProductColor @relation(fields: [productColorId], references: [id], onDelete: Cascade)
+
+  @@unique([productColorId, size])
+  @@index([productColorId])
+  @@map("product_variants")
 }
 
 model Order {
@@ -83,7 +112,7 @@ model HeroSlide {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  @@index([sortOrder], name: "hero_slides_sort_order_idx")
+  @@index([sortOrder])
   @@map("hero_slides")
 }
 
@@ -100,13 +129,22 @@ model HeroBanner {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  @@index([sortOrder], name: "hero_banners_sort_order_idx")
+  @@index([sortOrder])
   @@map("hero_banners")
 }
 
 enum ProductCategory {
   men
   women
+}
+
+enum ProductSize {
+  S
+  M
+  L
+  XL
+  X2XL
+  X3XL
 }
 
 enum OrderStatus {

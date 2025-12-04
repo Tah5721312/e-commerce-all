@@ -213,6 +213,51 @@ async function main() {
             imageOrder: index,
           })),
         },
+        colors: {
+          create: [
+            {
+              colorName: 'أسود',
+              colorCode: '#000000',
+              variants: {
+                create: [
+                  { size: 'S', quantity: Math.floor(Math.random() * 20) + 5 },
+                  { size: 'M', quantity: Math.floor(Math.random() * 20) + 10 },
+                  { size: 'L', quantity: Math.floor(Math.random() * 20) + 8 },
+                  { size: 'XL', quantity: Math.floor(Math.random() * 15) + 5 },
+                  { size: 'X2XL', quantity: Math.floor(Math.random() * 10) + 3 },
+                  { size: 'X3XL', quantity: Math.floor(Math.random() * 5) + 1 },
+                ],
+              },
+            },
+            {
+              colorName: 'أبيض',
+              colorCode: '#FFFFFF',
+              variants: {
+                create: [
+                  { size: 'S', quantity: Math.floor(Math.random() * 20) + 5 },
+                  { size: 'M', quantity: Math.floor(Math.random() * 20) + 10 },
+                  { size: 'L', quantity: Math.floor(Math.random() * 20) + 8 },
+                  { size: 'XL', quantity: Math.floor(Math.random() * 15) + 5 },
+                  { size: 'X2XL', quantity: Math.floor(Math.random() * 10) + 3 },
+                  { size: 'X3XL', quantity: Math.floor(Math.random() * 5) + 1 },
+                ],
+              },
+            },
+            {
+              colorName: 'أزرق',
+              colorCode: '#0066CC',
+              variants: {
+                create: [
+                  { size: 'S', quantity: Math.floor(Math.random() * 15) + 3 },
+                  { size: 'M', quantity: Math.floor(Math.random() * 15) + 8 },
+                  { size: 'L', quantity: Math.floor(Math.random() * 15) + 6 },
+                  { size: 'XL', quantity: Math.floor(Math.random() * 10) + 3 },
+                  { size: 'X2XL', quantity: Math.floor(Math.random() * 8) + 2 },
+                ],
+              },
+            },
+          ],
+        },
       },
     });
     console.log(`✅ Created product: ${product.productTitle} (ID: ${product.id})`);

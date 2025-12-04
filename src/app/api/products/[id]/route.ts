@@ -65,6 +65,7 @@ export async function PUT(
       productRating,
       category,
       images,
+      colors,
     } = body;
 
     // Check if product exists
@@ -92,13 +93,48 @@ export async function PUT(
             imageOrder: 'asc',
           },
         },
+        colors: {
+          include: {
+            variants: true,
+          },
+        },
       },
     });
+
+    // Update colors and variants if provided
+    if (colors && Array.isArray(colors)) {
+      // Delete existing colors (variants will be deleted automatically due to cascade)
+      await prisma.productColor.deleteMany({
+        where: { productId },
+      });
+
+      // Create new colors and variants
+      for (const colorData of colors) {
+        const color = await prisma.productColor.create({
+          data: {
+            productId,
+            colorName: colorData.colorName,
+            colorCode: colorData.colorCode,
+          },
+        });
+
+        // Create variants for this color
+        if (colorData.variants && colorData.variants.length > 0) {
+          await prisma.productVariant.createMany({
+            data: colorData.variants.map((variant: any) => ({
+              productColorId: color.id,
+              size: variant.size,
+              quantity: variant.quantity,
+            })),
+          });
+        }
+      }
+    }
 
     // Update images if provided
     if (images && Array.isArray(images)) {
       console.log('Updating images for product:', productId, 'Images:', images);
-      
+
       // Delete existing images
       await prisma.productImage.deleteMany({
         where: { productId },
@@ -125,13 +161,22 @@ export async function PUT(
         console.log('No valid images to create');
       }
 
-      // Fetch updated product with images
+      // Fetch updated product with images and colors
       const productWithImages = await prisma.product.findUnique({
         where: { id: productId },
         include: {
           images: {
             orderBy: {
               imageOrder: 'asc',
+            },
+          },
+          colors: {
+            include: {
+              variants: {
+                orderBy: {
+                  size: 'asc',
+                },
+              },
             },
           },
         },
@@ -152,25 +197,66 @@ export async function PUT(
             url: img.imageUrl,
             image_order: img.imageOrder,
           })),
+          colors: productWithImages!.colors?.map((color: any) => ({
+            id: color.id,
+            colorName: color.colorName,
+            colorCode: color.colorCode,
+            variants: color.variants.map((variant: any) => ({
+              id: variant.id,
+              size: variant.size,
+              quantity: variant.quantity,
+            })),
+          })) || [],
         },
       });
     }
 
+    // Fetch updated product with colors
+    const productWithColors = await prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        images: {
+          orderBy: {
+            imageOrder: 'asc',
+          },
+        },
+        colors: {
+          include: {
+            variants: {
+              orderBy: {
+                size: 'asc',
+              },
+            },
+          },
+        },
+      },
+    });
+
     return NextResponse.json({
       data: {
-        id: updatedProduct.id,
-        productTitle: updatedProduct.productTitle,
-        productPrice: Number(updatedProduct.productPrice),
-        productDiscription: updatedProduct.productDiscription,
-        productRating: Number(updatedProduct.productRating),
-        category: updatedProduct.category,
-        createdAt: updatedProduct.createdAt.toISOString(),
-        updatedAt: updatedProduct.updatedAt.toISOString(),
-        productimg: updatedProduct.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
+        id: productWithColors!.id,
+        productTitle: productWithColors!.productTitle,
+        productPrice: Number(productWithColors!.productPrice),
+        productDiscription: productWithColors!.productDiscription,
+        productRating: Number(productWithColors!.productRating),
+        category: productWithColors!.category,
+        createdAt: productWithColors!.createdAt.toISOString(),
+        updatedAt: productWithColors!.updatedAt.toISOString(),
+        productimg: productWithColors!.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
           id: img.id,
           url: img.imageUrl,
           image_order: img.imageOrder,
         })),
+        colors: productWithColors!.colors?.map((color: any) => ({
+          id: color.id,
+          colorName: color.colorName,
+          colorCode: color.colorCode,
+          variants: color.variants.map((variant: any) => ({
+            id: variant.id,
+            size: variant.size,
+            quantity: variant.quantity,
+          })),
+        })) || [],
       },
     });
   } catch (error) {

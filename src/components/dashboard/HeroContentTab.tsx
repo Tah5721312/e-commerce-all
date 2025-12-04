@@ -45,7 +45,6 @@ export default function HeroContentTab() {
       setLoading(true);
       const response = await fetch('/api/hero', { cache: 'no-store' });
       if (!response.ok) {
-        console.error('Failed to fetch hero slides, status:', response.status);
         setSlides([]);
         return;
       }
@@ -54,14 +53,13 @@ export default function HeroContentTab() {
       try {
         data = await response.json();
       } catch (parseError) {
-        console.error('Failed to parse hero slides JSON', parseError);
         setSlides([]);
         return;
       }
 
       setSlides(Array.isArray(data?.data) ? data.data : []);
     } catch (error) {
-      console.error('Failed to fetch hero slides', error);
+      setSlides([]);
     } finally {
       setLoading(false);
     }
@@ -324,7 +322,7 @@ export default function HeroContentTab() {
             <div className="h-10 w-10 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin" />
           </div>
         ) : slides.length === 0 ? (
-          <p className="text-center text-gray-500 py-10">لا يوجد سلايدات بعد</p>
+          <p className="text-center text-gray-500 py-10">لا توجد بيانات</p>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {slides.map((slide) => (

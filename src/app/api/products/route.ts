@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
       productRating,
       category,
       images,
+      colors,
     } = body;
 
     console.log('=== RECEIVED PRODUCT DATA ===');
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Ensure images is an array and filter out empty values
-    const imagesArray = Array.isArray(images) 
+    const imagesArray = Array.isArray(images)
       ? images.filter((url: any) => url && typeof url === 'string' && url.trim() !== '')
       : [];
 
@@ -94,6 +95,7 @@ export async function POST(request: NextRequest) {
       productRating: parseFloat(productRating) || 0,
       category: category as ProductCategory,
       images: imagesArray,
+      colors: colors || [],
     });
 
     console.log('Product created successfully!');

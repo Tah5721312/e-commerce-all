@@ -50,12 +50,12 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div
-        className="absolute inset-0 bg-black bg-opacity-50"
+        className="absolute inset-0 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
         className={`absolute right-0 top-0 h-full w-full md:w-[750px] bg-white p-4 md:p-6 shadow-xl transition-transform duration-500 ${slideIn ? 'translate-x-0' : 'translate-x-full'
-          }`}
+          } flex flex-col`}
       >
         <button
           onClick={onClose}
@@ -64,139 +64,182 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
           <FiX className="w-6 h-6" />
         </button>
 
-        <div className="text-center mb-6 mt-8">
+        <div className="text-center mb-6 mt-8 flex-shrink-0">
           <h2 className="text-2xl md:text-4xl flex items-center justify-center gap-2">
             <FiShoppingCart className="w-8 h-8" />
             Shopping Cart
           </h2>
         </div>
 
-        <div className="border-b border-gray-300 mb-6" />
+        <div className="border-b border-gray-300 mb-6 flex-shrink-0" />
 
-        {cartItems.length === 0 ? (
-          <p className="text-center">The cart is empty...</p>
-        ) : (
-          <div>
-            <div className="hidden md:flex text-center mb-2 px-1 font-bold text-sm">
-              <div className="flex-[0.2] text-left">Image</div>
-              <div className="flex-[0.2]">Name</div>
-              <div className="flex-[0.19]">Quantity</div>
-              <div className="flex-[0.2]">Price</div>
-              <div className="flex-[0.2]">Remove</div>
-            </div>
-            <div className="border-b border-gray-300 mb-2" />
+        {/* منطقة المحتوى الرئيسية - قابلة للتمرير */}
+        <div className="flex-1 overflow-y-auto pr-1">
+          {cartItems.length === 0 ? (
+            <p className="text-center">The cart is empty...</p>
+          ) : (
+            <div>
+              <div className="hidden md:flex text-center mb-2 px-1 font-bold text-sm">
+                <div className="flex-[0.2] text-left">Image</div>
+                <div className="flex-[0.2]">Name</div>
+                <div className="flex-[0.19]">Quantity</div>
+                <div className="flex-[0.2]">Price</div>
+                <div className="flex-[0.2]">Remove</div>
+              </div>
+              <div className="border-b border-gray-300 mb-2" />
 
-            {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="border-b border-gray-300 py-2 px-1 mb-2"
-              >
-                <div className="flex flex-col md:flex-row items-center gap-2">
-                  <div className="flex-[0.2]">
-                    {item.productimg && item.productimg[0] && (
-                      <Image
-                        src={
-                          item.productimg[0].url.startsWith('http://') ||
-                            item.productimg[0].url.startsWith('https://')
-                            ? item.productimg[0].url
-                            : item.productimg[0].url.startsWith('/')
+              {cartItems.map((item) => (
+                <div
+                  key={`${item.id}-${item.selectedColor ?? 'noColor'}-${item.selectedSize ?? 'noSize'}`}
+                  className="border-b border-gray-300 py-2 px-1 mb-2"
+                >
+                  <div className="flex flex-col md:flex-row items-center gap-2">
+                    <div className="flex-[0.2]">
+                      {item.productimg && item.productimg[0] && (
+                        <Image
+                          src={
+                            item.productimg[0].url.startsWith('http://') ||
+                              item.productimg[0].url.startsWith('https://')
                               ? item.productimg[0].url
-                              : `/${item.productimg[0].url}`
+                              : item.productimg[0].url.startsWith('/')
+                                ? item.productimg[0].url
+                                : `/${item.productimg[0].url}`
+                          }
+                          alt={item.productTitle}
+                          width={50}
+                          height={50}
+                          className="w-10 h-10 md:w-12 md:h-12 object-cover rounded"
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex-[0.2] text-center md:text-left">
+                      <p className="text-sm font-medium truncate">
+                        {item.productTitle}
+                      </p>
+                      {(item.selectedColor || item.selectedSize) && (
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                          {item.selectedColor && (
+                            <span>
+                              {item.colors?.find((c) => c.id === item.selectedColor)?.colorName ||
+                                'Color'}
+                            </span>
+                          )}
+                          {item.selectedSize && (
+                            <span className="px-1.5 py-0.5 bg-gray-100 rounded">
+                              {item.selectedSize === 'X2XL'
+                                ? '2XL'
+                                : item.selectedSize === 'X3XL'
+                                  ? '3XL'
+                                  : item.selectedSize}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-[0.2] flex items-center justify-center gap-2">
+                      <button
+                        onClick={() =>
+                          increaseQuantity(
+                            item.id,
+                            item.selectedColor,
+                            item.selectedSize
+                          )
                         }
-                        alt={item.productTitle}
-                        width={50}
-                        height={50}
-                        className="w-10 h-10 md:w-12 md:h-12 object-cover rounded"
-                      />
-                    )}
-                  </div>
+                        className="p-1 hover:bg-gray-100 rounded"
+                      >
+                        <FiPlus className="w-4 h-4" />
+                      </button>
+                      <span className="w-8 text-center font-bold text-primary">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() =>
+                          decreaseQuantity(
+                            item.id,
+                            item.selectedColor,
+                            item.selectedSize
+                          )
+                        }
+                        className="p-1 hover:bg-gray-100 rounded"
+                      >
+                        <FiMinus className="w-4 h-4" />
+                      </button>
+                    </div>
 
-                  <div className="flex-[0.2] text-center md:text-left">
-                    <p className="text-sm font-medium truncate">
-                      {item.productTitle}
-                    </p>
-                  </div>
+                    <div className="flex-[0.2] text-center">
+                      <p className="text-sm">${item.productPrice.toFixed(2)}</p>
+                    </div>
 
-                  <div className="flex-[0.2] flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => increaseQuantity(item.id)}
-                      className="p-1 hover:bg-gray-100 rounded"
-                    >
-                      <FiPlus className="w-4 h-4" />
-                    </button>
-                    <span className="w-8 text-center font-bold text-primary">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => decreaseQuantity(item.id)}
-                      className="p-1 hover:bg-gray-100 rounded"
-                    >
-                      <FiMinus className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="flex-[0.2] text-center">
-                    <p className="text-sm">${item.productPrice.toFixed(2)}</p>
-                  </div>
-
-                  <div className="flex-[0.2] text-center">
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded"
-                      title="Remove item"
-                    >
-                      <FiTrash2 className="w-5 h-5" />
-                    </button>
+                    <div className="flex-[0.2] text-center">
+                      <button
+                        onClick={() =>
+                          removeFromCart(
+                            item.id,
+                            item.selectedColor,
+                            item.selectedSize
+                          )
+                        }
+                        className="p-2 text-red-500 hover:bg-red-50 rounded"
+                        title="Remove item"
+                      >
+                        <FiTrash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            <div className="text-center mt-4">
+              <div className="text-center mt-4 mb-4">
+                <button
+                  onClick={clearCart}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors mt-2"
+                >
+                  Clear Cart
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* منطقة الإجمالي والأزرار السفلية - ثابتة */}
+        {cartItems.length > 0 && (
+          <div className="pt-4 border-t border-gray-200 mt-2 flex-shrink-0">
+            <div className="flex flex-col md:flex-row gap-2 items-center md:items-start">
               <button
-                onClick={clearCart}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors mt-2"
+                onClick={handleCheckout}
+                className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition-colors text-sm md:text-base"
               >
-                Clear Cart
+                Checkout
               </button>
+              <p className="text-xl md:text-2xl font-semibold text-center md:text-left mt-2 md:mt-0">
+                Total: ${getTotal().toFixed(2)}
+              </p>
             </div>
 
-            <div className="mt-6">
-              <div className="flex flex-col md:flex-row gap-2 items-center md:items-start">
-                <button
-                  onClick={handleCheckout}
-                  className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition-colors text-sm md:text-base"
-                >
-                  Checkout
-                </button>
-                <p className="text-xl md:text-2xl font-semibold text-center md:text-left mt-2 md:mt-0">
-                  Total: ${getTotal().toFixed(2)}
-                </p>
-              </div>
-
-              <div className="flex gap-2 mt-4 justify-center md:justify-start">
-                <Image
-                  src="/images/visa.png"
-                  alt="Visa"
-                  width={25}
-                  height={20}
-                  className="h-5 md:h-6"
-                />
-                <Image
-                  src="/images/mastercard.png"
-                  alt="Mastercard"
-                  width={25}
-                  height={20}
-                  className="h-5 md:h-6"
-                />
-                <Image
-                  src="/images/paypal.png"
-                  alt="PayPal"
-                  width={25}
-                  height={20}
-                  className="h-5 md:h-6"
-                />
-              </div>
+            <div className="flex gap-2 mt-4 justify-center md:justify-start">
+              <Image
+                src="/images/visa.png"
+                alt="Visa"
+                width={25}
+                height={20}
+                className="h-5 md:h-6"
+              />
+              <Image
+                src="/images/mastercard.png"
+                alt="Mastercard"
+                width={25}
+                height={20}
+                className="h-5 md:h-6"
+              />
+              <Image
+                src="/images/paypal.png"
+                alt="PayPal"
+                width={25}
+                height={20}
+                className="h-5 md:h-6"
+              />
             </div>
           </div>
         )}
@@ -206,4 +249,5 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
 };
 
 export default CartDrawer;
+
 

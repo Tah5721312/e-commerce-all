@@ -10,6 +10,15 @@ export async function getAllProducts(category?: ProductCategory): Promise<Produc
           imageOrder: 'asc',
         },
       },
+      colors: {
+        include: {
+          variants: {
+            orderBy: {
+              size: 'asc',
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -25,11 +34,30 @@ export async function getAllProducts(category?: ProductCategory): Promise<Produc
     category: product.category,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
-    productimg: product.images.map((img: any) => ({
-      id: img.id,
-      url: img.imageUrl.startsWith('http') ? img.imageUrl : img.imageUrl,
-      image_order: img.imageOrder,
-    })),
+    productimg: product.images.map((img: any) => {
+      let imageUrl = img.imageUrl;
+      // If it's not an external URL, ensure it starts with /
+      if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        if (!imageUrl.startsWith('/')) {
+          imageUrl = `/${imageUrl}`;
+        }
+      }
+      return {
+        id: img.id,
+        url: imageUrl,
+        image_order: img.imageOrder,
+      };
+    }),
+    colors: product.colors?.map((color: any) => ({
+      id: color.id,
+      colorName: color.colorName,
+      colorCode: color.colorCode,
+      variants: color.variants.map((variant: any) => ({
+        id: variant.id,
+        size: variant.size,
+        quantity: variant.quantity,
+      })),
+    })) || [],
   }));
 }
 
@@ -40,6 +68,15 @@ export async function getProductById(id: number): Promise<Product | null> {
       images: {
         orderBy: {
           imageOrder: 'asc',
+        },
+      },
+      colors: {
+        include: {
+          variants: {
+            orderBy: {
+              size: 'asc',
+            },
+          },
         },
       },
     },
@@ -58,11 +95,30 @@ export async function getProductById(id: number): Promise<Product | null> {
     category: product.category,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
-    productimg: product.images.map((img: any) => ({
-      id: img.id,
-      url: img.imageUrl.startsWith('http') ? img.imageUrl : img.imageUrl,
-      image_order: img.imageOrder,
-    })),
+    productimg: product.images.map((img: any) => {
+      let imageUrl = img.imageUrl;
+      // If it's not an external URL, ensure it starts with /
+      if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        if (!imageUrl.startsWith('/')) {
+          imageUrl = `/${imageUrl}`;
+        }
+      }
+      return {
+        id: img.id,
+        url: imageUrl,
+        image_order: img.imageOrder,
+      };
+    }),
+    colors: product.colors?.map((color: any) => ({
+      id: color.id,
+      colorName: color.colorName,
+      colorCode: color.colorCode,
+      variants: color.variants.map((variant: any) => ({
+        id: variant.id,
+        size: variant.size,
+        quantity: variant.quantity,
+      })),
+    })) || [],
   };
 }
 
@@ -73,6 +129,14 @@ export async function createProduct(product: {
   productRating: number;
   category: ProductCategory;
   images: string[];
+  colors?: Array<{
+    colorName: string;
+    colorCode: string;
+    variants: Array<{
+      size: string;
+      quantity: number;
+    }>;
+  }>;
 }): Promise<Product> {
   console.log('createProduct called with:', {
     productTitle: product.productTitle,
@@ -120,13 +184,47 @@ export async function createProduct(product: {
     console.log('No images to create');
   }
 
-  // Fetch product with images
+  // Create colors and variants if provided
+  if (product.colors && product.colors.length > 0) {
+    console.log('Creating colors for product:', newProduct.id);
+    for (const colorData of product.colors) {
+      const color = await prisma.productColor.create({
+        data: {
+          productId: newProduct.id,
+          colorName: colorData.colorName,
+          colorCode: colorData.colorCode,
+        },
+      });
+
+      // Create variants for this color
+      if (colorData.variants && colorData.variants.length > 0) {
+        await prisma.productVariant.createMany({
+          data: colorData.variants.map((variant) => ({
+            productColorId: color.id,
+            size: variant.size as any,
+            quantity: variant.quantity,
+          })),
+        });
+      }
+    }
+  }
+
+  // Fetch product with images and colors
   const productWithImages = await prisma.product.findUnique({
     where: { id: newProduct.id },
     include: {
       images: {
         orderBy: {
           imageOrder: 'asc',
+        },
+      },
+      colors: {
+        include: {
+          variants: {
+            orderBy: {
+              size: 'asc',
+            },
+          },
         },
       },
     },
@@ -154,10 +252,29 @@ export async function createProduct(product: {
     category: productWithImages.category,
     createdAt: productWithImages.createdAt.toISOString(),
     updatedAt: productWithImages.updatedAt.toISOString(),
-    productimg: productWithImages.images.map((img: any) => ({
-      id: img.id,
-      url: img.imageUrl.startsWith('http') ? img.imageUrl : img.imageUrl,
-      image_order: img.imageOrder,
-    })),
+    productimg: productWithImages.images.map((img: any) => {
+      let imageUrl = img.imageUrl;
+      // If it's not an external URL, ensure it starts with /
+      if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+        if (!imageUrl.startsWith('/')) {
+          imageUrl = `/${imageUrl}`;
+        }
+      }
+      return {
+        id: img.id,
+        url: imageUrl,
+        image_order: img.imageOrder,
+      };
+    }),
+    colors: productWithImages.colors?.map((color: any) => ({
+      id: color.id,
+      colorName: color.colorName,
+      colorCode: color.colorCode,
+      variants: color.variants.map((variant: any) => ({
+        id: variant.id,
+        size: variant.size,
+        quantity: variant.quantity,
+      })),
+    })) || [],
   };
 }

@@ -1,13 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FiX } from 'react-icons/fi';
-import type { Product } from '@/types/product';
+import { FiX, FiPlus, FiTrash2 } from 'react-icons/fi';
+import type { Product, ProductSize } from '@/types/product';
 
 interface ProductModalProps {
   product: Product | null;
   onClose: () => void;
 }
+
+interface ColorFormData {
+  colorName: string;
+  colorCode: string;
+  variants: Array<{
+    size: ProductSize;
+    quantity: number;
+  }>;
+}
+
+const sizes: ProductSize[] = ['S', 'M', 'L', 'XL', 'X2XL', 'X3XL'];
+const sizeLabels: Record<ProductSize, string> = {
+  S: 'S',
+  M: 'M',
+  L: 'L',
+  XL: 'XL',
+  X2XL: '2XL',
+  X3XL: '3XL',
+};
 
 const ProductModal = ({ product, onClose }: ProductModalProps) => {
   const [formData, setFormData] = useState({
@@ -18,6 +37,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
     category: 'men' as 'men' | 'women',
     images: [] as string[],
   });
+  const [colors, setColors] = useState<ColorFormData[]>([]);
   const [loading, setLoading] = useState(false);
   const [imageInput, setImageInput] = useState('');
 
@@ -31,6 +51,18 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
         category: product.category,
         images: product.productimg?.map((img) => img.url) || [],
       });
+      setColors(
+        product.colors?.map((color) => ({
+          colorName: color.colorName,
+          colorCode: color.colorCode,
+          variants: color.variants.map((v) => ({
+            size: v.size,
+            quantity: v.quantity,
+          })),
+        })) || []
+      );
+    } else {
+      setColors([]);
     }
   }, [product]);
 
@@ -45,13 +77,21 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
       const method = product ? 'PUT' : 'POST';
 
       // Ensure images is always an array and filter out empty values
-      const imagesToSend = Array.isArray(formData.images) 
+      const imagesToSend = Array.isArray(formData.images)
         ? formData.images.filter((url) => url && url.trim() !== '')
         : [];
 
       const dataToSend = {
         ...formData,
         images: imagesToSend,
+        colors: colors.map((color) => ({
+          colorName: color.colorName,
+          colorCode: color.colorCode,
+          variants: color.variants.map((v) => ({
+            size: v.size,
+            quantity: v.quantity,
+          })),
+        })),
       };
 
       console.log('=== SENDING PRODUCT DATA ===');
@@ -102,6 +142,63 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
       ...formData,
       images: formData.images.filter((_, i) => i !== index),
     });
+  };
+
+  const handleAddColor = () => {
+    setColors([
+      ...colors,
+      {
+        colorName: '',
+        colorCode: '#000000',
+        variants: [],
+      },
+    ]);
+  };
+
+  const handleRemoveColor = (index: number) => {
+    setColors(colors.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateColor = (index: number, field: 'colorName' | 'colorCode', value: string) => {
+    const newColors = [...colors];
+    newColors[index] = { ...newColors[index], [field]: value };
+    setColors(newColors);
+  };
+
+  const handleAddVariant = (colorIndex: number) => {
+    const newColors = [...colors];
+    const availableSizes = sizes.filter(
+      (size) => !newColors[colorIndex].variants.some((v) => v.size === size)
+    );
+    if (availableSizes.length > 0) {
+      newColors[colorIndex].variants.push({
+        size: availableSizes[0],
+        quantity: 0,
+      });
+      setColors(newColors);
+    }
+  };
+
+  const handleRemoveVariant = (colorIndex: number, variantIndex: number) => {
+    const newColors = [...colors];
+    newColors[colorIndex].variants = newColors[colorIndex].variants.filter(
+      (_, i) => i !== variantIndex
+    );
+    setColors(newColors);
+  };
+
+  const handleUpdateVariant = (
+    colorIndex: number,
+    variantIndex: number,
+    field: 'size' | 'quantity',
+    value: ProductSize | number
+  ) => {
+    const newColors = [...colors];
+    newColors[colorIndex].variants[variantIndex] = {
+      ...newColors[colorIndex].variants[variantIndex],
+      [field]: value,
+    };
+    setColors(newColors);
   };
 
   return (
@@ -243,8 +340,8 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                         url.startsWith('http://') || url.startsWith('https://')
                           ? url
                           : url.startsWith('/')
-                          ? url
-                          : `/${url}`
+                            ? url
+                            : `/${url}`
                       }
                       alt={`Image ${index + 1}`}
                       className="w-full h-full object-cover"
@@ -263,6 +360,135 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Colors and Variants Section */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                الألوان والمقاسات / Colors & Sizes
+              </label>
+              <button
+                type="button"
+                onClick={handleAddColor}
+                className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-1"
+              >
+                <FiPlus className="w-4 h-4" />
+                إضافة لون
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {colors.map((color, colorIndex) => (
+                <div
+                  key={colorIndex}
+                  className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <input
+                      type="text"
+                      placeholder="اسم اللون (مثال: أحمر)"
+                      value={color.colorName}
+                      onChange={(e) =>
+                        handleUpdateColor(colorIndex, 'colorName', e.target.value)
+                      }
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    <input
+                      type="color"
+                      value={color.colorCode}
+                      onChange={(e) =>
+                        handleUpdateColor(colorIndex, 'colorCode', e.target.value)
+                      }
+                      className="w-16 h-10 rounded border border-gray-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveColor(colorIndex)}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-medium text-gray-600">
+                        المقاسات والكميات
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleAddVariant(colorIndex)}
+                        className="px-2 py-1 text-xs bg-primary-500 text-white rounded hover:bg-primary-600 transition-colors flex items-center gap-1"
+                      >
+                        <FiPlus className="w-3 h-3" />
+                        إضافة مقاس
+                      </button>
+                    </div>
+
+                    {color.variants.map((variant, variantIndex) => (
+                      <div
+                        key={variantIndex}
+                        className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200"
+                      >
+                        <select
+                          value={variant.size}
+                          onChange={(e) =>
+                            handleUpdateVariant(
+                              colorIndex,
+                              variantIndex,
+                              'size',
+                              e.target.value as ProductSize
+                            )
+                          }
+                          className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                          {sizes.map((size) => (
+                            <option key={size} value={size}>
+                              {sizeLabels[size]}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder="الكمية"
+                          value={variant.quantity}
+                          onChange={(e) =>
+                            handleUpdateVariant(
+                              colorIndex,
+                              variantIndex,
+                              'quantity',
+                              parseInt(e.target.value) || 0
+                            )
+                          }
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVariant(colorIndex, variantIndex)}
+                          className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                        >
+                          <FiX className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+
+                    {color.variants.length === 0 && (
+                      <p className="text-xs text-gray-400 text-center py-2">
+                        لا توجد مقاسات مضافة بعد
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {colors.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4 border border-dashed border-gray-300 rounded-lg">
+                  لا توجد ألوان مضافة. المنتج بدون ألوان ومقاسات محددة.
+                </p>
+              )}
             </div>
           </div>
 

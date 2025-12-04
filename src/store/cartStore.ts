@@ -2,22 +2,48 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Product } from '@/types/product';
+import type { Product, ProductSize } from '@/types/product';
 
 export interface CartItem extends Product {
   quantity: number;
+  selectedColor?: number;
+  selectedSize?: ProductSize;
 }
 
 interface CartStore {
   cartItems: CartItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  increaseQuantity: (productId: number) => void;
-  decreaseQuantity: (productId: number) => void;
+  addToCart: (
+    product: Product,
+    selectedColor?: number,
+    selectedSize?: ProductSize
+  ) => void;
+  removeFromCart: (
+    productId: number,
+    selectedColor?: number,
+    selectedSize?: ProductSize
+  ) => void;
+  increaseQuantity: (
+    productId: number,
+    selectedColor?: number,
+    selectedSize?: ProductSize
+  ) => void;
+  decreaseQuantity: (
+    productId: number,
+    selectedColor?: number,
+    selectedSize?: ProductSize
+  ) => void;
   clearCart: () => void;
   getTotal: () => number;
-  getItemQuantity: (productId: number) => number;
-  isInCart: (productId: number) => boolean;
+  getItemQuantity: (
+    productId: number,
+    selectedColor?: number,
+    selectedSize?: ProductSize
+  ) => number;
+  isInCart: (
+    productId: number,
+    selectedColor?: number,
+    selectedSize?: ProductSize
+  ) => boolean;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -25,51 +51,81 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       cartItems: [],
 
-      addToCart: (product) => {
+      addToCart: (product, selectedColor, selectedSize) => {
         const cartItems = get().cartItems;
-        const existingItem = cartItems.find((item) => item.id === product.id);
+        const existingItem = cartItems.find(
+          (item) =>
+            item.id === product.id &&
+            item.selectedColor === selectedColor &&
+            item.selectedSize === selectedSize
+        );
 
         if (existingItem) {
           set({
             cartItems: cartItems.map((item) =>
-              item.id === product.id
+              item.id === product.id &&
+                item.selectedColor === selectedColor &&
+                item.selectedSize === selectedSize
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
             ),
           });
         } else {
           set({
-            cartItems: [...cartItems, { ...product, quantity: 1 }],
+            cartItems: [
+              ...cartItems,
+              { ...product, quantity: 1, selectedColor, selectedSize },
+            ],
           });
         }
       },
 
-      removeFromCart: (productId) => {
+      removeFromCart: (productId, selectedColor, selectedSize) => {
         set({
-          cartItems: get().cartItems.filter((item) => item.id !== productId),
-        });
-      },
-
-      increaseQuantity: (productId) => {
-        set({
-          cartItems: get().cartItems.map((item) =>
-            item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+          cartItems: get().cartItems.filter(
+            (item) =>
+              !(
+                item.id === productId &&
+                item.selectedColor === selectedColor &&
+                item.selectedSize === selectedSize
+              )
           ),
         });
       },
 
-      decreaseQuantity: (productId) => {
+      increaseQuantity: (productId, selectedColor, selectedSize) => {
+        set({
+          cartItems: get().cartItems.map((item) =>
+            item.id === productId &&
+              item.selectedColor === selectedColor &&
+              item.selectedSize === selectedSize
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          ),
+        });
+      },
+
+      decreaseQuantity: (productId, selectedColor, selectedSize) => {
         const cartItems = get().cartItems;
-        const item = cartItems.find((item) => item.id === productId);
+        const item = cartItems.find(
+          (item) =>
+            item.id === productId &&
+            item.selectedColor === selectedColor &&
+            item.selectedSize === selectedSize
+        );
 
         if (item && item.quantity > 1) {
           set({
             cartItems: cartItems.map((item) =>
-              item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
+              item.id === productId &&
+                item.selectedColor === selectedColor &&
+                item.selectedSize === selectedSize
+                ? { ...item, quantity: item.quantity - 1 }
+                : item
             ),
           });
         } else if (item && item.quantity === 1) {
-          get().removeFromCart(productId);
+          get().removeFromCart(productId, selectedColor, selectedSize);
         }
       },
 
@@ -84,13 +140,23 @@ export const useCartStore = create<CartStore>()(
         );
       },
 
-      getItemQuantity: (productId) => {
-        const item = get().cartItems.find((item) => item.id === productId);
+      getItemQuantity: (productId, selectedColor, selectedSize) => {
+        const item = get().cartItems.find(
+          (item) =>
+            item.id === productId &&
+            item.selectedColor === selectedColor &&
+            item.selectedSize === selectedSize
+        );
         return item ? item.quantity : 0;
       },
 
-      isInCart: (productId) => {
-        return get().cartItems.some((item) => item.id === productId);
+      isInCart: (productId, selectedColor, selectedSize) => {
+        return get().cartItems.some(
+          (item) =>
+            item.id === productId &&
+            item.selectedColor === selectedColor &&
+            item.selectedSize === selectedSize
+        );
       },
     }),
     {

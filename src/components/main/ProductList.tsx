@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
-import type { Product, ProductCategory } from '@/types/product';
+import type { Product, ProductCategory, ProductSize } from '@/types/product';
 import ProductCard from './ProductCard';
 import ProductDetails from './ProductDetails';
 import CartDrawer from '@/components/cart/CartDrawer';
@@ -14,6 +14,8 @@ const ProductList = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+  const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartSource, setCartSource] = useState<'button' | 'icon'>('icon');
@@ -41,19 +43,54 @@ const ProductList = () => {
     }
   };
 
-  const handleProductClick = (product: Product) => {
+  const handleProductClick = (
+    product: Product,
+    colorId?: number | null,
+    size?: ProductSize | null
+  ) => {
+    const fallbackColor =
+      product.colors && product.colors.length > 0 ? product.colors[0].id : null;
+
     setSelectedProduct(product);
+    setSelectedColorId(colorId !== undefined ? colorId : fallbackColor);
+    setSelectedSize(size !== undefined ? size : null);
     setIsDetailsOpen(true);
   };
 
-  const handleAddToCart = (product: Product) => {
-    addToCart(product);
-    setIsCartOpen(true);
-    setCartSource('button');
-    setTimeout(() => {
-      setIsCartOpen(false);
-      setCartSource('icon');
-    }, 1700);
+  const handleAddToCart = (
+    product: Product,
+    colorId?: number | null,
+    size?: ProductSize | null
+  ) => {
+    const hasVariants = product.colors && product.colors.length > 0;
+
+    if (hasVariants) {
+      // لو اللون والمقاس متوفرين نضيف مباشرة ونفتح السلة
+      if (colorId && size) {
+        addToCart(product, colorId, size);
+        setIsCartOpen(true);
+        setCartSource('button');
+        setTimeout(() => {
+          setIsCartOpen(false);
+          setCartSource('icon');
+        }, 1700);
+      } else {
+        // لو لسه في اختيارات ناقصة نفتح الـ modal مع تمرير الموجود
+        setSelectedProduct(product);
+        setSelectedColorId(colorId ?? null);
+        setSelectedSize(size ?? null);
+        setIsDetailsOpen(true);
+      }
+    } else {
+      // المنتجات بدون مقاسات تضاف مباشرة ونفتح السلة
+      addToCart(product);
+      setIsCartOpen(true);
+      setCartSource('button');
+      setTimeout(() => {
+        setIsCartOpen(false);
+        setCartSource('icon');
+      }, 1700);
+    }
   };
 
   if (loading) {
@@ -91,11 +128,10 @@ const ProductList = () => {
             <button
               key={category.value}
               onClick={() => setSelectedCategory(category.value)}
-              className={`px-4 py-2 text-sm transition-colors ${
-                selectedCategory === category.value
-                  ? 'bg-primary-50 border border-primary-500 text-primary-600'
-                  : 'hover:bg-gray-50'
-              }`}
+              className={`px-4 py-2 text-sm transition-colors ${selectedCategory === category.value
+                ? 'bg-primary-50 border border-primary-500 text-primary-600'
+                : 'hover:bg-gray-50'
+                }`}
             >
               {category.label}
             </button>
@@ -108,34 +144,57 @@ const ProductList = () => {
           <ProductCard
             key={product.id}
             product={product}
-            onImageClick={() => handleProductClick(product)}
-            onAddToCart={() => handleAddToCart(product)}
+            onImageClick={(colorId, size) => handleProductClick(product, colorId, size)}
+            onAddToCart={(colorId, size) => handleAddToCart(product, colorId, size)}
           />
         ))}
       </div>
 
       {isDetailsOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
-            <button
-              onClick={() => setIsDetailsOpen(false)}
-              className="absolute top-4 right-4 p-2 hover:text-red-500 hover:rotate-180 transition-all"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4 animate-fadeIn"
+          onClick={() => setIsDetailsOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-4 md:p-6 lg:p-8 max-w-6xl w-full max-h-[96vh] overflow-hidden relative shadow-2xl flex flex-col animate-slideUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with close button */}
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-800">Product Details</h3>
+              <button
+                onClick={() => setIsDetailsOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-500 hover:text-gray-700"
+                aria-label="Close"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-            <ProductDetails product={selectedProduct} />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content area with scroll */}
+            <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+              <ProductDetails
+                product={selectedProduct}
+                initialColorId={selectedColorId}
+                initialSize={selectedSize}
+                onSelectionChange={(colorId, size) => {
+                  setSelectedColorId(colorId);
+                  setSelectedSize(size);
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
