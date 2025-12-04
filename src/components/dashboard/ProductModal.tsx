@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FiX, FiPlus, FiTrash2 } from 'react-icons/fi';
-import type { Product, ProductSize } from '@/types/product';
+import type { Product, ProductSize, ProductCategory } from '@/types/product';
 
 interface ProductModalProps {
   product: Product | null;
@@ -34,7 +34,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
     productPrice: '',
     productDiscription: '',
     productRating: '0',
-    category: 'men' as 'men' | 'women',
+    category: 'men' as ProductCategory,
     images: [] as string[],
   });
   const [colors, setColors] = useState<ColorFormData[]>([]);
@@ -277,13 +277,19 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  category: e.target.value as 'men' | 'women',
+                  category: e.target.value as ProductCategory,
                 })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="men">Men</option>
               <option value="women">Women</option>
+              <option value="children">Children</option>
+              <option value="accessories">Accessories</option>
+              <option value="shoes">Shoes</option>
+              <option value="electronics">Electronics</option>
+              <option value="beauty">Beauty</option>
+              <option value="home">Home</option>
             </select>
           </div>
 

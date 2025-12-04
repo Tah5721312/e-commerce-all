@@ -119,16 +119,22 @@ const ProductList = () => {
           </p>
         </div>
 
-        <div className="flex gap-2 border border-gray-300 rounded">
+        <div className="flex flex-wrap gap-2 border border-gray-300 rounded p-1">
           {[
             { value: 'all', label: 'All Products' },
-            { value: 'men', label: 'MEN category' },
-            { value: 'women', label: 'Women category' },
+            { value: 'men', label: 'Men' },
+            { value: 'women', label: 'Women' },
+            { value: 'children', label: 'Children' },
+            { value: 'accessories', label: 'Accessories' },
+            { value: 'shoes', label: 'Shoes' },
+            { value: 'electronics', label: 'Electronics' },
+            { value: 'beauty', label: 'Beauty' },
+            { value: 'home', label: 'Home' },
           ].map((category) => (
             <button
               key={category.value}
               onClick={() => setSelectedCategory(category.value)}
-              className={`px-4 py-2 text-sm transition-colors ${selectedCategory === category.value
+              className={`px-3 py-1.5 text-xs md:text-sm rounded-full transition-colors ${selectedCategory === category.value
                 ? 'bg-primary-50 border border-primary-500 text-primary-600'
                 : 'hover:bg-gray-50'
                 }`}

@@ -18,6 +18,7 @@ model Product {
   updatedAt          DateTime        @updatedAt @map("updated_at")
   colors             ProductColor[]
   images             ProductImage[]
+  reviews            ProductReview[]
 
   @@map("products")
 }
@@ -60,6 +61,19 @@ model ProductVariant {
   @@unique([productColorId, size])
   @@index([productColorId])
   @@map("product_variants")
+}
+
+model ProductReview {
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id")
+  author    String   @db.VarChar(100)
+  rating    Int      @default(5)
+  comment   String
+  createdAt DateTime @default(now()) @map("created_at")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_reviews")
 }
 
 model Order {
@@ -136,6 +150,12 @@ model HeroBanner {
 enum ProductCategory {
   men
   women
+  children
+  accessories
+  shoes
+  electronics
+  beauty
+  home
 }
 
 enum ProductSize {

@@ -1,4 +1,12 @@
-export type ProductCategory = 'men' | 'women';
+export type ProductCategory =
+  | 'men'
+  | 'women'
+  | 'children'
+  | 'accessories'
+  | 'shoes'
+  | 'electronics'
+  | 'beauty'
+  | 'home';
 export type ProductSize = 'S' | 'M' | 'L' | 'XL' | 'X2XL' | 'X3XL';
 
 export interface ProductImage {
@@ -20,6 +28,15 @@ export interface ProductColor {
   variants: ProductVariant[];
 }
 
+export interface ProductReview {
+  id: number;
+  productId: number;
+  author: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 export interface Product {
   id: number;
   productTitle: string;
@@ -29,6 +46,7 @@ export interface Product {
   category: ProductCategory;
   productimg: ProductImage[];
   colors?: ProductColor[];
+  reviews?: ProductReview[];
   createdAt?: string;
   updatedAt?: string;
 }

@@ -2,12 +2,46 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// دالة لحساب وتحديث متوسط التقييمات
+async function updateProductRating(productId: number): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const reviewDelegate = (prisma as any).productReview;
+
+  if (!reviewDelegate) {
+    console.warn('ProductReview model not found');
+    return;
+  }
+
+  // جلب جميع التقييمات للمنتج
+  const reviews = await reviewDelegate.findMany({
+    where: { productId },
+    select: { rating: true },
+  });
+
+  // حساب المتوسط
+  let averageRating = 0;
+  if (reviews.length > 0) {
+    const sum = reviews.reduce((acc: number, review: { rating: number }) => acc + review.rating, 0);
+    averageRating = sum / reviews.length;
+    // تقريب إلى رقمين عشريين
+    averageRating = Math.round(averageRating * 100) / 100;
+  }
+
+  // تحديث productRating في جدول المنتج
+  await prisma.product.update({
+    where: { id: productId },
+    data: {
+      productRating: averageRating,
+    },
+  });
+}
+
 interface ProductData {
   productTitle: string;
   productPrice: number;
   productDiscription: string;
   productRating: number;
-  category: 'men' | 'women';
+  category: 'men' | 'women' | 'children' | 'accessories' | 'shoes';
   images: string[];
 }
 
@@ -113,7 +147,7 @@ const sampleProducts: ProductData[] = [
     productPrice: 39.99,
     productDiscription: 'Unique NASA Space Bear print t-shirt. Casual loose short sleeve design.',
     productRating: 4.7,
-    category: 'men',
+    category: 'children',
     images: ['/images/more/Mens NASA Space Bear Print O-Neck Casual Loose Short Sleeve T-Shirt.png', '/images/more/Mens NASA Space Bear Print O-Neck Casual Loose Short Sleeve T-Shirt (1).jfif'],
   },
   {
@@ -191,9 +225,23 @@ async function main() {
   console.log('🗑️  Clearing existing data...');
   // First clear hero slides so constraints don't conflict
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).heroSlide?.deleteMany?.();
+  try {
+    await (prisma as any).heroSlide?.deleteMany?.();
+  } catch (e) {
+    console.warn('⚠️  Could not clear hero slides:', (e as Error).message);
+  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (prisma as any).heroBanner?.deleteMany?.();
+  try {
+    await (prisma as any).heroBanner?.deleteMany?.();
+  } catch (e) {
+    console.warn('⚠️  Could not clear hero banners:', (e as Error).message);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  try {
+    await (prisma as any).productReview?.deleteMany?.();
+  } catch (e) {
+    console.warn('⚠️  Could not clear product reviews:', (e as Error).message);
+  }
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
 
@@ -206,7 +254,8 @@ async function main() {
         productPrice: productData.productPrice,
         productDiscription: productData.productDiscription,
         productRating: productData.productRating,
-        category: productData.category,
+        // cast category to any to avoid mismatch with older Prisma enum typings
+        category: productData.category as any,
         images: {
           create: productData.images.map((imageUrl, index) => ({
             imageUrl,
@@ -261,6 +310,28 @@ async function main() {
       },
     });
     console.log(`✅ Created product: ${product.productTitle} (ID: ${product.id})`);
+
+    // Seed some reviews for each product
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (prisma as any).productReview?.createMany?.({
+      data: [
+        {
+          productId: product.id,
+          author: 'أحمد',
+          rating: Math.floor(Math.random() * 2) + 4,
+          comment: 'منتج ممتاز، الجودة عالية والتغليف رائع. أنصح بشرائه.',
+        },
+        {
+          productId: product.id,
+          author: 'سارة',
+          rating: Math.floor(Math.random() * 3) + 3,
+          comment: 'الخامة جيدة جداً والمقاس مناسب، لكن الشحن تأخر قليلاً.',
+        },
+      ],
+    });
+
+    // تحديث متوسط التقييمات للمنتج
+    await updateProductRating(product.id);
   }
 
   // Seed hero slides

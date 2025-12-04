@@ -2,7 +2,8 @@ import { prisma } from './prisma';
 import type { Product, ProductCategory } from '@/types/product';
 
 export async function getAllProducts(category?: ProductCategory): Promise<Product[]> {
-  const products = await prisma.product.findMany({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const products = await (prisma.product.findMany as any)({
     where: category ? { category } : undefined,
     include: {
       images: {
@@ -17,6 +18,11 @@ export async function getAllProducts(category?: ProductCategory): Promise<Produc
               size: 'asc',
             },
           },
+        },
+      },
+      reviews: {
+        orderBy: {
+          createdAt: 'desc',
         },
       },
     },
@@ -58,11 +64,20 @@ export async function getAllProducts(category?: ProductCategory): Promise<Produc
         quantity: variant.quantity,
       })),
     })) || [],
+    reviews: product.reviews?.map((review: any) => ({
+      id: review.id,
+      productId: review.productId,
+      author: review.author,
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: review.createdAt.toISOString(),
+    })) || [],
   }));
 }
 
 export async function getProductById(id: number): Promise<Product | null> {
-  const product = await prisma.product.findUnique({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const product = await (prisma.product.findUnique as any)({
     where: { id },
     include: {
       images: {
@@ -79,6 +94,11 @@ export async function getProductById(id: number): Promise<Product | null> {
           },
         },
       },
+      reviews: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
     },
   });
 
@@ -86,16 +106,19 @@ export async function getProductById(id: number): Promise<Product | null> {
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const productWithIncludes = product as any;
+
   return {
-    id: product.id,
-    productTitle: product.productTitle,
-    productPrice: Number(product.productPrice),
-    productDiscription: product.productDiscription,
-    productRating: Number(product.productRating),
-    category: product.category,
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
-    productimg: product.images.map((img: any) => {
+    id: productWithIncludes.id,
+    productTitle: productWithIncludes.productTitle,
+    productPrice: Number(productWithIncludes.productPrice),
+    productDiscription: productWithIncludes.productDiscription,
+    productRating: Number(productWithIncludes.productRating),
+    category: productWithIncludes.category,
+    createdAt: productWithIncludes.createdAt.toISOString(),
+    updatedAt: productWithIncludes.updatedAt.toISOString(),
+    productimg: productWithIncludes.images.map((img: any) => {
       let imageUrl = img.imageUrl;
       // If it's not an external URL, ensure it starts with /
       if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
@@ -109,7 +132,7 @@ export async function getProductById(id: number): Promise<Product | null> {
         image_order: img.imageOrder,
       };
     }),
-    colors: product.colors?.map((color: any) => ({
+    colors: productWithIncludes.colors?.map((color: any) => ({
       id: color.id,
       colorName: color.colorName,
       colorCode: color.colorCode,
@@ -119,7 +142,53 @@ export async function getProductById(id: number): Promise<Product | null> {
         quantity: variant.quantity,
       })),
     })) || [],
+    reviews:
+      productWithIncludes.reviews?.map((review: any) => ({
+        id: review.id,
+        productId: review.productId,
+        author: review.author,
+        rating: review.rating,
+        comment: review.comment,
+        createdAt: review.createdAt.toISOString(),
+      })) || [],
   };
+}
+
+/**
+ * حساب وتحديث متوسط التقييمات للمنتج
+ * @param productId - معرف المنتج
+ */
+export async function updateProductRating(productId: number): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const reviewDelegate = (prisma as any).productReview;
+
+  if (!reviewDelegate) {
+    console.warn('ProductReview model not found');
+    return;
+  }
+
+  // جلب جميع التقييمات للمنتج
+  const reviews = await reviewDelegate.findMany({
+    where: { productId },
+    select: { rating: true },
+  });
+
+  // حساب المتوسط
+  let averageRating = 0;
+  if (reviews.length > 0) {
+    const sum = reviews.reduce((acc: number, review: { rating: number }) => acc + review.rating, 0);
+    averageRating = sum / reviews.length;
+    // تقريب إلى رقمين عشريين
+    averageRating = Math.round(averageRating * 100) / 100;
+  }
+
+  // تحديث productRating في جدول المنتج
+  await prisma.product.update({
+    where: { id: productId },
+    data: {
+      productRating: averageRating,
+    },
+  });
 }
 
 export async function createProduct(product: {
@@ -159,7 +228,7 @@ export async function createProduct(product: {
       productPrice: product.productPrice,
       productDiscription: product.productDiscription,
       productRating: product.productRating,
-      category: product.category,
+      category: product.category as any,
     },
   });
 
