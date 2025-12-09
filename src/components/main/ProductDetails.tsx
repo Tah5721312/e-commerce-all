@@ -194,7 +194,7 @@ const ProductDetails = ({
         <div>
           <div className="mb-3">
             <span className="inline-block px-3 py-1.5 bg-primary-50 text-primary-600 rounded-full text-xs font-semibold capitalize">
-              {product.category}
+              {typeof product.category === 'string' ? product.category : product.category.name}
             </span>
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">

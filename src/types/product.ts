@@ -1,12 +1,14 @@
-export type ProductCategory =
-  | 'men'
-  | 'women'
-  | 'children'
-  | 'accessories'
-  | 'shoes'
-  | 'electronics'
-  | 'beauty'
-  | 'home';
+export interface ProductCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export type ProductSize = 'S' | 'M' | 'L' | 'XL' | 'X2XL' | 'X3XL';
 
 export interface ProductImage {
@@ -44,6 +46,7 @@ export interface Product {
   productDiscription: string;
   productRating: number;
   category: ProductCategory;
+  categoryId?: number;
   productimg: ProductImage[];
   colors?: ProductColor[];
   reviews?: ProductReview[];

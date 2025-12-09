@@ -29,17 +29,37 @@ const sizeLabels: Record<ProductSize, string> = {
 };
 
 const ProductModal = ({ product, onClose }: ProductModalProps) => {
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [formData, setFormData] = useState({
     productTitle: '',
     productPrice: '',
     productDiscription: '',
     productRating: '0',
-    category: 'men' as ProductCategory,
+    category: '',
     images: [] as string[],
   });
   const [colors, setColors] = useState<ColorFormData[]>([]);
   const [loading, setLoading] = useState(false);
   const [imageInput, setImageInput] = useState('');
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories?activeOnly=true');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data.data || []);
+        if (data.data && data.data.length > 0 && !formData.category) {
+          setFormData((prev) => ({ ...prev, category: data.data[0].slug }));
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -48,7 +68,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
         productPrice: product.productPrice.toString(),
         productDiscription: product.productDiscription,
         productRating: product.productRating.toString(),
-        category: product.category,
+        category: typeof product.category === 'string' ? product.category : product.category.slug,
         images: product.productimg?.map((img) => img.url) || [],
       });
       setColors(
@@ -81,8 +101,17 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
         ? formData.images.filter((url) => url && url.trim() !== '')
         : [];
 
+      // Find category by slug
+      const selectedCategory = categories.find(cat => cat.slug === formData.category);
+      if (!selectedCategory) {
+        alert('Please select a valid category');
+        setLoading(false);
+        return;
+      }
+
       const dataToSend = {
         ...formData,
+        category: selectedCategory.id, // Send category ID
         images: imagesToSend,
         colors: colors.map((color) => ({
           colorName: color.colorName,
@@ -277,19 +306,20 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  category: e.target.value as ProductCategory,
+                  category: e.target.value,
                 })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-              <option value="children">Children</option>
-              <option value="accessories">Accessories</option>
-              <option value="shoes">Shoes</option>
-              <option value="electronics">Electronics</option>
-              <option value="beauty">Beauty</option>
-              <option value="home">Home</option>
+              {categories.length === 0 ? (
+                <option value="">Loading categories...</option>
+              ) : (
+                categories.map((cat) => (
+                  <option key={cat.id} value={cat.slug}>
+                    {cat.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

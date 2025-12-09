@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllProducts, createProduct } from '@/lib/db/products';
-import type { ProductCategory } from '@/types/product';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const category = searchParams.get('category') as ProductCategory | null;
+    const category = searchParams.get('category'); // category slug
 
     const products = await getAllProducts(category || undefined);
 
@@ -73,9 +72,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!['men', 'women'].includes(category)) {
+    // Get category by slug or ID
+    const { prisma } = await import('@/lib/db/prisma');
+    let categoryRecord;
+    
+    if (typeof category === 'number' || !isNaN(Number(category))) {
+      categoryRecord = await prisma.productCategory.findUnique({
+        where: { id: Number(category) },
+      });
+    } else {
+      categoryRecord = await prisma.productCategory.findUnique({
+        where: { slug: category },
+      });
+    }
+
+    if (!categoryRecord) {
       return NextResponse.json(
-        { error: 'Invalid category. Must be "men" or "women"' },
+        { error: 'Category not found' },
         { status: 400 }
       );
     }
@@ -93,7 +106,7 @@ export async function POST(request: NextRequest) {
       productPrice: parseFloat(productPrice),
       productDiscription,
       productRating: parseFloat(productRating) || 0,
-      category: category as ProductCategory,
+      categoryId: categoryRecord.id,
       images: imagesArray,
       colors: colors || [],
     });

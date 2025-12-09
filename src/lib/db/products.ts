@@ -1,11 +1,22 @@
 import { prisma } from './prisma';
 import type { Product, ProductCategory } from '@/types/product';
 
-export async function getAllProducts(category?: ProductCategory): Promise<Product[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const products = await (prisma.product.findMany as any)({
-    where: category ? { category } : undefined,
+export async function getAllProducts(categorySlug?: string): Promise<Product[]> {
+  const where: any = {};
+  
+  if (categorySlug) {
+    const category = await prisma.productCategory.findUnique({
+      where: { slug: categorySlug },
+    });
+    if (category) {
+      where.categoryId = category.id;
+    }
+  }
+
+  const products = await prisma.product.findMany({
+    where,
     include: {
+      category: true,
       images: {
         orderBy: {
           imageOrder: 'asc',
@@ -37,7 +48,17 @@ export async function getAllProducts(category?: ProductCategory): Promise<Produc
     productPrice: Number(product.productPrice),
     productDiscription: product.productDiscription,
     productRating: Number(product.productRating),
-    category: product.category,
+    category: {
+      id: product.category.id,
+      name: product.category.name,
+      slug: product.category.slug,
+      description: product.category.description,
+      isActive: product.category.isActive,
+      sortOrder: product.category.sortOrder,
+      createdAt: product.category.createdAt.toISOString(),
+      updatedAt: product.category.updatedAt.toISOString(),
+    },
+    categoryId: product.categoryId,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
     productimg: product.images.map((img: any) => {
@@ -76,10 +97,10 @@ export async function getAllProducts(category?: ProductCategory): Promise<Produc
 }
 
 export async function getProductById(id: number): Promise<Product | null> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const product = await (prisma.product.findUnique as any)({
+  const product = await prisma.product.findUnique({
     where: { id },
     include: {
+      category: true,
       images: {
         orderBy: {
           imageOrder: 'asc',
@@ -106,19 +127,26 @@ export async function getProductById(id: number): Promise<Product | null> {
     return null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const productWithIncludes = product as any;
-
   return {
-    id: productWithIncludes.id,
-    productTitle: productWithIncludes.productTitle,
-    productPrice: Number(productWithIncludes.productPrice),
-    productDiscription: productWithIncludes.productDiscription,
-    productRating: Number(productWithIncludes.productRating),
-    category: productWithIncludes.category,
-    createdAt: productWithIncludes.createdAt.toISOString(),
-    updatedAt: productWithIncludes.updatedAt.toISOString(),
-    productimg: productWithIncludes.images.map((img: any) => {
+    id: product.id,
+    productTitle: product.productTitle,
+    productPrice: Number(product.productPrice),
+    productDiscription: product.productDiscription,
+    productRating: Number(product.productRating),
+    category: {
+      id: product.category.id,
+      name: product.category.name,
+      slug: product.category.slug,
+      description: product.category.description,
+      isActive: product.category.isActive,
+      sortOrder: product.category.sortOrder,
+      createdAt: product.category.createdAt.toISOString(),
+      updatedAt: product.category.updatedAt.toISOString(),
+    },
+    categoryId: product.categoryId,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
+    productimg: product.images.map((img) => {
       let imageUrl = img.imageUrl;
       // If it's not an external URL, ensure it starts with /
       if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
@@ -132,18 +160,18 @@ export async function getProductById(id: number): Promise<Product | null> {
         image_order: img.imageOrder,
       };
     }),
-    colors: productWithIncludes.colors?.map((color: any) => ({
+    colors: product.colors?.map((color) => ({
       id: color.id,
       colorName: color.colorName,
       colorCode: color.colorCode,
-      variants: color.variants.map((variant: any) => ({
+      variants: color.variants.map((variant) => ({
         id: variant.id,
         size: variant.size,
         quantity: variant.quantity,
       })),
     })) || [],
     reviews:
-      productWithIncludes.reviews?.map((review: any) => ({
+      product.reviews?.map((review) => ({
         id: review.id,
         productId: review.productId,
         author: review.author,
@@ -196,7 +224,7 @@ export async function createProduct(product: {
   productPrice: number;
   productDiscription: string;
   productRating: number;
-  category: ProductCategory;
+  categoryId: number;
   images: string[];
   colors?: Array<{
     colorName: string;
@@ -228,7 +256,7 @@ export async function createProduct(product: {
       productPrice: product.productPrice,
       productDiscription: product.productDiscription,
       productRating: product.productRating,
-      category: product.category as any,
+      categoryId: product.categoryId,
     },
   });
 
@@ -282,6 +310,7 @@ export async function createProduct(product: {
   const productWithImages = await prisma.product.findUnique({
     where: { id: newProduct.id },
     include: {
+      category: true,
       images: {
         orderBy: {
           imageOrder: 'asc',
@@ -318,7 +347,17 @@ export async function createProduct(product: {
     productPrice: Number(productWithImages.productPrice),
     productDiscription: productWithImages.productDiscription,
     productRating: Number(productWithImages.productRating),
-    category: productWithImages.category,
+    category: {
+      id: productWithImages.category.id,
+      name: productWithImages.category.name,
+      slug: productWithImages.category.slug,
+      description: productWithImages.category.description,
+      isActive: productWithImages.category.isActive,
+      sortOrder: productWithImages.category.sortOrder,
+      createdAt: productWithImages.category.createdAt.toISOString(),
+      updatedAt: productWithImages.category.updatedAt.toISOString(),
+    },
+    categoryId: productWithImages.categoryId,
     createdAt: productWithImages.createdAt.toISOString(),
     updatedAt: productWithImages.updatedAt.toISOString(),
     productimg: productWithImages.images.map((img: any) => {

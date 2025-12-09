@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProductById } from '@/lib/db/products';
 import { prisma } from '@/lib/db/prisma';
-import type { ProductCategory } from '@/types/product';
 
 export async function GET(
   request: NextRequest,
@@ -77,6 +76,25 @@ export async function PUT(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
+    // Get category by slug or ID
+    let categoryId = existingProduct.categoryId;
+    if (category) {
+      let categoryRecord;
+      if (typeof category === 'number' || !isNaN(Number(category))) {
+        categoryRecord = await prisma.productCategory.findUnique({
+          where: { id: Number(category) },
+        });
+      } else {
+        categoryRecord = await prisma.productCategory.findUnique({
+          where: { slug: category },
+        });
+      }
+      
+      if (categoryRecord) {
+        categoryId = categoryRecord.id;
+      }
+    }
+
     // Update product
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
@@ -85,7 +103,7 @@ export async function PUT(
         productPrice: parseFloat(productPrice),
         productDiscription,
         productRating: parseFloat(productRating) || 0,
-        category: category as ProductCategory,
+        ...(categoryId && { categoryId }),
       },
       include: {
         images: {
@@ -165,6 +183,7 @@ export async function PUT(
       const productWithImages = await prisma.product.findUnique({
         where: { id: productId },
         include: {
+          category: true,
           images: {
             orderBy: {
               imageOrder: 'asc',
@@ -189,7 +208,17 @@ export async function PUT(
           productPrice: Number(productWithImages!.productPrice),
           productDiscription: productWithImages!.productDiscription,
           productRating: Number(productWithImages!.productRating),
-          category: productWithImages!.category,
+          category: {
+            id: productWithImages!.category.id,
+            name: productWithImages!.category.name,
+            slug: productWithImages!.category.slug,
+            description: productWithImages!.category.description,
+            isActive: productWithImages!.category.isActive,
+            sortOrder: productWithImages!.category.sortOrder,
+            createdAt: productWithImages!.category.createdAt.toISOString(),
+            updatedAt: productWithImages!.category.updatedAt.toISOString(),
+          },
+          categoryId: productWithImages!.categoryId,
           createdAt: productWithImages!.createdAt.toISOString(),
           updatedAt: productWithImages!.updatedAt.toISOString(),
           productimg: productWithImages!.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
@@ -215,6 +244,7 @@ export async function PUT(
     const productWithColors = await prisma.product.findUnique({
       where: { id: productId },
       include: {
+        category: true,
         images: {
           orderBy: {
             imageOrder: 'asc',
@@ -239,7 +269,17 @@ export async function PUT(
         productPrice: Number(productWithColors!.productPrice),
         productDiscription: productWithColors!.productDiscription,
         productRating: Number(productWithColors!.productRating),
-        category: productWithColors!.category,
+        category: {
+          id: productWithColors!.category.id,
+          name: productWithColors!.category.name,
+          slug: productWithColors!.category.slug,
+          description: productWithColors!.category.description,
+          isActive: productWithColors!.category.isActive,
+          sortOrder: productWithColors!.category.sortOrder,
+          createdAt: productWithColors!.category.createdAt.toISOString(),
+          updatedAt: productWithColors!.category.updatedAt.toISOString(),
+        },
+        categoryId: productWithColors!.categoryId,
         createdAt: productWithColors!.createdAt.toISOString(),
         updatedAt: productWithColors!.updatedAt.toISOString(),
         productimg: productWithColors!.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({

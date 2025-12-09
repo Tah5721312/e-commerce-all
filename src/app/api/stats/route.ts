@@ -14,13 +14,24 @@ export async function GET() {
     const totalProducts = await prisma.product.count();
 
     // Get products by category
-    const menProducts = await prisma.product.count({
-      where: { category: 'men' },
+    const menCategory = await prisma.productCategory.findUnique({
+      where: { slug: 'men' },
+    });
+    const womenCategory = await prisma.productCategory.findUnique({
+      where: { slug: 'women' },
     });
 
-    const womenProducts = await prisma.product.count({
-      where: { category: 'women' },
-    });
+    const menProducts = menCategory
+      ? await prisma.product.count({
+          where: { categoryId: menCategory.id },
+        })
+      : 0;
+
+    const womenProducts = womenCategory
+      ? await prisma.product.count({
+          where: { categoryId: womenCategory.id },
+        })
+      : 0;
 
     // Get average price
     const avgPriceResult = await prisma.product.aggregate({

@@ -13,14 +13,32 @@ model Product {
   productPrice       Decimal         @map("product_price") @db.Decimal(10, 2)
   productDiscription String          @map("product_discription")
   productRating      Decimal         @default(0) @map("product_rating") @db.Decimal(3, 2)
-  category           ProductCategory
+  categoryId         Int             @map("category_id")
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
+  category           ProductCategory @relation(fields: [categoryId], references: [id])
   colors             ProductColor[]
   images             ProductImage[]
   reviews            ProductReview[]
 
+  @@index([categoryId])
   @@map("products")
+}
+
+model ProductCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  isActive    Boolean   @default(true) @map("is_active")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  products    Product[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("product_categories")
 }
 
 model ProductImage {
@@ -145,17 +163,6 @@ model HeroBanner {
 
   @@index([sortOrder])
   @@map("hero_banners")
-}
-
-enum ProductCategory {
-  men
-  women
-  children
-  accessories
-  shoes
-  electronics
-  beauty
-  home
 }
 
 enum ProductSize {

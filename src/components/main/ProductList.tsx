@@ -10,6 +10,7 @@ import CartButton from '@/components/cart/CartButton';
 
 const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -23,8 +24,24 @@ const ProductList = () => {
   const addToCart = useCartStore((state) => state.addToCart);
 
   useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     fetchProducts();
   }, [selectedCategory]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories?activeOnly=true');
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -120,26 +137,25 @@ const ProductList = () => {
         </div>
 
         <div className="flex flex-wrap gap-2 border border-gray-300 rounded p-1">
-          {[
-            { value: 'all', label: 'All Products' },
-            { value: 'men', label: 'Men' },
-            { value: 'women', label: 'Women' },
-            { value: 'children', label: 'Children' },
-            { value: 'accessories', label: 'Accessories' },
-            { value: 'shoes', label: 'Shoes' },
-            { value: 'electronics', label: 'Electronics' },
-            { value: 'beauty', label: 'Beauty' },
-            { value: 'home', label: 'Home' },
-          ].map((category) => (
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`px-3 py-1.5 text-xs md:text-sm rounded-full transition-colors ${selectedCategory === 'all'
+              ? 'bg-primary-50 border border-primary-500 text-primary-600'
+              : 'hover:bg-gray-50'
+              }`}
+          >
+            All Products
+          </button>
+          {categories.map((category) => (
             <button
-              key={category.value}
-              onClick={() => setSelectedCategory(category.value)}
-              className={`px-3 py-1.5 text-xs md:text-sm rounded-full transition-colors ${selectedCategory === category.value
+              key={category.id}
+              onClick={() => setSelectedCategory(category.slug)}
+              className={`px-3 py-1.5 text-xs md:text-sm rounded-full transition-colors ${selectedCategory === category.slug
                 ? 'bg-primary-50 border border-primary-500 text-primary-600'
                 : 'hover:bg-gray-50'
                 }`}
             >
-              {category.label}
+              {category.name}
             </button>
           ))}
         </div>

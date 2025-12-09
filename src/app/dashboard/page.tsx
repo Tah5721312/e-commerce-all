@@ -21,6 +21,7 @@ import OrderModal from '@/components/dashboard/OrderModal';
 import OrderStatsCards from '@/components/dashboard/OrderStatsCards';
 import HeroContentTab from '@/components/dashboard/HeroContentTab';
 import HeroBannersTab from '@/components/dashboard/HeroBannersTab';
+import CategoriesTab from '@/components/dashboard/CategoriesTab';
 
 interface Stats {
   totalProducts: number;
@@ -63,7 +64,7 @@ interface OrderStats {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<
-    'products' | 'orders' | 'hero' | 'heroBanners'
+    'products' | 'orders' | 'hero' | 'heroBanners' | 'categories'
   >('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -303,6 +304,16 @@ export default function DashboardPage() {
             <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
             Hero Side Banners
           </button>
+          <button
+            onClick={() => setActiveTab('categories')}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'categories'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
+            Categories
+          </button>
         </div>
 
         {/* Products Tab */}
@@ -350,6 +361,15 @@ export default function DashboardPage() {
         {activeTab === 'heroBanners' && (
           <div className="mt-8">
             <HeroBannersTab />
+          </div>
+        )}
+
+        {activeTab === 'categories' && (
+          <div className="mt-8">
+            <CategoriesTab onCategoryChange={() => {
+              fetchProducts();
+              fetchStats();
+            }} />
           </div>
         )}
 

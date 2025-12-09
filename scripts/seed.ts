@@ -244,18 +244,46 @@ async function main() {
   }
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.productCategory.deleteMany();
+
+  // Create categories
+  console.log('📁 Creating categories...');
+  const categories = [
+    { name: 'Men', slug: 'men', description: 'Men\'s clothing and accessories', sortOrder: 1 },
+    { name: 'Women', slug: 'women', description: 'Women\'s clothing and accessories', sortOrder: 2 },
+    { name: 'Children', slug: 'children', description: 'Children\'s clothing and accessories', sortOrder: 3 },
+    { name: 'Accessories', slug: 'accessories', description: 'Fashion accessories', sortOrder: 4 },
+    { name: 'Shoes', slug: 'shoes', description: 'Footwear for all ages', sortOrder: 5 },
+    { name: 'Electronics', slug: 'electronics', description: 'Electronic devices and gadgets', sortOrder: 6 },
+    { name: 'Beauty', slug: 'beauty', description: 'Beauty and personal care products', sortOrder: 7 },
+    { name: 'Home', slug: 'home', description: 'Home and living products', sortOrder: 8 },
+  ];
+
+  const categoryMap: Record<string, number> = {};
+  for (const catData of categories) {
+    const category = await prisma.productCategory.create({
+      data: catData,
+    });
+    categoryMap[catData.slug] = category.id;
+    console.log(`✅ Created category: ${category.name} (ID: ${category.id})`);
+  }
 
   // Create products
   console.log('📦 Creating products...');
   for (const productData of sampleProducts) {
+    const categoryId = categoryMap[productData.category];
+    if (!categoryId) {
+      console.warn(`⚠️  Category "${productData.category}" not found, skipping product: ${productData.productTitle}`);
+      continue;
+    }
+
     const product = await prisma.product.create({
       data: {
         productTitle: productData.productTitle,
         productPrice: productData.productPrice,
         productDiscription: productData.productDiscription,
         productRating: productData.productRating,
-        // cast category to any to avoid mismatch with older Prisma enum typings
-        category: productData.category as any,
+        categoryId: categoryId,
         images: {
           create: productData.images.map((imageUrl, index) => ({
             imageUrl,
