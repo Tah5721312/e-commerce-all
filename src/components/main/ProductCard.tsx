@@ -2,24 +2,14 @@
 
 import { useState, useMemo } from 'react';
 import { FiShoppingCart, FiHeart } from 'react-icons/fi';
-import type { Product, ProductSize } from '@/types/product';
+import type { Product } from '@/types/product';
 import { useFavoritesStore } from '@/store/favoritesStore';
 
 interface ProductCardProps {
   product: Product;
-  onImageClick: (selectedColor?: number | null, selectedSize?: ProductSize | null) => void;
-  // يُستخدم لفتح الـ modal مع تمرير اللون والمقاس المختارين (إن وُجدوا)
-  onAddToCart: (selectedColor?: number | null, selectedSize?: ProductSize | null) => void;
+  onImageClick: () => void;
+  onAddToCart: () => void;
 }
-
-const sizeLabels: Record<ProductSize, string> = {
-  S: 'S',
-  M: 'M',
-  L: 'L',
-  XL: 'XL',
-  X2XL: '2XL',
-  X3XL: '3XL',
-};
 
 // دالة مساعدة لمعالجة URL الصور بشكل صحيح
 const getImageUrl = (url: string): string => {
@@ -47,26 +37,10 @@ const getImageUrl = (url: string): string => {
 const ProductCard = ({ product, onImageClick, onAddToCart }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  const [selectedColor, setSelectedColor] = useState<number | null>(
-    product.colors && product.colors.length > 0 ? product.colors[0].id : null
-  );
-  const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
 
   const isFavorite = useFavoritesStore((state) => state.isFavorite(product.id));
   const addFavorite = useFavoritesStore((state) => state.addFavorite);
   const removeFavorite = useFavoritesStore((state) => state.removeFavorite);
-
-  const selectedColorData = product.colors?.find((c) => c.id === selectedColor);
-  const hasVariants = product.colors && product.colors.length > 0;
-
-  // المقاسات المتاحة للّون المختار
-  const availableSizes =
-    selectedColorData?.variants?.filter((variant) => variant.quantity > 0) || [];
-
-  const handleAddToCart = () => {
-    // نمرّر الاختيارات الحالية للـ Parent وهو يقرر يضيف مباشرة أو يفتح الـ modal
-    onAddToCart(selectedColor, selectedSize);
-  };
 
   // معالجة URL الصورة
   const imageUrl = useMemo(() => {
@@ -90,7 +64,7 @@ const ProductCard = ({ product, onImageClick, onAddToCart }: ProductCardProps) =
     <div className="max-w-[333px] mt-6 group hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden bg-white border border-gray-100">
       <div
         className="relative h-[277px] cursor-pointer overflow-hidden bg-gray-100"
-        onClick={() => onImageClick(selectedColor, selectedSize)}
+        onClick={onImageClick}
       >
         {/* Placeholder أثناء التحميل */}
         {imageLoading && (
@@ -178,77 +152,16 @@ const ProductCard = ({ product, onImageClick, onAddToCart }: ProductCardProps) =
           )}
         </div>
 
-        {/* اختيار اللون */}
-        {hasVariants && product.colors && (
-          <div className="mb-3">
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-[11px] font-medium text-gray-600">
-                الألوان المتاحة:
-              </span>
-            </div>
-            <div className="flex gap-1 flex-wrap items-center">
-              {product.colors.slice(0, 5).map((color) => (
-                <button
-                  key={color.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedColor(color.id);
-                    setSelectedSize(null);
-                  }}
-                  className={`w-5 h-5 md:w-6 md:h-6 rounded-full border transition-all shadow-sm hover:scale-110 ${selectedColor === color.id
-                    ? 'border-primary-500 scale-110 ring-1 ring-primary-200'
-                    : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  style={{ backgroundColor: color.colorCode }}
-                  title={color.colorName}
-                />
-              ))}
-              {product.colors.length > 5 && (
-                <span className="text-[10px] text-gray-500 font-medium px-2 py-0.5 bg-gray-100 rounded-full">
-                  +{product.colors.length - 5}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* اختيار المقاس للّون المختار */}
-        {hasVariants && selectedColorData && availableSizes.length > 0 && (
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-medium text-gray-600">المقاسات المتاحة:</span>
-            </div>
-            {/* صف واحد مع سكرول أفقي لو المساحة ضيقة */}
-            <div className="flex gap-1 items-center overflow-x-auto scrollbar-hide">
-              {availableSizes.map((variant) => (
-                <button
-                  key={`${variant.id}-${variant.size}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedSize(variant.size);
-                  }}
-                  className={`px-2 py-1 rounded-full border text-[11px] font-medium whitespace-nowrap transition-all ${selectedSize === variant.size
-                    ? 'bg-primary-500 text-white border-primary-500'
-                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                    }`}
-                >
-                  {sizeLabels[variant.size]}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              handleAddToCart();
+              onAddToCart();
             }}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all duration-200 shadow-md hover:shadow-lg capitalize font-medium text-xs sm:text-sm whitespace-nowrap"
           >
             <FiShoppingCart className="w-4 h-4" />
-            {hasVariants ? 'Add to cart' : 'أضف للسلة'}
+            Add to cart
           </button>
 
           <button
@@ -271,7 +184,7 @@ const ProductCard = ({ product, onImageClick, onAddToCart }: ProductCardProps) =
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onImageClick(selectedColor, selectedSize);
+              onImageClick();
             }}
             className="px-4 py-2 text-xs font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
           >

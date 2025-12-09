@@ -60,46 +60,29 @@ const ProductList = () => {
     }
   };
 
-  const handleProductClick = (
-    product: Product,
-    colorId?: number | null,
-    size?: ProductSize | null
-  ) => {
+  const handleProductClick = (product: Product) => {
     const fallbackColor =
       product.colors && product.colors.length > 0 ? product.colors[0].id : null;
 
     setSelectedProduct(product);
-    setSelectedColorId(colorId !== undefined ? colorId : fallbackColor);
-    setSelectedSize(size !== undefined ? size : null);
+    setSelectedColorId(fallbackColor);
+    setSelectedSize(null);
     setIsDetailsOpen(true);
   };
 
-  const handleAddToCart = (
-    product: Product,
-    colorId?: number | null,
-    size?: ProductSize | null
-  ) => {
+  const handleAddToCart = (product: Product) => {
     const hasVariants = product.colors && product.colors.length > 0;
 
     if (hasVariants) {
-      // لو اللون والمقاس متوفرين نضيف مباشرة ونفتح السلة
-      if (colorId && size) {
-        addToCart(product, colorId, size);
-        setIsCartOpen(true);
-        setCartSource('button');
-        setTimeout(() => {
-          setIsCartOpen(false);
-          setCartSource('icon');
-        }, 1700);
-      } else {
-        // لو لسه في اختيارات ناقصة نفتح الـ modal مع تمرير الموجود
-        setSelectedProduct(product);
-        setSelectedColorId(colorId ?? null);
-        setSelectedSize(size ?? null);
-        setIsDetailsOpen(true);
-      }
+      // لو فيه ألوان ومقاسات نفتح الـ modal للاختيار
+      const fallbackColor =
+        product.colors && product.colors.length > 0 ? product.colors[0].id : null;
+      setSelectedProduct(product);
+      setSelectedColorId(fallbackColor);
+      setSelectedSize(null);
+      setIsDetailsOpen(true);
     } else {
-      // المنتجات بدون مقاسات تضاف مباشرة ونفتح السلة
+      // المنتجات بدون ألوان ومقاسات تضاف مباشرة ونفتح السلة
       addToCart(product);
       setIsCartOpen(true);
       setCartSource('button');
@@ -166,8 +149,8 @@ const ProductList = () => {
           <ProductCard
             key={product.id}
             product={product}
-            onImageClick={(colorId, size) => handleProductClick(product, colorId, size)}
-            onAddToCart={(colorId, size) => handleAddToCart(product, colorId, size)}
+            onImageClick={() => handleProductClick(product)}
+            onAddToCart={() => handleAddToCart(product)}
           />
         ))}
       </div>
