@@ -7,6 +7,8 @@ interface OrderItem {
   productTitle: string;
   productPrice: number;
   quantity: number;
+  colorId?: number;
+  size?: string;
 }
 
 interface CreateOrderRequest {
@@ -44,6 +46,55 @@ export async function POST(request: NextRequest) {
 
     // Generate unique order number
     const orderNumber = generateOrderNumber();
+
+    // Deduct quantities from product variants before creating order
+    for (const item of items) {
+      if (item.colorId && item.size) {
+        try {
+          // Find the product color
+          const productColor = await prisma.productColor.findFirst({
+            where: {
+              id: item.colorId,
+              productId: item.productId,
+            },
+          });
+
+          if (productColor) {
+            // Find the variant
+            const variant = await prisma.productVariant.findFirst({
+              where: {
+                productColorId: productColor.id,
+                size: item.size as any,
+              },
+            });
+
+            if (variant) {
+              // Check if enough stock
+              if (variant.quantity < item.quantity) {
+                return NextResponse.json(
+                  { error: `Insufficient stock for ${item.productTitle}. Available: ${variant.quantity}, Requested: ${item.quantity}` },
+                  { status: 400 }
+                );
+              }
+
+              // Deduct quantity
+              await prisma.productVariant.update({
+                where: { id: variant.id },
+                data: {
+                  quantity: variant.quantity - item.quantity,
+                },
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error deducting quantity:', error);
+          return NextResponse.json(
+            { error: `Failed to update stock for ${item.productTitle}` },
+            { status: 500 }
+          );
+        }
+      }
+    }
 
     // Create order with items
     const order = await prisma.order.create({

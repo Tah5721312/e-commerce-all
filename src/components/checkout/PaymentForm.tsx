@@ -108,17 +108,19 @@ function CheckoutForm({ total }: PaymentFormProps) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              customerInfo,
-              items: cartItems.map((item) => ({
-                productId: item.id,
-                productTitle: item.productTitle,
-                productPrice: item.productPrice,
-                quantity: item.quantity,
-              })),
-              totalAmount: total,
-              stripePaymentIntentId: paymentIntent.id,
-            }),
+              body: JSON.stringify({
+                customerInfo,
+                items: cartItems.map((item) => ({
+                  productId: item.id,
+                  productTitle: item.productTitle,
+                  productPrice: item.productPrice,
+                  quantity: item.quantity,
+                  colorId: item.selectedColor,
+                  size: item.selectedSize,
+                })),
+                totalAmount: total,
+                stripePaymentIntentId: paymentIntent.id,
+              }),
           });
 
           const orderData = await orderResponse.json();

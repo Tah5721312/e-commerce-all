@@ -89,6 +89,12 @@ const ProductDetails = ({
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
+  const getAvailableQuantity = () => {
+    if (!selectedColorData || !selectedSize) return null;
+    const variant = selectedColorData.variants.find((v) => v.size === selectedSize);
+    return variant?.quantity ?? null;
+  };
+
   if (!product || !product.productimg || product.productimg.length === 0) {
     return null;
   }
@@ -297,14 +303,14 @@ const ProductDetails = ({
                   >
                     <div className="flex items-center gap-2">
                       <span>{sizeLabels[size]}</span>
-                      {isAvailable && (
+                      {/* {isAvailable && (
                         <span
                           className={`text-xs px-1.5 py-0.5 rounded-full ${selectedSize === size ? 'bg-white/20' : 'bg-gray-100'
                             }`}
                         >
                           {quantity}
                         </span>
-                      )}
+                      )} */}
                     </div>
                   </button>
                 );
@@ -313,11 +319,17 @@ const ProductDetails = ({
           </div>
         )}
 
+
         {/* Add to Cart Section */}
         <div className="border-t border-gray-200 pt-6">
           {selectedColorData && selectedSize ? (
             isInCart ? (
               <div className="flex items-center justify-center sm:justify-start gap-4 bg-primary-50 px-6 py-4 rounded-xl border border-primary-200">
+                {(() => {
+                  const availableQuantity = getAvailableQuantity();
+                  const isMax = availableQuantity !== null && itemQuantity >= availableQuantity;
+                  return (
+                    <>
                 <button
                   onClick={() =>
                     decreaseQuantity(
@@ -341,10 +353,18 @@ const ProductDetails = ({
                       selectedSize || undefined
                     )
                   }
-                  className="p-2 hover:bg-primary-100 rounded-full transition-colors"
+                  disabled={isMax}
+                  className={`p-2 rounded-full transition-colors ${
+                    isMax
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-primary-100'
+                  }`}
                 >
                   <FiPlus className="w-5 h-5 text-primary-600" />
                 </button>
+                    </>
+                  );
+                })()}
               </div>
             ) : (
               <button

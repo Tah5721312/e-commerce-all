@@ -22,6 +22,51 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
   const getTotal = useCartStore((state) => state.getTotal);
 
   const [slideIn, setSlideIn] = useState(false);
+  const [variantQuantities, setVariantQuantities] = useState<Record<string, number>>({});
+
+  // جلب الكميات المتاحة من قاعدة البيانات
+  useEffect(() => {
+    const fetchQuantities = async () => {
+      const quantities: Record<string, number> = {};
+      
+      for (const item of cartItems) {
+        if (item.selectedColor && item.selectedSize) {
+          try {
+            const response = await fetch('/api/products/variants/get-quantity', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                productColorId: item.selectedColor,
+                size: item.selectedSize,
+              }),
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              const key = `${item.id}-${item.selectedColor}-${item.selectedSize}`;
+              quantities[key] = data.quantity;
+            }
+          } catch (error) {
+            console.error('Error fetching quantity:', error);
+          }
+        }
+      }
+      
+      setVariantQuantities(quantities);
+    };
+
+    if (cartItems.length > 0) {
+      fetchQuantities();
+    }
+  }, [cartItems]);
+
+  const getAvailableQuantity = (item: { id: number; selectedColor?: number; selectedSize?: string | null }) => {
+    if (!item.selectedColor || !item.selectedSize) return null;
+    const key = `${item.id}-${item.selectedColor}-${item.selectedSize}`;
+    return variantQuantities[key] ?? null;
+  };
 
   const handleCheckout = () => {
     onClose();
@@ -88,85 +133,98 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
               </div>
               <div className="border-b border-gray-300 mb-2" />
 
-              {cartItems.map((item) => (
-                <div
-                  key={`${item.id}-${item.selectedColor ?? 'noColor'}-${item.selectedSize ?? 'noSize'}`}
-                  className="border-b border-gray-300 py-2 px-1 mb-2"
-                >
-                  <div className="flex flex-col md:flex-row items-center gap-2">
-                    <div className="flex-[0.2]">
-                      {item.productimg && item.productimg[0] && (
-                        <Image
-                          src={
-                            item.productimg[0].url.startsWith('http://') ||
-                              item.productimg[0].url.startsWith('https://')
-                              ? item.productimg[0].url
-                              : item.productimg[0].url.startsWith('/')
+              {cartItems.map((item) => {
+                const availableQuantity = getAvailableQuantity(item);
+                const isMaxQuantity = availableQuantity !== null && item.quantity >= availableQuantity;
+                const exceedsAvailable = availableQuantity !== null && item.quantity > availableQuantity;
+                
+                return (
+                  <div
+                    key={`${item.id}-${item.selectedColor ?? 'noColor'}-${item.selectedSize ?? 'noSize'}`}
+                    className="border-b border-gray-300 py-2 px-1 mb-2"
+                  >
+                    <div className="flex flex-col md:flex-row items-center gap-2">
+                      <div className="flex-[0.2]">
+                        {item.productimg && item.productimg[0] && (
+                          <Image
+                            src={
+                              item.productimg[0].url.startsWith('http://') ||
+                                item.productimg[0].url.startsWith('https://')
                                 ? item.productimg[0].url
-                                : `/${item.productimg[0].url}`
+                                : item.productimg[0].url.startsWith('/')
+                                  ? item.productimg[0].url
+                                  : `/${item.productimg[0].url}`
+                            }
+                            alt={item.productTitle}
+                            width={50}
+                            height={50}
+                            className="w-10 h-10 md:w-12 md:h-12 object-cover rounded"
+                          />
+                        )}
+                      </div>
+
+                      <div className="flex-[0.2] text-center md:text-left">
+                        <p className="text-sm font-medium truncate">
+                          {item.productTitle}
+                        </p>
+                        {(item.selectedColor || item.selectedSize) && (
+                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                            {item.selectedColor && (
+                              <span>
+                                {item.colors?.find((c) => c.id === item.selectedColor)?.colorName ||
+                                  'Color'}
+                              </span>
+                            )}
+                            {item.selectedSize && (
+                              <span className="px-1.5 py-0.5 bg-gray-100 rounded">
+                                {item.selectedSize === 'X2XL'
+                                  ? '2XL'
+                                  : item.selectedSize === 'X3XL'
+                                    ? '3XL'
+                                    : item.selectedSize}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {exceedsAvailable && availableQuantity !== null && (
+                          <p className="text-xs text-red-600 mt-1">
+                            ⚠️ الكمية أكبر من المتاح ({availableQuantity} متاح)
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-[0.2] flex items-center justify-center gap-2">
+                        <button
+                          onClick={() =>
+                            increaseQuantity(
+                              item.id,
+                              item.selectedColor,
+                              item.selectedSize
+                            )
                           }
-                          alt={item.productTitle}
-                          width={50}
-                          height={50}
-                          className="w-10 h-10 md:w-12 md:h-12 object-cover rounded"
-                        />
-                      )}
-                    </div>
-
-                    <div className="flex-[0.2] text-center md:text-left">
-                      <p className="text-sm font-medium truncate">
-                        {item.productTitle}
-                      </p>
-                      {(item.selectedColor || item.selectedSize) && (
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                          {item.selectedColor && (
-                            <span>
-                              {item.colors?.find((c) => c.id === item.selectedColor)?.colorName ||
-                                'Color'}
-                            </span>
-                          )}
-                          {item.selectedSize && (
-                            <span className="px-1.5 py-0.5 bg-gray-100 rounded">
-                              {item.selectedSize === 'X2XL'
-                                ? '2XL'
-                                : item.selectedSize === 'X3XL'
-                                  ? '3XL'
-                                  : item.selectedSize}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex-[0.2] flex items-center justify-center gap-2">
-                      <button
-                        onClick={() =>
-                          increaseQuantity(
-                            item.id,
-                            item.selectedColor,
-                            item.selectedSize
-                          )
-                        }
-                        className="p-1 hover:bg-gray-100 rounded"
-                      >
-                        <FiPlus className="w-4 h-4" />
-                      </button>
-                      <span className="w-8 text-center font-bold text-primary">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          decreaseQuantity(
-                            item.id,
-                            item.selectedColor,
-                            item.selectedSize
-                          )
-                        }
-                        className="p-1 hover:bg-gray-100 rounded"
-                      >
-                        <FiMinus className="w-4 h-4" />
-                      </button>
-                    </div>
+                          disabled={isMaxQuantity}
+                          className={`p-1 rounded ${isMaxQuantity 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:bg-gray-100'}`}
+                        >
+                          <FiPlus className="w-4 h-4" />
+                        </button>
+                        <span className="w-8 text-center font-bold text-primary">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            decreaseQuantity(
+                              item.id,
+                              item.selectedColor,
+                              item.selectedSize
+                            )
+                          }
+                          className="p-1 hover:bg-gray-100 rounded"
+                        >
+                          <FiMinus className="w-4 h-4" />
+                        </button>
+                      </div>
 
                     <div className="flex-[0.2] text-center">
                       <p className="text-sm">${item.productPrice.toFixed(2)}</p>
@@ -189,7 +247,8 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               <div className="text-center mt-4 mb-4">
                 <button
