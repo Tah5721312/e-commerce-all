@@ -11,9 +11,27 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const category = searchParams.get('category'); // category slug
+    const category = searchParams.get('category');
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    const minRating = searchParams.get('minRating');
 
-    const products = await getAllProducts(category || undefined);
+    let products = await getAllProducts(category || undefined);
+
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      const min = minPrice ? parseFloat(minPrice) : 0;
+      const max = maxPrice ? parseFloat(maxPrice) : Infinity;
+      products = products.filter(
+        (p) => p.productPrice >= min && p.productPrice <= max
+      );
+    }
+
+    // Filter by minimum rating
+    if (minRating) {
+      const minRatingNum = parseFloat(minRating);
+      products = products.filter((p) => p.productRating >= minRatingNum);
+    }
 
     return NextResponse.json({
       data: products,
@@ -75,7 +93,7 @@ export async function POST(request: NextRequest) {
     // Get category by slug or ID
     const { prisma } = await import('@/lib/db/prisma');
     let categoryRecord;
-    
+
     if (typeof category === 'number' || !isNaN(Number(category))) {
       categoryRecord = await prisma.productCategory.findUnique({
         where: { id: Number(category) },

@@ -9,7 +9,12 @@ import ProductDetails from './ProductDetails';
 import CartDrawer from '@/components/cart/CartDrawer';
 import CartButton from '@/components/cart/CartButton';
 
-const ProductList = () => {
+interface ProductListProps {
+  priceRange: [number, number];
+  minRating: number;
+}
+
+const ProductList = ({ priceRange, minRating }: ProductListProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -33,7 +38,7 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategory]);
+  }, [selectedCategory, priceRange, minRating]);
 
   // Sync selected category with URL query (?category=slug)
   useEffect(() => {
@@ -56,9 +61,22 @@ const ProductList = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const categoryParam =
-        selectedCategory === 'all' ? '' : `?category=${selectedCategory}`;
-      const response = await fetch(`/api/products${categoryParam}`);
+      const params = new URLSearchParams();
+
+      if (selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+      if (priceRange[0] > 0 || priceRange[1] < 10000) {
+        params.append('minPrice', String(priceRange[0]));
+        params.append('maxPrice', String(priceRange[1]));
+      }
+      if (minRating > 0) {
+        params.append('minRating', String(minRating));
+      }
+
+      const queryString = params.toString();
+      const url = `/api/products${queryString ? `?${queryString}` : ''}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();
       setProducts(data.data || []);
@@ -122,14 +140,16 @@ const ProductList = () => {
   return (
     <div className="container mx-auto px-4 py-9">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h2 className="text-xl font-semibold">Selected Products</h2>
-          <p className="text-gray-600 font-light">
-            All our new arrivals in a exclusive brand selection
-          </p>
-        </div>
+        {pathname !== '/products' && (
+          <div>
+            <h2 className="text-xl font-semibold">Selected Products</h2>
+            <p className="text-gray-600 font-light">
+              All our new arrivals in a exclusive brand selection
+            </p>
+          </div>
+        )}
 
-        <div className="flex flex-wrap gap-2 border border-gray-300 rounded p-1">
+        <div className="flex flex-wrap gap-2 border border-gray-300 rounded p-1 items-center">
           <button
             onClick={() => {
               setSelectedCategory('all');
@@ -173,7 +193,7 @@ const ProductList = () => {
 
       {isDetailsOpen && selectedProduct && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4 animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-30 backdrop-blur-sm p-4 animate-fadeIn"
           onClick={() => setIsDetailsOpen(false)}
         >
           <div
