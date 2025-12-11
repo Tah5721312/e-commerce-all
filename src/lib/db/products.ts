@@ -3,11 +3,27 @@ import type { Product, ProductCategory } from '@/types/product';
 
 export async function getAllProducts(categorySlug?: string): Promise<Product[]> {
   const where: any = {};
-  
+
+  // Support filtering by either category slug or name
   if (categorySlug) {
-    const category = await prisma.productCategory.findUnique({
+    let category = await prisma.productCategory.findUnique({
       where: { slug: categorySlug },
     });
+
+    if (!category) {
+      // Try by exact name (unique)
+      category = await prisma.productCategory.findUnique({
+        where: { name: categorySlug },
+      });
+    }
+
+    if (!category) {
+      // Try case-insensitive match on name
+      category = await prisma.productCategory.findFirst({
+        where: { name: { equals: categorySlug, mode: 'insensitive' } },
+      });
+    }
+
     if (category) {
       where.categoryId = category.id;
     }

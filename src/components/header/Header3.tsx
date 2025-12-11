@@ -135,7 +135,9 @@ const Header3 = () => {
               categories.map((category) => (
                 <Link
                   key={category.id}
-                  href={`/category/${category.slug}`}
+                  href={`/products?category=${category.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-3"
                 >
                   <span className="text-[#D23F57]">

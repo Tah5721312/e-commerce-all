@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import type { Product, ProductCategory, ProductSize } from '@/types/product';
 import ProductCard from './ProductCard';
@@ -9,11 +10,14 @@ import CartDrawer from '@/components/cart/CartDrawer';
 import CartButton from '@/components/cart/CartButton';
 
 const ProductList = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>(() => searchParams.get('category') || 'all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
@@ -30,6 +34,12 @@ const ProductList = () => {
   useEffect(() => {
     fetchProducts();
   }, [selectedCategory]);
+
+  // Sync selected category with URL query (?category=slug)
+  useEffect(() => {
+    const urlCategory = searchParams.get('category') || 'all';
+    setSelectedCategory((prev) => (prev !== urlCategory ? urlCategory : prev));
+  }, [searchParams]);
 
   const fetchCategories = async () => {
     try {
@@ -121,7 +131,10 @@ const ProductList = () => {
 
         <div className="flex flex-wrap gap-2 border border-gray-300 rounded p-1">
           <button
-            onClick={() => setSelectedCategory('all')}
+            onClick={() => {
+              setSelectedCategory('all');
+              router.replace(pathname);
+            }}
             className={`px-3 py-1.5 text-xs md:text-sm rounded-full transition-colors ${selectedCategory === 'all'
               ? 'bg-primary-50 border border-primary-500 text-primary-600'
               : 'hover:bg-gray-50'
@@ -132,7 +145,10 @@ const ProductList = () => {
           {categories.map((category) => (
             <button
               key={category.id}
-              onClick={() => setSelectedCategory(category.slug)}
+              onClick={() => {
+                setSelectedCategory(category.slug);
+                router.replace(`${pathname}?category=${category.slug}`);
+              }}
               className={`px-3 py-1.5 text-xs md:text-sm rounded-full transition-colors ${selectedCategory === category.slug
                 ? 'bg-primary-50 border border-primary-500 text-primary-600'
                 : 'hover:bg-gray-50'
