@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
       productDiscription,
       productRating,
       category,
+      company,
       images,
       colors,
     } = body;
@@ -119,12 +120,24 @@ export async function POST(request: NextRequest) {
     console.log('Creating product with images:', imagesArray);
     console.log('Images count:', imagesArray.length);
 
+    // Get company if provided
+    let companyId = null;
+    if (company) {
+      const companyRecord = await prisma.company.findUnique({
+        where: { id: typeof company === 'number' ? company : parseInt(company) },
+      });
+      if (companyRecord) {
+        companyId = companyRecord.id;
+      }
+    }
+
     const product = await createProduct({
       productTitle,
       productPrice: parseFloat(productPrice),
       productDiscription,
       productRating: parseFloat(productRating) || 0,
       categoryId: categoryRecord.id,
+      companyId,
       images: imagesArray,
       colors: colors || [],
     });

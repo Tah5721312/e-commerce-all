@@ -11,6 +11,8 @@ import {
   FiStar,
   FiShoppingBag,
   FiLayers,
+  FiBriefcase,
+  FiBox,
 } from 'react-icons/fi';
 import type { Product } from '@/types/product';
 import ProductModal from '@/components/dashboard/ProductModal';
@@ -24,6 +26,8 @@ import HeroContentTab from '@/components/dashboard/HeroContentTab';
 import HeroBannersTab from '@/components/dashboard/HeroBannersTab';
 import CategoriesTab from '@/components/dashboard/CategoriesTab';
 import SizesTab from '@/components/dashboard/SizesTab';
+import CompaniesTab from '@/components/dashboard/CompaniesTab';
+import InventoryTab from '@/components/dashboard/InventoryTab';
 
 interface Stats {
   totalProducts: number;
@@ -66,7 +70,7 @@ interface OrderStats {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<
-    'products' | 'orders' | 'hero' | 'heroBanners' | 'categories' | 'sizes'
+    'products' | 'orders' | 'hero' | 'heroBanners' | 'categories' | 'sizes' | 'companies' | 'inventory'
   >('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -326,6 +330,26 @@ export default function DashboardPage() {
             <FiLayers className="inline-block w-5 h-5 mr-2" />
             Sizes / المقاسات
           </button>
+          <button
+            onClick={() => setActiveTab('companies')}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'companies'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            <FiBriefcase className="inline-block w-5 h-5 mr-2" />
+            Companies / الشركات
+          </button>
+          <button
+            onClick={() => setActiveTab('inventory')}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'inventory'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            <FiBox className="inline-block w-5 h-5 mr-2" />
+            Inventory / المخزون
+          </button>
         </div>
 
         {/* Products Tab */}
@@ -391,6 +415,18 @@ export default function DashboardPage() {
               fetchProducts();
               fetchStats();
             }} />
+          </div>
+        )}
+
+        {activeTab === 'companies' && (
+          <div className="mt-8">
+            <CompaniesTab />
+          </div>
+        )}
+
+        {activeTab === 'inventory' && (
+          <div className="mt-8">
+            <InventoryTab />
           </div>
         )}
 

@@ -33,6 +33,7 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
     where,
     include: {
       category: true,
+      company: true,
       images: {
         orderBy: {
           imageOrder: 'asc',
@@ -80,6 +81,20 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
       updatedAt: product.category.updatedAt.toISOString(),
     },
     categoryId: product.categoryId,
+    companyId: product.companyId,
+    company: product.company ? {
+      id: product.company.id,
+      name: product.company.name,
+      slug: product.company.slug,
+      description: product.company.description,
+      email: product.company.email,
+      phone: product.company.phone,
+      address: product.company.address,
+      website: product.company.website,
+      isActive: product.company.isActive,
+      createdAt: product.company.createdAt.toISOString(),
+      updatedAt: product.company.updatedAt.toISOString(),
+    } : null,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
     productimg: product.images.map((img: any) => {
@@ -98,6 +113,7 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
     }),
     colors: product.colors?.map((color: any) => ({
       id: color.id,
+      quantity: color.quantity || 0,
       colorName: color.colorName,
       colorCode: color.colorCode,
       variants: color.variants.map((variant: any) => ({
@@ -130,6 +146,7 @@ export async function getProductById(id: number): Promise<Product | null> {
     where: { id },
     include: {
       category: true,
+      company: true,
       images: {
         orderBy: {
           imageOrder: 'asc',
@@ -178,6 +195,20 @@ export async function getProductById(id: number): Promise<Product | null> {
       updatedAt: product.category.updatedAt.toISOString(),
     },
     categoryId: product.categoryId,
+    companyId: product.companyId,
+    company: product.company ? {
+      id: product.company.id,
+      name: product.company.name,
+      slug: product.company.slug,
+      description: product.company.description,
+      email: product.company.email,
+      phone: product.company.phone,
+      address: product.company.address,
+      website: product.company.website,
+      isActive: product.company.isActive,
+      createdAt: product.company.createdAt.toISOString(),
+      updatedAt: product.company.updatedAt.toISOString(),
+    } : null,
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
     productimg: product.images.map((img) => {
@@ -198,11 +229,22 @@ export async function getProductById(id: number): Promise<Product | null> {
       id: color.id,
       colorName: color.colorName,
       colorCode: color.colorCode,
-      variants: color.variants.map((variant) => ({
-        id: variant.id,
-        size: variant.size,
-        quantity: variant.quantity,
-      })),
+      quantity: color.quantity || 0,
+      variants: color.variants
+        .filter((variant) => variant.size !== null)
+        .map((variant) => ({
+          id: variant.id,
+          size: {
+            id: variant.size!.id,
+            name: variant.size!.name,
+            displayName: variant.size!.displayName,
+            sortOrder: variant.size!.sortOrder,
+            createdAt: variant.size!.createdAt.toISOString(),
+            updatedAt: variant.size!.updatedAt.toISOString(),
+          },
+          sizeId: variant.sizeId,
+          quantity: variant.quantity,
+        })),
     })) || [],
     reviews:
       product.reviews?.map((review) => ({
@@ -259,11 +301,13 @@ export async function createProduct(product: {
   productDiscription: string;
   productRating: number;
   categoryId: number;
+  companyId?: number | null;
   images: string[];
   colors?: Array<{
     colorName: string;
     colorCode: string;
-      variants: Array<{
+    quantity?: number; // For products without sizes
+    variants: Array<{
       sizeId: number;
       quantity: number;
     }>;
@@ -291,6 +335,7 @@ export async function createProduct(product: {
       productDiscription: product.productDiscription,
       productRating: product.productRating,
       categoryId: product.categoryId,
+      companyId: product.companyId || null,
     },
   });
 
@@ -319,11 +364,13 @@ export async function createProduct(product: {
   if (product.colors && product.colors.length > 0) {
     console.log('Creating colors for product:', newProduct.id);
     for (const colorData of product.colors) {
+      const hasVariants = colorData.variants && colorData.variants.length > 0;
       const color = await prisma.productColor.create({
         data: {
           productId: newProduct.id,
           colorName: colorData.colorName,
           colorCode: colorData.colorCode,
+          quantity: hasVariants ? 0 : (colorData.quantity || 0), // Set quantity only if no variants
         },
       });
 

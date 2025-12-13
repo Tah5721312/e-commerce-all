@@ -646,6 +646,7 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.productSize.deleteMany();
   await prisma.productCategory.deleteMany();
+  await prisma.company.deleteMany();
 
   // Create sizes
   console.log('📏 Creating sizes...');
@@ -716,6 +717,26 @@ async function main() {
     console.log(`✅ Created category: ${category.name} (ID: ${category.id})`);
   }
 
+  // Create companies
+  console.log('🏢 Creating companies...');
+  const companies = [
+    { name: 'Nike', slug: 'nike', description: 'Just Do It', email: 'info@nike.com', website: 'https://nike.com', isActive: true },
+    { name: 'Adidas', slug: 'adidas', description: 'Impossible is Nothing', email: 'info@adidas.com', website: 'https://adidas.com', isActive: true },
+    { name: 'Zara', slug: 'zara', description: 'Fast Fashion', email: 'info@zara.com', website: 'https://zara.com', isActive: true },
+    { name: 'H&M', slug: 'hm', description: 'Fashion & Quality', email: 'info@hm.com', website: 'https://hm.com', isActive: true },
+    { name: 'Apple', slug: 'apple', description: 'Think Different', email: 'info@apple.com', website: 'https://apple.com', isActive: true },
+    { name: 'Samsung', slug: 'samsung', description: 'Innovation for Everyone', email: 'info@samsung.com', website: 'https://samsung.com', isActive: true },
+  ];
+
+  const companyMap: Record<string, number> = {};
+  for (const companyData of companies) {
+    const company = await prisma.company.create({
+      data: companyData,
+    });
+    companyMap[companyData.slug] = company.id;
+    console.log(`✅ Created company: ${company.name} (ID: ${company.id})`);
+  }
+
   // Helper function to get sizes based on type
   const getSizesForType = (sizeType: 'clothing' | 'shoes' | 'none'): string[] => {
     if (sizeType === 'clothing') {
@@ -753,6 +774,9 @@ async function main() {
 
   // Create products
   console.log('📦 Creating products...');
+  const companySlugs = Object.keys(companyMap);
+  let companyIndex = 0;
+  
   for (const productData of sampleProducts) {
     const categoryId = categoryMap[productData.category];
     if (!categoryId) {
@@ -760,12 +784,17 @@ async function main() {
       continue;
     }
 
+    // Assign company randomly
+    const companyId = companyMap[companySlugs[companyIndex % companySlugs.length]] || null;
+    companyIndex++;
+
     const sizes = getSizesForType(productData.sizeType);
     const colors = getColorsForProduct(productData.category, productData.sizeType);
 
     // Create colors with variants
     const colorsData = colors.map((color) => {
-      const variants = sizes.map((sizeName) => {
+      const hasSizes = sizes.length > 0;
+      const variants = hasSizes ? sizes.map((sizeName) => {
         const sizeId = sizeMap[sizeName];
         if (!sizeId) {
           console.warn(`⚠️  Size "${sizeName}" not found for product: ${productData.productTitle}`);
@@ -776,11 +805,17 @@ async function main() {
           ? Math.floor(Math.random() * 10) + 3  // Shoes: 3-12
           : Math.floor(Math.random() * 20) + 5; // Clothing: 5-24
         return { sizeId, quantity };
-      }).filter((v): v is { sizeId: number; quantity: number } => v !== null);
+      }).filter((v): v is { sizeId: number; quantity: number } => v !== null) : [];
+
+      // For products without sizes, set quantity on color
+      const colorQuantity = !hasSizes 
+        ? (productData.sizeType === 'none' ? Math.floor(Math.random() * 50) + 10 : 0) // Accessories: 10-60
+        : 0;
 
       return {
         colorName: color.colorName,
         colorCode: color.colorCode,
+        quantity: colorQuantity,
         variants: {
           create: variants,
         },
@@ -794,6 +829,7 @@ async function main() {
         productDiscription: productData.productDiscription,
         productRating: productData.productRating,
         categoryId: categoryId,
+        companyId: companyId,
         images: {
           create: productData.images.map((imageUrl, index) => ({
             imageUrl,

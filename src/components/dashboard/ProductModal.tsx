@@ -12,6 +12,7 @@ interface ProductModalProps {
 interface ColorFormData {
   colorName: string;
   colorCode: string;
+  quantity: number; // For products without sizes
   variants: Array<{
     sizeId: number;
     quantity: number;
@@ -21,12 +22,14 @@ interface ColorFormData {
 const ProductModal = ({ product, onClose }: ProductModalProps) => {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [sizes, setSizes] = useState<ProductSize[]>([]);
+  const [companies, setCompanies] = useState<Array<{ id: number; name: string; slug: string }>>([]);
   const [formData, setFormData] = useState({
     productTitle: '',
     productPrice: '',
     productDiscription: '',
     productRating: '0',
     category: '',
+    company: '',
     images: [] as string[],
   });
   const [colors, setColors] = useState<ColorFormData[]>([]);
@@ -36,6 +39,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
   useEffect(() => {
     fetchCategories();
     fetchSizes();
+    fetchCompanies();
   }, []);
 
   const fetchCategories = async () => {
@@ -65,6 +69,18 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
     }
   };
 
+  const fetchCompanies = async () => {
+    try {
+      const response = await fetch('/api/companies?activeOnly=true');
+      if (response.ok) {
+        const data = await response.json();
+        setCompanies(data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching companies:', err);
+    }
+  };
+
   useEffect(() => {
     if (product) {
       setFormData({
@@ -73,12 +89,14 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
         productDiscription: product.productDiscription,
         productRating: product.productRating.toString(),
         category: typeof product.category === 'string' ? product.category : product.category.slug,
+        company: product.companyId?.toString() || '',
         images: product.productimg?.map((img) => img.url) || [],
       });
       setColors(
         product.colors?.map((color) => ({
           colorName: color.colorName,
           colorCode: color.colorCode,
+          quantity: (color as any).quantity || 0, // For products without variants
           variants: color.variants.map((v) => ({
             sizeId: v.size?.id || v.sizeId || 0,
             quantity: v.quantity,
@@ -116,10 +134,12 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
       const dataToSend = {
         ...formData,
         category: selectedCategory.id, // Send category ID
+        company: formData.company ? parseInt(formData.company) : null, // Send company ID or null
         images: imagesToSend,
         colors: colors.map((color) => ({
           colorName: color.colorName,
           colorCode: color.colorCode,
+          quantity: color.variants.length === 0 ? color.quantity : 0, // Only set quantity if no variants
           variants: color.variants.map((v) => ({
             sizeId: v.sizeId,
             quantity: v.quantity,
@@ -183,6 +203,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
       {
         colorName: '',
         colorCode: '#000000',
+        quantity: 0,
         variants: [],
       },
     ]);
@@ -192,7 +213,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
     setColors(colors.filter((_, i) => i !== index));
   };
 
-  const handleUpdateColor = (index: number, field: 'colorName' | 'colorCode', value: string) => {
+  const handleUpdateColor = (index: number, field: 'colorName' | 'colorCode' | 'quantity', value: string | number) => {
     const newColors = [...colors];
     newColors[index] = { ...newColors[index], [field]: value };
     setColors(newColors);
@@ -300,31 +321,56 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category *
-            </label>
-            <select
-              required
-              value={formData.category}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  category: e.target.value,
-                })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              {categories.length === 0 ? (
-                <option value="">Loading categories...</option>
-              ) : (
-                categories.map((cat) => (
-                  <option key={cat.id} value={cat.slug}>
-                    {cat.name}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category *
+              </label>
+              <select
+                required
+                value={formData.category}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    category: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                {categories.length === 0 ? (
+                  <option value="">Loading categories...</option>
+                ) : (
+                  categories.map((cat) => (
+                    <option key={cat.id} value={cat.slug}>
+                      {cat.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company / الشركة
+              </label>
+              <select
+                value={formData.company}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    company: e.target.value,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="">No Company / بدون شركة</option>
+                {companies.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
                   </option>
-                ))
-              )}
-            </select>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
@@ -443,6 +489,21 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                       }
                       className="w-16 h-10 rounded border border-gray-300"
                     />
+                    {color.variants.length === 0 && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-gray-600 whitespace-nowrap">الكمية:</label>
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          value={color.quantity}
+                          onChange={(e) =>
+                            handleUpdateColor(colorIndex, 'quantity', parseInt(e.target.value) || 0)
+                          }
+                          className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                      </div>
+                    )}
                     <button
                       type="button"
                       onClick={() => handleRemoveColor(colorIndex)}
@@ -467,53 +528,62 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                       </button>
                     </div>
 
-                    {color.variants.map((variant, variantIndex) => (
-                      <div
-                        key={variantIndex}
-                        className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200"
-                      >
-                        <select
-                          value={variant.sizeId}
-                          onChange={(e) =>
-                            handleUpdateVariant(
-                              colorIndex,
-                              variantIndex,
-                              'sizeId',
-                              parseInt(e.target.value)
-                            )
-                          }
-                          className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    {color.variants.map((variant, variantIndex) => {
+                      const selectedSize = sizes.find(s => s.id === variant.sizeId);
+                      return (
+                        <div
+                          key={variantIndex}
+                          className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200"
                         >
-                          {sizes.map((size) => (
-                            <option key={size.id} value={size.id}>
-                              {size.displayName}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          type="number"
-                          min="0"
-                          placeholder="الكمية"
-                          value={variant.quantity}
-                          onChange={(e) =>
-                            handleUpdateVariant(
-                              colorIndex,
-                              variantIndex,
-                              'quantity',
-                              parseInt(e.target.value) || 0
-                            )
-                          }
-                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveVariant(colorIndex, variantIndex)}
-                          className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
-                        >
-                          <FiX className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-xs font-medium text-gray-600 whitespace-nowrap">المقاس:</span>
+                            <select
+                              value={variant.sizeId}
+                              onChange={(e) =>
+                                handleUpdateVariant(
+                                  colorIndex,
+                                  variantIndex,
+                                  'sizeId',
+                                  parseInt(e.target.value)
+                                )
+                              }
+                              className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            >
+                              {sizes.map((size) => (
+                                <option key={size.id} value={size.id}>
+                                  {size.displayName}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-xs font-medium text-gray-600 whitespace-nowrap">الكمية:</span>
+                            <input
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              value={variant.quantity}
+                              onChange={(e) =>
+                                handleUpdateVariant(
+                                  colorIndex,
+                                  variantIndex,
+                                  'quantity',
+                                  parseInt(e.target.value) || 0
+                                )
+                              }
+                              className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveVariant(colorIndex, variantIndex)}
+                            className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <FiX className="w-4 h-4" />
+                          </button>
+                        </div>
+                      );
+                    })}
 
                     {color.variants.length === 0 && (
                       <p className="text-xs text-gray-400 text-center py-2">

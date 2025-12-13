@@ -70,7 +70,7 @@ const ProductDetails = ({
 
   const getSizeQuantity = (sizeId: number) => {
     if (!selectedColorData) return 0;
-    const variant = selectedColorData.variants.find((v) => v.size.id === sizeId);
+    const variant = selectedColorData.variants.find((v) => v.size?.id === sizeId);
     return variant?.quantity || 0;
   };
 
@@ -85,9 +85,20 @@ const ProductDetails = ({
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
   const getAvailableQuantity = () => {
-    if (!selectedColorData || !selectedSizeId) return null;
-    const variant = selectedColorData.variants.find((v) => v.size.id === selectedSizeId);
-    return variant?.quantity ?? null;
+    if (!selectedColorData) return null;
+    
+    // If product has sizes, get quantity from variant
+    if (selectedSizeId) {
+      const variant = selectedColorData.variants.find((v) => v.size?.id === selectedSizeId);
+      return variant?.quantity ?? null;
+    }
+    
+    // If product has no sizes, get quantity from color itself
+    if (availableSizes.length === 0) {
+      return (selectedColorData as any).quantity ?? null;
+    }
+    
+    return null;
   };
 
   if (!product || !product.productimg || product.productimg.length === 0) {
@@ -317,38 +328,46 @@ const ProductDetails = ({
                   const isMax = availableQuantity !== null && itemQuantity >= availableQuantity;
                   return (
                     <>
-                <button
-                  onClick={() =>
-                    decreaseQuantity(
-                      product.id,
-                      selectedColor || undefined,
-                      selectedSizeId || undefined
-                    )
-                  }
-                  className="p-2 hover:bg-primary-100 rounded-full transition-colors"
-                >
-                  <FiMinus className="w-5 h-5 text-primary-600" />
-                </button>
-                <span className="w-12 text-center font-bold text-primary-600 text-xl">
-                  {itemQuantity}
-                </span>
-                <button
-                  onClick={() =>
-                    increaseQuantity(
-                      product.id,
-                      selectedColor || undefined,
-                      selectedSizeId || undefined
-                    )
-                  }
-                  disabled={isMax}
-                  className={`p-2 rounded-full transition-colors ${
-                    isMax
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'hover:bg-primary-100'
-                  }`}
-                >
-                  <FiPlus className="w-5 h-5 text-primary-600" />
-                </button>
+                      <button
+                        onClick={() =>
+                          decreaseQuantity(
+                            product.id,
+                            selectedColor || undefined,
+                            selectedSizeId || undefined
+                          )
+                        }
+                        className="p-2 hover:bg-primary-100 rounded-full transition-colors"
+                      >
+                        <FiMinus className="w-5 h-5 text-primary-600" />
+                      </button>
+                      <span className="w-12 text-center font-bold text-primary-600 text-xl">
+                        {itemQuantity}
+                      </span>
+                      {availableQuantity !== null && (
+                        <span className="text-xs text-gray-500">
+                          / {availableQuantity}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => {
+                          const availableQuantity = getAvailableQuantity();
+                          if (availableQuantity !== null && itemQuantity < availableQuantity) {
+                            increaseQuantity(
+                              product.id,
+                              selectedColor || undefined,
+                              selectedSizeId || undefined
+                            );
+                          }
+                        }}
+                        disabled={isMax}
+                        className={`p-2 rounded-full transition-colors ${
+                          isMax
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'hover:bg-primary-100'
+                        }`}
+                      >
+                        <FiPlus className={`w-5 h-5 text-primary-600 ${isMax ? 'opacity-50' : ''}`} />
+                      </button>
                     </>
                   );
                 })()}

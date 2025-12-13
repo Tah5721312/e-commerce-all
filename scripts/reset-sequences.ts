@@ -17,6 +17,7 @@ async function resetSequences() {
     'product_reviews_id_seq',
     'hero_slides_id_seq',
     'hero_banners_id_seq',
+    'companies_id_seq',
   ];
 
   try {

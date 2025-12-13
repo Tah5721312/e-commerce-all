@@ -7,6 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Company {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  email       String?
+  phone       String?
+  address     String?
+  website     String?
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  products    Product[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("companies")
+}
+
 model Product {
   id                 Int             @id @default(autoincrement())
   productTitle       String          @map("product_title")
@@ -14,14 +33,17 @@ model Product {
   productDiscription String          @map("product_discription")
   productRating      Decimal         @default(0) @map("product_rating") @db.Decimal(3, 2)
   categoryId         Int             @map("category_id")
+  companyId          Int?            @map("company_id")
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
   category           ProductCategory @relation(fields: [categoryId], references: [id])
+  company            Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
   colors             ProductColor[]
   images             ProductImage[]
   reviews            ProductReview[]
 
   @@index([categoryId])
+  @@index([companyId])
   @@map("products")
 }
 
@@ -58,6 +80,7 @@ model ProductColor {
   productId Int              @map("product_id")
   colorName String           @map("color_name") @db.VarChar(100)
   colorCode String           @map("color_code") @db.VarChar(7)
+  quantity  Int              @default(0) // For products without sizes
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @updatedAt @map("updated_at")
   product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)

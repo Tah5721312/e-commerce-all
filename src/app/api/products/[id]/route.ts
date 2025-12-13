@@ -63,14 +63,16 @@ export async function PUT(
       productDiscription,
       productRating,
       category,
+      company,
       images,
       colors,
     } = body;
 
     // Check if product exists
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const existingProduct = await prisma.product.findUnique({
       where: { id: productId },
-    });
+    }) as any;
 
     if (!existingProduct) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
@@ -95,6 +97,23 @@ export async function PUT(
       }
     }
 
+    // Get company if provided
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let companyId: number | null = existingProduct?.companyId || null;
+    if (company !== undefined) {
+      if (company === null || company === '') {
+        companyId = null;
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const companyRecord = await (prisma as any).company?.findUnique({
+          where: { id: typeof company === 'number' ? company : parseInt(company) },
+        });
+        if (companyRecord) {
+          companyId = companyRecord.id;
+        }
+      }
+    }
+
     // Update product
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
@@ -104,6 +123,7 @@ export async function PUT(
         productDiscription,
         productRating: parseFloat(productRating) || 0,
         ...(categoryId && { categoryId }),
+        ...(companyId !== undefined && { companyId }),
       },
       include: {
         images: {
@@ -128,20 +148,30 @@ export async function PUT(
 
       // Create new colors and variants
       for (const colorData of colors) {
+        const hasVariants = colorData.variants && colorData.variants.length > 0;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const colorDataToCreate: any = {
+          productId,
+          colorName: colorData.colorName,
+          colorCode: colorData.colorCode,
+        };
+        
+        // Add quantity only if no variants (for products without sizes)
+        if (!hasVariants && colorData.quantity !== undefined) {
+          colorDataToCreate.quantity = colorData.quantity || 0;
+        }
+        
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const color = await prisma.productColor.create({
-          data: {
-            productId,
-            colorName: colorData.colorName,
-            colorCode: colorData.colorCode,
-          },
-        });
+          data: colorDataToCreate,
+        }) as any;
 
-        // Create variants for this color
-        if (colorData.variants && colorData.variants.length > 0) {
+        // Create variants for this color (if product has sizes)
+        if (hasVariants) {
           await prisma.productVariant.createMany({
             data: colorData.variants.map((variant: any) => ({
               productColorId: color.id,
-              size: variant.size,
+              sizeId: variant.sizeId || variant.size?.id,
               quantity: variant.quantity,
             })),
           });
@@ -192,8 +222,13 @@ export async function PUT(
           colors: {
             include: {
               variants: {
+                include: {
+                  size: true,
+                },
                 orderBy: {
-                  size: 'asc',
+                  size: {
+                    sortOrder: 'asc',
+                  },
                 },
               },
             },
@@ -253,8 +288,13 @@ export async function PUT(
         colors: {
           include: {
             variants: {
+              include: {
+                size: true,
+              },
               orderBy: {
-                size: 'asc',
+                size: {
+                  sortOrder: 'asc',
+                },
               },
             },
           },

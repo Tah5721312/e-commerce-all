@@ -31,10 +31,26 @@ export interface ProductVariant {
   quantity: number;
 }
 
+export interface Company {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  website?: string | null;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  productCount?: number;
+}
+
 export interface ProductColor {
   id: number;
   colorName: string;
   colorCode: string;
+  quantity?: number; // For products without sizes
   variants: ProductVariant[];
 }
 
@@ -55,6 +71,8 @@ export interface Product {
   productRating: number;
   category: ProductCategory;
   categoryId?: number;
+  companyId?: number | null;
+  company?: Company | null;
   productimg: ProductImage[];
   colors?: ProductColor[];
   reviews?: ProductReview[];
