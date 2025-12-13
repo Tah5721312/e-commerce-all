@@ -13,23 +13,14 @@ interface ColorFormData {
   colorName: string;
   colorCode: string;
   variants: Array<{
-    size: ProductSize;
+    sizeId: number;
     quantity: number;
   }>;
 }
 
-const sizes: ProductSize[] = ['S', 'M', 'L', 'XL', 'X2XL', 'X3XL'];
-const sizeLabels: Record<ProductSize, string> = {
-  S: 'S',
-  M: 'M',
-  L: 'L',
-  XL: 'XL',
-  X2XL: '2XL',
-  X3XL: '3XL',
-};
-
 const ProductModal = ({ product, onClose }: ProductModalProps) => {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [sizes, setSizes] = useState<ProductSize[]>([]);
   const [formData, setFormData] = useState({
     productTitle: '',
     productPrice: '',
@@ -44,6 +35,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
   useEffect(() => {
     fetchCategories();
+    fetchSizes();
   }, []);
 
   const fetchCategories = async () => {
@@ -58,6 +50,18 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
       }
     } catch (err) {
       console.error('Error fetching categories:', err);
+    }
+  };
+
+  const fetchSizes = async () => {
+    try {
+      const response = await fetch('/api/sizes?sortBy=sortOrder&order=asc');
+      if (response.ok) {
+        const data = await response.json();
+        setSizes(data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching sizes:', err);
     }
   };
 
@@ -76,7 +80,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
           colorName: color.colorName,
           colorCode: color.colorCode,
           variants: color.variants.map((v) => ({
-            size: v.size,
+            sizeId: v.size?.id || v.sizeId || 0,
             quantity: v.quantity,
           })),
         })) || []
@@ -117,7 +121,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
           colorName: color.colorName,
           colorCode: color.colorCode,
           variants: color.variants.map((v) => ({
-            size: v.size,
+            sizeId: v.sizeId,
             quantity: v.quantity,
           })),
         })),
@@ -197,11 +201,11 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
   const handleAddVariant = (colorIndex: number) => {
     const newColors = [...colors];
     const availableSizes = sizes.filter(
-      (size) => !newColors[colorIndex].variants.some((v) => v.size === size)
+      (size) => !newColors[colorIndex].variants.some((v) => v.sizeId === size.id)
     );
     if (availableSizes.length > 0) {
       newColors[colorIndex].variants.push({
-        size: availableSizes[0],
+        sizeId: availableSizes[0].id,
         quantity: 0,
       });
       setColors(newColors);
@@ -219,8 +223,8 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
   const handleUpdateVariant = (
     colorIndex: number,
     variantIndex: number,
-    field: 'size' | 'quantity',
-    value: ProductSize | number
+    field: 'sizeId' | 'quantity',
+    value: number
   ) => {
     const newColors = [...colors];
     newColors[colorIndex].variants[variantIndex] = {
@@ -231,15 +235,15 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-100 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 bg-gray-50 border-b px-6 py-4 flex justify-between items-center z-10 backdrop-blur-sm bg-opacity-95">
           <h2 className="text-2xl font-bold text-gray-800">
             {product ? 'Edit Product' : 'Add New Product'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-200 rounded-full transition-colors"
           >
             <FiX className="w-6 h-6" />
           </button>
@@ -469,20 +473,20 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                         className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200"
                       >
                         <select
-                          value={variant.size}
+                          value={variant.sizeId}
                           onChange={(e) =>
                             handleUpdateVariant(
                               colorIndex,
                               variantIndex,
-                              'size',
-                              e.target.value as ProductSize
+                              'sizeId',
+                              parseInt(e.target.value)
                             )
                           }
                           className="px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         >
                           {sizes.map((size) => (
-                            <option key={size} value={size}>
-                              {sizeLabels[size]}
+                            <option key={size.id} value={size.id}>
+                              {size.displayName}
                             </option>
                           ))}
                         </select>

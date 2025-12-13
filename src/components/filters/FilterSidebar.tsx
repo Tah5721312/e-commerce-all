@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { FiSliders } from 'react-icons/fi';
+import { useState, useEffect, useCallback } from 'react';
+import { FiSliders, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 interface FilterSidebarProps {
   priceRange: [number, number];
@@ -20,6 +20,17 @@ const FilterSidebar = ({
 }: FilterSidebarProps) => {
   const [localPriceRange, setLocalPriceRange] = useState<[number, number]>(priceRange);
   const [localRating, setLocalRating] = useState(minRating);
+  const [isPriceExpanded, setIsPriceExpanded] = useState(true);
+  const [isRatingExpanded, setIsRatingExpanded] = useState(true);
+
+  // Sync local state with props when they change externally
+  useEffect(() => {
+    setLocalPriceRange(priceRange);
+  }, [priceRange]);
+
+  useEffect(() => {
+    setLocalRating(minRating);
+  }, [minRating]);
 
   const handleApplyFilters = () => {
     onPriceChange(localPriceRange);
@@ -28,14 +39,27 @@ const FilterSidebar = ({
 
   const handleRatingSelect = (rating: number) => {
     setLocalRating(rating);
+    // Apply rating immediately for better UX
+    onRatingChange(rating);
   };
 
   const handleReset = () => {
-    setLocalPriceRange([0, maxPrice]);
+    const resetRange: [number, number] = [0, maxPrice];
+    setLocalPriceRange(resetRange);
     setLocalRating(0);
-    onPriceChange([0, maxPrice]);
+    onPriceChange(resetRange);
     onRatingChange(0);
   };
+
+  // Format price for display
+  const formatPrice = useCallback((price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  }, []);
 
   return (
     <aside className="w-full md:w-80 bg-white rounded-2xl shadow-sm border border-gray-100 sticky top-8 flex flex-col max-h-[calc(100vh-2rem)]">
@@ -46,17 +70,30 @@ const FilterSidebar = ({
       </div>
 
       {/* Content - Scrollable */}
-      <div className="space-y-8 overflow-y-auto px-6 flex-1">
+      <div className="space-y-6 overflow-y-auto px-6 flex-1">
         {/* Price Range Filter */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-900">Price Range</h3>
-            <span className="text-xs font-medium text-primary-500">
-              ${localPriceRange[0]} - ${localPriceRange[1]}
-            </span>
-          </div>
+        <div className="border-b border-gray-100 pb-6">
+          <button
+            onClick={() => setIsPriceExpanded(!isPriceExpanded)}
+            className="flex items-center justify-between w-full mb-4 group"
+          >
+            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+              Price Range
+            </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-primary-500">
+                {formatPrice(localPriceRange[0])} - {formatPrice(localPriceRange[1])}
+              </span>
+              {isPriceExpanded ? (
+                <FiChevronUp className="w-4 h-4 text-gray-400" />
+              ) : (
+                <FiChevronDown className="w-4 h-4 text-gray-400" />
+              )}
+            </div>
+          </button>
 
-          <div className="space-y-4">
+          {isPriceExpanded && (
+            <div className="space-y-4">
             {/* Min Price */}
             <div>
               <label className="block text-xs text-gray-600 mb-2">Min Price</label>
@@ -119,16 +156,32 @@ const FilterSidebar = ({
               />
             </div>
           </div>
+          )}
         </div>
 
         {/* Rating Filter */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-gray-900">Minimum Rating</h3>
-            <span className="text-xs font-medium text-primary-500">{localRating}★</span>
-          </div>
+        <div className="border-b border-gray-100 pb-6">
+          <button
+            onClick={() => setIsRatingExpanded(!isRatingExpanded)}
+            className="flex items-center justify-between w-full mb-4 group"
+          >
+            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+              Minimum Rating
+            </h3>
+            <div className="flex items-center gap-2">
+              {localRating > 0 && (
+                <span className="text-xs font-medium text-primary-500">{localRating}★</span>
+              )}
+              {isRatingExpanded ? (
+                <FiChevronUp className="w-4 h-4 text-gray-400" />
+              ) : (
+                <FiChevronDown className="w-4 h-4 text-gray-400" />
+              )}
+            </div>
+          </button>
 
-          <div className="space-y-3">
+          {isRatingExpanded && (
+            <div className="space-y-3">
             {[5, 4, 3, 2, 1, 0].map((rating) => (
               <label
                 key={rating}
@@ -161,7 +214,8 @@ const FilterSidebar = ({
                 </span>
               </label>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

@@ -9,7 +9,14 @@ export interface ProductCategory {
   updatedAt?: string;
 }
 
-export type ProductSize = 'S' | 'M' | 'L' | 'XL' | 'X2XL' | 'X3XL';
+export interface ProductSize {
+  id: number;
+  name: string;
+  displayName: string;
+  sortOrder: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface ProductImage {
   id: number;
@@ -20,6 +27,7 @@ export interface ProductImage {
 export interface ProductVariant {
   id: number;
   size: ProductSize;
+  sizeId?: number;
   quantity: number;
 }
 

@@ -4,30 +4,20 @@ import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { FiShoppingCart, FiPlus, FiMinus } from 'react-icons/fi';
 import { useCartStore } from '@/store/cartStore';
-import type { Product, ProductSize } from '@/types/product';
+import type { Product } from '@/types/product';
 
 interface ProductDetailsProps {
   product: Product;
   initialColorId?: number | null;
-  initialSize?: ProductSize | null;
+  initialSizeId?: number | null;
   // لإبلاغ الـ Parent بأي تغيير في اللون أو المقاس
-  onSelectionChange?: (colorId: number | null, size: ProductSize | null) => void;
+  onSelectionChange?: (colorId: number | null, sizeId: number | null) => void;
 }
-
-const sizes: ProductSize[] = ['S', 'M', 'L', 'XL', 'X2XL', 'X3XL'];
-const sizeLabels: Record<ProductSize, string> = {
-  S: 'S',
-  M: 'M',
-  L: 'L',
-  XL: 'XL',
-  X2XL: '2XL',
-  X3XL: '3XL',
-};
 
 const ProductDetails = ({
   product,
   initialColorId,
-  initialSize,
+  initialSizeId,
   onSelectionChange,
 }: ProductDetailsProps) => {
   const [selectedImg, setSelectedImg] = useState(0);
@@ -38,8 +28,8 @@ const ProductDetails = ({
         ? product.colors[0].id
         : null
   );
-  const [selectedSize, setSelectedSize] = useState<ProductSize | null>(
-    initialSize || null
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(
+    initialSizeId || null
   );
 
   // مزامنة اللون/المقاس عند تغيير المدخلات أو المنتج
@@ -56,12 +46,12 @@ const ProductDetails = ({
   }, [product.id, product.colors, initialColorId]);
 
   useEffect(() => {
-    if (initialSize === undefined) {
-      setSelectedSize(null);
+    if (initialSizeId === undefined) {
+      setSelectedSizeId(null);
     } else {
-      setSelectedSize(initialSize);
+      setSelectedSizeId(initialSizeId);
     }
-  }, [product.id, initialSize]);
+  }, [product.id, initialSizeId]);
 
   const selectedColorData = useMemo(() => {
     if (!selectedColor || !product.colors) return null;
@@ -70,28 +60,33 @@ const ProductDetails = ({
 
   const availableSizes = useMemo(() => {
     if (!selectedColorData) return [];
-    return selectedColorData.variants.filter((v) => v.quantity > 0);
+    return selectedColorData.variants
+      .filter((v) => v.quantity > 0)
+      .map((v) => v.size)
+      .filter((size, index, self) => 
+        index === self.findIndex((s) => s.id === size.id)
+      );
   }, [selectedColorData]);
 
-  const getSizeQuantity = (size: ProductSize) => {
+  const getSizeQuantity = (sizeId: number) => {
     if (!selectedColorData) return 0;
-    const variant = selectedColorData.variants.find((v) => v.size === size);
+    const variant = selectedColorData.variants.find((v) => v.size.id === sizeId);
     return variant?.quantity || 0;
   };
 
   const isInCart = useCartStore((state) =>
-    state.isInCart(product.id, selectedColor || undefined, selectedSize || undefined)
+    state.isInCart(product.id, selectedColor || undefined, selectedSizeId || undefined)
   );
   const itemQuantity = useCartStore((state) =>
-    state.getItemQuantity(product.id, selectedColor || undefined, selectedSize || undefined)
+    state.getItemQuantity(product.id, selectedColor || undefined, selectedSizeId || undefined)
   );
   const addToCart = useCartStore((state) => state.addToCart);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
   const getAvailableQuantity = () => {
-    if (!selectedColorData || !selectedSize) return null;
-    const variant = selectedColorData.variants.find((v) => v.size === selectedSize);
+    if (!selectedColorData || !selectedSizeId) return null;
+    const variant = selectedColorData.variants.find((v) => v.size.id === selectedSizeId);
     return variant?.quantity ?? null;
   };
 
@@ -251,7 +246,7 @@ const ProductDetails = ({
                   onClick={() => {
                     const newColor = color.id;
                     setSelectedColor(newColor);
-                    setSelectedSize(null);
+                    setSelectedSizeId(null);
                     onSelectionChange?.(newColor, null);
                   }}
                   className={`px-4 py-2.5 rounded-lg border-2 transition-all shadow-sm hover:shadow-md ${selectedColor === color.id
@@ -276,25 +271,25 @@ const ProductDetails = ({
         )}
 
         {/* Size Selection */}
-        {selectedColorData && (
+        {selectedColorData && availableSizes.length > 0 && (
           <div className="border-t border-gray-200 pt-6">
             <label className="block text-sm font-semibold text-gray-800 mb-4">
               اختر المقاس / Select Size
             </label>
             <div className="flex gap-2.5 flex-wrap">
-              {sizes.map((size) => {
-                const quantity = getSizeQuantity(size);
+              {availableSizes.map((size) => {
+                const quantity = getSizeQuantity(size.id);
                 const isAvailable = quantity > 0;
                 return (
                   <button
-                    key={size}
+                    key={size.id}
                     onClick={() => {
                       if (!isAvailable) return;
-                      setSelectedSize(size);
-                      onSelectionChange?.(selectedColor, size);
+                      setSelectedSizeId(size.id);
+                      onSelectionChange?.(selectedColor, size.id);
                     }}
                     disabled={!isAvailable}
-                    className={`px-5 py-2.5 rounded-lg border-2 transition-all font-medium text-sm shadow-sm hover:shadow-md ${selectedSize === size
+                    className={`px-5 py-2.5 rounded-lg border-2 transition-all font-medium text-sm shadow-sm hover:shadow-md ${selectedSizeId === size.id
                       ? 'border-primary-500 bg-primary-500 text-white ring-2 ring-primary-200'
                       : isAvailable
                         ? 'border-gray-300 hover:border-primary-300 bg-white text-gray-700 hover:bg-primary-50'
@@ -302,15 +297,7 @@ const ProductDetails = ({
                       }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span>{sizeLabels[size]}</span>
-                      {/* {isAvailable && (
-                        <span
-                          className={`text-xs px-1.5 py-0.5 rounded-full ${selectedSize === size ? 'bg-white/20' : 'bg-gray-100'
-                            }`}
-                        >
-                          {quantity}
-                        </span>
-                      )} */}
+                      <span>{size.displayName}</span>
                     </div>
                   </button>
                 );
@@ -322,7 +309,7 @@ const ProductDetails = ({
 
         {/* Add to Cart Section */}
         <div className="border-t border-gray-200 pt-6">
-          {selectedColorData && selectedSize ? (
+          {selectedColorData && (availableSizes.length === 0 || selectedSizeId) ? (
             isInCart ? (
               <div className="flex items-center justify-center sm:justify-start gap-4 bg-primary-50 px-6 py-4 rounded-xl border border-primary-200">
                 {(() => {
@@ -335,7 +322,7 @@ const ProductDetails = ({
                     decreaseQuantity(
                       product.id,
                       selectedColor || undefined,
-                      selectedSize || undefined
+                      selectedSizeId || undefined
                     )
                   }
                   className="p-2 hover:bg-primary-100 rounded-full transition-colors"
@@ -350,7 +337,7 @@ const ProductDetails = ({
                     increaseQuantity(
                       product.id,
                       selectedColor || undefined,
-                      selectedSize || undefined
+                      selectedSizeId || undefined
                     )
                   }
                   disabled={isMax}
@@ -372,7 +359,7 @@ const ProductDetails = ({
                   addToCart(
                     product,
                     selectedColor || undefined,
-                    selectedSize || undefined
+                    selectedSizeId || undefined
                   )
                 }
                 className="w-full px-8 py-4 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all duration-200 shadow-lg hover:shadow-xl capitalize flex items-center justify-center gap-3 font-semibold text-base"
@@ -385,7 +372,7 @@ const ProductDetails = ({
             <div className="px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-700 text-center">
               {!selectedColorData
                 ? '⚠️ يرجى اختيار لون أولاً'
-                : !selectedSize
+                : availableSizes.length > 0 && !selectedSizeId
                   ? '⚠️ يرجى اختيار مقاس'
                   : ''}
             </div>

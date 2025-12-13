@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
-import type { ProductSize } from '@/types/product';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,11 +10,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { productColorId, size } = await request.json();
+    const { productColorId, sizeId } = await request.json();
 
-    if (!productColorId || !size) {
+    if (!productColorId || !sizeId) {
       return NextResponse.json(
-        { error: 'Missing required fields: productColorId and size' },
+        { error: 'Missing required fields: productColorId and sizeId' },
         { status: 400 }
       );
     }
@@ -24,7 +23,7 @@ export async function POST(request: NextRequest) {
     const variant = await prisma.productVariant.findFirst({
       where: {
         productColorId,
-        size: size as ProductSize,
+        sizeId,
       },
     });
 

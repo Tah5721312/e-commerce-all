@@ -41,8 +41,13 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
       colors: {
         include: {
           variants: {
+            include: {
+              size: true,
+            },
             orderBy: {
-              size: 'asc',
+              size: {
+                sortOrder: 'asc',
+              },
             },
           },
         },
@@ -97,7 +102,15 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
       colorCode: color.colorCode,
       variants: color.variants.map((variant: any) => ({
         id: variant.id,
-        size: variant.size,
+        size: variant.size ? {
+          id: variant.size.id,
+          name: variant.size.name,
+          displayName: variant.size.displayName,
+          sortOrder: variant.size.sortOrder,
+          createdAt: variant.size.createdAt.toISOString(),
+          updatedAt: variant.size.updatedAt.toISOString(),
+        } : null,
+        sizeId: variant.sizeId,
         quantity: variant.quantity,
       })),
     })) || [],
@@ -125,8 +138,13 @@ export async function getProductById(id: number): Promise<Product | null> {
       colors: {
         include: {
           variants: {
+            include: {
+              size: true,
+            },
             orderBy: {
-              size: 'asc',
+              size: {
+                sortOrder: 'asc',
+              },
             },
           },
         },
@@ -245,8 +263,8 @@ export async function createProduct(product: {
   colors?: Array<{
     colorName: string;
     colorCode: string;
-    variants: Array<{
-      size: string;
+      variants: Array<{
+      sizeId: number;
       quantity: number;
     }>;
   }>;
@@ -314,7 +332,7 @@ export async function createProduct(product: {
         await prisma.productVariant.createMany({
           data: colorData.variants.map((variant) => ({
             productColorId: color.id,
-            size: variant.size as any,
+            sizeId: variant.sizeId,
             quantity: variant.quantity,
           })),
         });
@@ -335,8 +353,13 @@ export async function createProduct(product: {
       colors: {
         include: {
           variants: {
+            include: {
+              size: true,
+            },
             orderBy: {
-              size: 'asc',
+              size: {
+                sortOrder: 'asc',
+              },
             },
           },
         },
@@ -396,7 +419,15 @@ export async function createProduct(product: {
       colorCode: color.colorCode,
       variants: color.variants.map((variant: any) => ({
         id: variant.id,
-        size: variant.size,
+        size: variant.size ? {
+          id: variant.size.id,
+          name: variant.size.name,
+          displayName: variant.size.displayName,
+          sortOrder: variant.size.sortOrder,
+          createdAt: variant.size.createdAt.toISOString(),
+          updatedAt: variant.size.updatedAt.toISOString(),
+        } : null,
+        sizeId: variant.sizeId,
         quantity: variant.quantity,
       })),
     })) || [],

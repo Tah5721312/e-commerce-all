@@ -67,17 +67,32 @@ model ProductColor {
   @@map("product_colors")
 }
 
+model ProductSize {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  displayName String           @map("display_name")
+  sortOrder   Int              @default(0) @map("sort_order")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  variants    ProductVariant[]
+
+  @@index([sortOrder])
+  @@map("product_sizes")
+}
+
 model ProductVariant {
   id             Int          @id @default(autoincrement())
   productColorId Int          @map("product_color_id")
-  size           ProductSize
+  sizeId         Int          @map("size_id")
   quantity       Int          @default(0)
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
   productColor   ProductColor @relation(fields: [productColorId], references: [id], onDelete: Cascade)
+  size           ProductSize  @relation(fields: [sizeId], references: [id], onDelete: Cascade)
 
-  @@unique([productColorId, size])
+  @@unique([productColorId, sizeId])
   @@index([productColorId])
+  @@index([sizeId])
   @@map("product_variants")
 }
 
@@ -163,15 +178,6 @@ model HeroBanner {
 
   @@index([sortOrder])
   @@map("hero_banners")
-}
-
-enum ProductSize {
-  S
-  M
-  L
-  XL
-  X2XL
-  X3XL
 }
 
 enum OrderStatus {

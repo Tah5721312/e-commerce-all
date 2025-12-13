@@ -10,6 +10,7 @@ import {
   FiDollarSign,
   FiStar,
   FiShoppingBag,
+  FiLayers,
 } from 'react-icons/fi';
 import type { Product } from '@/types/product';
 import ProductModal from '@/components/dashboard/ProductModal';
@@ -22,6 +23,7 @@ import OrderStatsCards from '@/components/dashboard/OrderStatsCards';
 import HeroContentTab from '@/components/dashboard/HeroContentTab';
 import HeroBannersTab from '@/components/dashboard/HeroBannersTab';
 import CategoriesTab from '@/components/dashboard/CategoriesTab';
+import SizesTab from '@/components/dashboard/SizesTab';
 
 interface Stats {
   totalProducts: number;
@@ -64,7 +66,7 @@ interface OrderStats {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<
-    'products' | 'orders' | 'hero' | 'heroBanners' | 'categories'
+    'products' | 'orders' | 'hero' | 'heroBanners' | 'categories' | 'sizes'
   >('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -314,6 +316,16 @@ export default function DashboardPage() {
             <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
             Categories
           </button>
+          <button
+            onClick={() => setActiveTab('sizes')}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'sizes'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
+          >
+            <FiLayers className="inline-block w-5 h-5 mr-2" />
+            Sizes / المقاسات
+          </button>
         </div>
 
         {/* Products Tab */}
@@ -367,6 +379,15 @@ export default function DashboardPage() {
         {activeTab === 'categories' && (
           <div className="mt-8">
             <CategoriesTab onCategoryChange={() => {
+              fetchProducts();
+              fetchStats();
+            }} />
+          </div>
+        )}
+
+        {activeTab === 'sizes' && (
+          <div className="mt-8">
+            <SizesTab onSizeChange={() => {
               fetchProducts();
               fetchStats();
             }} />

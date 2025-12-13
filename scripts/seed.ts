@@ -41,26 +41,30 @@ interface ProductData {
   productPrice: number;
   productDiscription: string;
   productRating: number;
-  category: 'men' | 'women' | 'children' | 'accessories' | 'shoes';
+  category: 'men' | 'women' | 'children' | 'accessories' | 'shoes' | 'electronics' | 'beauty' | 'home';
   images: string[];
+  sizeType: 'clothing' | 'shoes' | 'none'; // نوع المقاسات
 }
 
 const sampleProducts: ProductData[] = [
+  // Men's Clothing
   {
     productTitle: 'Classic Men\'s T-Shirt',
     productPrice: 29.99,
     productDiscription: 'Comfortable and stylish classic men\'s t-shirt made from premium cotton. Perfect for everyday wear.',
     productRating: 4.5,
     category: 'men',
-    images: ['/images/1.jpg', '/images/1/final.png', '/images/1/images.jpg'],
+    sizeType: 'clothing',
+    images: [ '/images/men1/final.png', '/images/men1/images.jpg'],
   },
   {
-    productTitle: 'Women\'s Summer Dress',
-    productPrice: 49.99,
-    productDiscription: 'Beautiful summer dress with elegant design. Lightweight and perfect for warm weather.',
-    productRating: 4.8,
-    category: 'women',
-    images: ['/images/2.jpg', '/images/2/2.jpg', '/images/2/3.jpg', '/images/2/final.jpg'],
+    productTitle: 'Men\'s Sport Shoes',
+    productPrice: 89.99,
+    productDiscription: 'Comfortable sport shoes with excellent support. Ideal for running and daily activities.',
+    productRating: 4.9,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/men2/1 (5).jpg', '/images/men2/1 (6).jpg', '/images/men2/100.jpg'],
   },
   {
     productTitle: 'Men\'s Casual Jeans',
@@ -68,47 +72,8 @@ const sampleProducts: ProductData[] = [
     productDiscription: 'High-quality denim jeans with perfect fit. Durable and comfortable for all occasions.',
     productRating: 4.6,
     category: 'men',
-    images: ['/images/3/1.jpg', '/images/3/2.jpg', '/images/3/4.jpg', '/images/3/final.jpg'],
-  },
-  {
-    productTitle: 'Women\'s Elegant Blouse',
-    productPrice: 39.99,
-    productDiscription: 'Elegant blouse with modern design. Perfect for office or casual occasions.',
-    productRating: 4.7,
-    category: 'women',
-    images: ['/images/4/3.jpg', '/images/4/4.jpg', '/images/4/final.jpg'],
-  },
-  {
-    productTitle: 'Men\'s Sport Shoes',
-    productPrice: 89.99,
-    productDiscription: 'Comfortable sport shoes with excellent support. Ideal for running and daily activities.',
-    productRating: 4.9,
-    category: 'men',
-    images: ['/images/5/1 (5).jpg', '/images/5/1 (6).jpg', '/images/5/100.jpg'],
-  },
-  {
-    productTitle: 'Women\'s High Heels',
-    productPrice: 69.99,
-    productDiscription: 'Stylish high heels with comfortable design. Perfect for special occasions.',
-    productRating: 4.4,
-    category: 'women',
-    images: ['/images/6/1.jpg', '/images/6/2.jpg'],
-  },
-  {
-    productTitle: 'Men\'s Leather Jacket',
-    productPrice: 199.99,
-    productDiscription: 'Premium leather jacket with classic design. Durable and stylish.',
-    productRating: 4.8,
-    category: 'men',
-    images: ['/images/banner-15.jpg', '/images/banner-16.jpg'],
-  },
-  {
-    productTitle: 'Women\'s Winter Coat',
-    productPrice: 149.99,
-    productDiscription: 'Warm and stylish winter coat. Perfect for cold weather with elegant design.',
-    productRating: 4.7,
-    category: 'women',
-    images: ['/images/banner-17.jpg', '/images/banner-25.jpg'],
+    sizeType: 'clothing',
+    images: ['/images/men3/1.jpg', '/images/men3/2.jpg'],
   },
   {
     productTitle: 'Men\'s Formal Shirt',
@@ -116,47 +81,195 @@ const sampleProducts: ProductData[] = [
     productDiscription: 'Classic formal shirt perfect for business occasions. Premium quality fabric.',
     productRating: 4.6,
     category: 'men',
-    images: ['/images/more/1.jpg', '/images/more/2.jpg', '/images/more/3.jpg'],
+    sizeType: 'clothing',
+    images: ['/images/men4/1.jpg', '/images/men4/2.jpg', '/images/men4/3.jpg'],
   },
+  {
+    productTitle: 'Men\'s Polo Shirt',
+    productPrice: 45.99,
+    productDiscription: 'Classic polo shirt with modern fit. Perfect for casual and semi-formal occasions.',
+    productRating: 4.7,
+    category: 'men',
+    sizeType: 'clothing',
+    images: ['/images/men5/1.jpg', '/images/men5/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Hoodie',
+    productPrice: 65.99,
+    productDiscription: 'Warm and comfortable hoodie with soft fabric. Perfect for casual wear.',
+    productRating: 4.5,
+    category: 'men',
+    sizeType: 'clothing',
+    images: ['/images/men6/1.jpg', '/images/men6/2.jpg'],
+  },
+  
+  // Men's Shoes
+  {
+    productTitle: 'Men\'s Casual Sneakers',
+    productPrice: 79.99,
+    productDiscription: 'Stylish casual sneakers with comfortable sole. Perfect for everyday wear.',
+    productRating: 4.7,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes1/1.jpg', '/images/shoes1/2.jpg', '/images/shoes1/3.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Formal Dress Shoes',
+    productPrice: 129.99,
+    productDiscription: 'Elegant formal dress shoes with premium leather. Perfect for business and formal events.',
+    productRating: 4.8,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes2/1.jpg', '/images/shoes2/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Running Shoes',
+    productPrice: 99.99,
+    productDiscription: 'High-performance running shoes with advanced cushioning technology.',
+    productRating: 4.9,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes3/1.jpg', '/images/shoes3/2.jpg'],
+  },
+  
+  // Men's Accessories
+  {
+    productTitle: 'Men\'s Luxury Watch',
+    productPrice: 129.99,
+    productDiscription: 'Elegant luxury men\'s watch with premium design and water-resistant features. Perfect for formal occasions and daily wear.',
+    productRating: 4.9,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories1/3.jpg', '/images/Accessories1/4.jpg', '/images/Accessories1/final.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Classic Watch',
+    productPrice: 49.99,
+    productDiscription: 'Classic men\'s watch with timeless design. Durable and stylish, perfect for everyday use.',
+    productRating: 4.6,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories2/1.jpg', '/images/Accessories2/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Sport Watch',
+    productPrice: 59.99,
+    productDiscription: 'Modern sport watch with advanced features. Water-resistant and durable for active lifestyle.',
+    productRating: 4.7,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories3/1.jpg', '/images/Accessories3/2.jpg', '/images/Accessories3/3.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Bracelet',
+    productPrice: 39.99,
+    productDiscription: 'Stylish men\'s bracelet with elegant design. Made from premium materials for durability and comfort.',
+    productRating: 4.6,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories4/1.jpg', '/images/Accessories4/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Silver Earrings',
+    productPrice: 24.99,
+    productDiscription: 'Elegant silver earrings for men with modern design. Perfect for adding a stylish touch to your look.',
+    productRating: 4.5,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories5/1.jpg', '/images/Accessories5/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Gold Earrings',
+    productPrice: 69.99,
+    productDiscription: 'Premium gold earrings for men with sophisticated design. Perfect for special occasions and formal events.',
+    productRating: 4.7,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories6/1.jpg', '/images/Accessories6/2.jpg', '/images/Accessories6/3.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Chain Necklace',
+    productPrice: 34.99,
+    productDiscription: 'Classic chain necklace for men with adjustable length. Made from high-quality materials for lasting durability.',
+    productRating: 4.6,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories7/1.jpg', '/images/Accessories7/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Aviator Sunglasses',
+    productPrice: 44.99,
+    productDiscription: 'Classic aviator sunglasses with UV protection. Stylish design perfect for sunny days and outdoor activities.',
+    productRating: 4.7,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories8/2.jpg', '/images/Accessories8/3.jpg', '/images/Accessories8/final.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Wayfarer Sunglasses',
+    productPrice: 29.99,
+    productDiscription: 'Timeless wayfarer sunglasses with UV protection. Classic design that never goes out of style.',
+    productRating: 4.5,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories9/1.jpg', '/images/Accessories9/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Leather Messenger Bag',
+    productPrice: 49.99,
+    productDiscription: 'Premium leather messenger bag with spacious compartments. Perfect for work, travel, and daily use.',
+    productRating: 4.6,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories10/1.jpg', '/images/Accessories10/2.jpg', '/images/Accessories10/4.jpg', '/images/Accessories10/final.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Crossbody Bag',
+    productPrice: 39.99,
+    productDiscription: 'Stylish crossbody bag with modern design. Compact and functional, perfect for everyday essentials.',
+    productRating: 4.5,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories11/1.jpg', '/images/Accessories11/2.jpg'],
+  },
+  {
+    productTitle: 'Men\'s Small Wallet Bag',
+    productPrice: 19.99,
+    productDiscription: 'Compact wallet bag with multiple card slots. Sleek design perfect for minimalists and daily use.',
+    productRating: 4.4,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories12/1.jpg', '/images/Accessories12/2.jpg'],
+  },
+  
+  // Women's Clothing
+  {
+    productTitle: 'Women\'s Summer Dress',
+    productPrice: 49.99,
+    productDiscription: 'Beautiful summer dress with elegant design. Lightweight and perfect for warm weather.',
+    productRating: 4.8,
+    category: 'women',
+    sizeType: 'clothing',
+    images: [ '/images/women1/1.jpg', '/images/women1/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Elegant Blouse',
+    productPrice: 39.99,
+    productDiscription: 'Elegant blouse with modern design. Perfect for office or casual occasions.',
+    productRating: 4.7,
+    category: 'women',
+    sizeType: 'clothing',
+    images: ['/images/women2/1.jpg', '/images/women2/2.jpg'],
+  },
+ 
   {
     productTitle: 'Women\'s Casual Top',
     productPrice: 34.99,
     productDiscription: 'Comfortable casual top with modern design. Perfect for everyday wear.',
     productRating: 4.5,
     category: 'women',
-    images: ['/images/more/4.jpg', '/images/more/5.jpg', '/images/more/6.jpg'],
-  },
-  {
-    productTitle: 'Men\'s Watch',
-    productPrice: 129.99,
-    productDiscription: 'Elegant men\'s watch with premium design. Water-resistant and durable.',
-    productRating: 4.9,
-    category: 'men',
-    images: ['/images/more/7.jpg', '/images/more/8.jpg'],
-  },
-  {
-    productTitle: 'Women\'s Handbag',
-    productPrice: 79.99,
-    productDiscription: 'Stylish handbag with spacious design. Perfect for daily use.',
-    productRating: 4.6,
-    category: 'women',
-    images: ['/images/more/10.jpg', '/images/more/100.jpg'],
-  },
-  {
-    productTitle: 'NASA Space Bear T-Shirt',
-    productPrice: 39.99,
-    productDiscription: 'Unique NASA Space Bear print t-shirt. Casual loose short sleeve design.',
-    productRating: 4.7,
-    category: 'children',
-    images: ['/images/more/Mens NASA Space Bear Print O-Neck Casual Loose Short Sleeve T-Shirt.png', '/images/more/Mens NASA Space Bear Print O-Neck Casual Loose Short Sleeve T-Shirt (1).jfif'],
-  },
-  {
-    productTitle: 'Paper Plane Liberty T-Shirt',
-    productPrice: 44.99,
-    productDiscription: 'Stylish Paper Plane of Liberty print crew neck short sleeve t-shirt. Available in multiple colors.',
-    productRating: 4.8,
-    category: 'men',
-    images: ['/images/more/Paper Plane of Liberty Print Crew Neck Short Sleeve T-Shirts - Black _ XL.png', '/images/more/Paper Plane of Liberty Print Crew Neck Short Sleeve T-Shirts - White _ XL.png'],
+    sizeType: 'clothing',
+    images: ['/images/women3/1.jpg', '/images/women3/2.jpg'],
   },
   {
     productTitle: 'Women\'s Fashion Top',
@@ -164,7 +277,292 @@ const sampleProducts: ProductData[] = [
     productDiscription: 'Trendy fashion top with modern design. Perfect for any occasion.',
     productRating: 4.6,
     category: 'women',
-    images: ['/images/more/1 (1).jpg', '/images/more/1 (2).jpg', '/images/more/1 (3).jpg'],
+    sizeType: 'clothing',
+    images: ['/images/women4/1.jpg', '/images/women4/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Jeans',
+    productPrice: 69.99,
+    productDiscription: 'Stylish women\'s jeans with perfect fit. Comfortable and flattering.',
+    productRating: 4.6,
+    category: 'women',
+    sizeType: 'clothing',
+    images: ['/images/women5/1.jpg', '/images/women5/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Skirt',
+    productPrice: 44.99,
+    productDiscription: 'Elegant skirt with flowing design. Perfect for office and casual wear.',
+    productRating: 4.5,
+    category: 'women',
+    sizeType: 'clothing',
+    images: ['/images/women6/1.jpg', '/images/women6/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Cardigan',
+    productPrice: 59.99,
+    productDiscription: 'Soft cardigan with elegant design. Perfect for layering.',
+    productRating: 4.7,
+    category: 'women',
+    sizeType: 'clothing',
+    images: ['/images/women7/1.jpg', '/images/women7/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Blazer',
+    productPrice: 79.99,
+    productDiscription: 'Elegant blazer with modern fit. Perfect for professional occasions.',
+    productRating: 4.6,
+    category: 'women',
+    sizeType: 'clothing',
+    images: ['/images/women8/1.jpg', '/images/women8/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Sweater',
+    productPrice: 65.99,
+    productDiscription: 'Warm sweater with elegant design. Perfect for winter season.',
+    productRating: 4.7,
+    category: 'women',
+    sizeType: 'clothing',
+    images: ['/images/women9/1.jpg', '/images/women9/2.jpg'],
+  },
+  
+  // Women's Shoes
+  {
+    productTitle: 'Women\'s High Heels',
+    productPrice: 69.99,
+    productDiscription: 'Stylish high heels with comfortable design. Perfect for special occasions.',
+    productRating: 4.4,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes1/1.jpg', '/images/shoes1/2.jpg', '/images/shoes1/3.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Flat Shoes',
+    productPrice: 54.99,
+    productDiscription: 'Comfortable flat shoes with elegant design. Perfect for everyday wear.',
+    productRating: 4.6,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes2/1.jpg', '/images/shoes2/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Boots',
+    productPrice: 89.99,
+    productDiscription: 'Stylish boots with comfortable fit. Perfect for winter season.',
+    productRating: 4.7,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes3/1.jpg', '/images/shoes3/2.jpg'],
+  },
+  
+  // Women's Accessories
+  {
+    productTitle: 'Women\'s Elegant Watch',
+    productPrice: 79.99,
+    productDiscription: 'Beautiful elegant watch for women with premium design. Perfect for both casual and formal occasions.',
+    productRating: 4.6,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories1/3.jpg', '/images/Accessories1/4.jpg', '/images/Accessories1/final.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Classic Watch',
+    productPrice: 49.99,
+    productDiscription: 'Timeless classic watch for women with sophisticated design. Water-resistant and durable for daily wear.',
+    productRating: 4.7,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories2/1.jpg', '/images/Accessories2/2.jpg'],
+  },
+  {
+    productTitle: 'Women\'s Fashion Watch',
+    productPrice: 29.99,
+    productDiscription: 'Stylish fashion watch for women with modern design. Perfect accessory to complement any outfit.',
+    productRating: 4.6,
+    category: 'accessories',
+    sizeType: 'none',
+    images: ['/images/Accessories3/1.jpg', '/images/Accessories3/2.jpg', '/images/Accessories3/3.jpg'],
+  },
+  
+  // Children's Clothing
+  {
+    productTitle: 'Children\'s T-Shirt',
+    productPrice: 24.99,
+    productDiscription: 'Comfortable t-shirt for children with fun designs. Perfect for everyday wear.',
+    productRating: 4.6,
+    category: 'children',
+    sizeType: 'clothing',
+    images: ['/images/Children1/1.jpg', '/images/Children1/2.jpg'],
+  },
+  {
+    productTitle: 'Children\'s Jeans',
+    productPrice: 34.99,
+    productDiscription: 'Durable children\'s jeans with comfortable fit. Perfect for active kids.',
+    productRating: 4.5,
+    category: 'children',
+    sizeType: 'clothing',
+    images: ['/images/Children2/1.jpg', '/images/Children2/2.jpg'],
+  },
+  {
+    productTitle: 'Children\'s Dress',
+    productPrice: 44.99,
+    productDiscription: 'Beautiful children\'s dress with colorful design. Perfect for special occasions.',
+    productRating: 4.6,
+    category: 'children',
+    sizeType: 'clothing',
+    images: ['/images/Children3/1.jpg', '/images/Children3/2.jpg'],
+  },
+  {
+    productTitle: 'Children\'s Hoodie',
+    productPrice: 39.99,
+    productDiscription: 'Warm and comfortable hoodie for children. Soft fabric and fun design.',
+    productRating: 4.5,
+    category: 'children',
+    sizeType: 'clothing',
+    images: ['/images/Children4/1.jpg', '/images/Children4/2.jpg'],
+  },
+  {
+    productTitle: 'Children\'s Shorts',
+    productPrice: 29.99,
+    productDiscription: 'Comfortable shorts for children. Perfect for summer activities.',
+    productRating: 4.4,
+    category: 'children',
+    sizeType: 'clothing',
+    images: ['/images/Children5/1.jpg', '/images/Children5/2.jpg'],
+  },
+  
+  // Children's Shoes
+  {
+    productTitle: 'Children\'s Sneakers',
+    productPrice: 49.99,
+    productDiscription: 'Comfortable sneakers for children. Durable and perfect for active play.',
+    productRating: 4.6,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes1/1.jpg', '/images/shoes1/2.jpg', '/images/shoes1/3.jpg'],
+  },
+  {
+    productTitle: 'Children\'s Sandals',
+    productPrice: 29.99,
+    productDiscription: 'Comfortable sandals for children. Perfect for summer activities.',
+    productRating: 4.4,
+    category: 'shoes',
+    sizeType: 'shoes',
+    images: ['/images/shoes2/1.jpg', '/images/shoes2/2.jpg'],
+  },
+  
+  // Electronics
+  {
+    productTitle: 'Wireless Earbuds',
+    productPrice: 79.99,
+    productDiscription: 'High-quality wireless earbuds with noise cancellation. Perfect for music lovers.',
+    productRating: 4.8,
+    category: 'electronics',
+    sizeType: 'none',
+    images: ['/images/Electronics1/1.jpg', '/images/Electronics1/2.jpg'],
+  },
+  {
+    productTitle: 'Smart Watch',
+    productPrice: 199.99,
+    productDiscription: 'Feature-rich smartwatch with fitness tracking. Water-resistant and durable.',
+    productRating: 4.7,
+    category: 'electronics',
+    sizeType: 'none',
+    images: ['/images/Electronics2/1.jpg', '/images/Electronics2/2.jpg'],
+  },
+  {
+    productTitle: 'Phone Case',
+    productPrice: 19.99,
+    productDiscription: 'Protective phone case with elegant design. Available in multiple colors.',
+    productRating: 4.5,
+    category: 'electronics',
+    sizeType: 'none',
+    images: ['/images/Electronics3/1.jpg', '/images/Electronics3/2.jpg'],
+  },
+  {
+    productTitle: 'Wireless Charger',
+    productPrice: 34.99,
+    productDiscription: 'Fast wireless charger with sleek design. Compatible with all devices.',
+    productRating: 4.6,
+    category: 'electronics',
+    sizeType: 'none',
+    images: ['/images/Electronics4/1.jpg', '/images/Electronics4/2.jpg'],
+  },
+  
+  // Beauty
+  {
+    productTitle: 'Face Moisturizer',
+    productPrice: 29.99,
+    productDiscription: 'Hydrating face moisturizer with natural ingredients. Perfect for all skin types.',
+    productRating: 4.6,
+    category: 'beauty',
+    sizeType: 'none',
+    images: ['/images/beauty1/1.jpg', '/images/beauty1/2.jpg'],
+  },
+  {
+    productTitle: 'Lipstick Set',
+    productPrice: 39.99,
+    productDiscription: 'Premium lipstick set with multiple shades. Long-lasting and vibrant colors.',
+    productRating: 4.7,
+    category: 'beauty',
+    sizeType: 'none',
+    images: ['/images/beauty2/1.jpg', '/images/beauty2/2.jpg'],
+  },
+  {
+    productTitle: 'Face Serum',
+    productPrice: 49.99,
+    productDiscription: 'Anti-aging face serum with vitamin C. Brightens and rejuvenates skin.',
+    productRating: 4.8,
+    category: 'beauty',
+    sizeType: 'none',
+    images: ['/images/beauty3/1.jpg', '/images/beauty3/2.jpg'],
+  },
+  
+  // Home
+  {
+    productTitle: 'Decorative Pillow',
+    productPrice: 24.99,
+    productDiscription: 'Soft decorative pillow with elegant design. Perfect for home decoration.',
+    productRating: 4.5,
+    category: 'home',
+    sizeType: 'none',
+    images: ['/images/home1/1.jpg', '/images/home1/2.jpg'],
+  },
+  {
+    productTitle: 'Table Lamp',
+    productPrice: 49.99,
+    productDiscription: 'Modern table lamp with elegant design. Perfect for home and office.',
+    productRating: 4.6,
+    category: 'home',
+    sizeType: 'none',
+    images: ['/images/home2/1.jpg', '/images/home2/2.jpg'],
+  },
+  {
+    productTitle: 'Wall Clock',
+    productPrice: 39.99,
+    productDiscription: 'Elegant wall clock with modern design. Perfect for any room.',
+    productRating: 4.5,
+    category: 'home',
+    sizeType: 'none',
+    images: ['/images/home3/1.jpg', '/images/home3/2.jpg'],
+  },
+  {
+    productTitle: 'Vase Set',
+    productPrice: 34.99,
+    productDiscription: 'Beautiful vase set with elegant design. Perfect for home decoration.',
+    productRating: 4.6,
+    category: 'home',
+    sizeType: 'none',
+    images: ['/images/home4/1.jpg', '/images/home4/2.jpg'],
+  },
+  {
+    productTitle: 'Candle Holder',
+    productPrice: 29.99,
+    productDiscription: 'Elegant candle holder with modern design. Perfect for creating ambiance.',
+    productRating: 4.5,
+    category: 'home',
+    sizeType: 'none',
+    images: ['/images/home5/1.jpg', '/images/home5/2.jpg'],
   },
 ];
 
@@ -242,9 +640,59 @@ async function main() {
   } catch (e) {
     console.warn('⚠️  Could not clear product reviews:', (e as Error).message);
   }
+  await prisma.productVariant.deleteMany();
+  await prisma.productColor.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.productSize.deleteMany();
   await prisma.productCategory.deleteMany();
+
+  // Create sizes
+  console.log('📏 Creating sizes...');
+  const sizes = [
+    // Clothing sizes
+    { name: 'S', displayName: 'S', sortOrder: 1 },
+    { name: 'M', displayName: 'M', sortOrder: 2 },
+    { name: 'L', displayName: 'L', sortOrder: 3 },
+    { name: 'XL', displayName: 'XL', sortOrder: 4 },
+    { name: 'X2XL', displayName: '2XL', sortOrder: 5 },
+    { name: 'X3XL', displayName: '3XL', sortOrder: 6 },
+    // Shoe sizes (22-46)
+    { name: '22', displayName: '22', sortOrder: 10 },
+    { name: '23', displayName: '23', sortOrder: 11 },
+    { name: '24', displayName: '24', sortOrder: 12 },
+    { name: '25', displayName: '25', sortOrder: 13 },
+    { name: '26', displayName: '26', sortOrder: 14 },
+    { name: '27', displayName: '27', sortOrder: 15 },
+    { name: '28', displayName: '28', sortOrder: 16 },
+    { name: '29', displayName: '29', sortOrder: 17 },
+    { name: '30', displayName: '30', sortOrder: 18 },
+    { name: '31', displayName: '31', sortOrder: 19 },
+    { name: '32', displayName: '32', sortOrder: 20 },
+    { name: '33', displayName: '33', sortOrder: 21 },
+    { name: '34', displayName: '34', sortOrder: 22 },
+    { name: '35', displayName: '35', sortOrder: 23 },
+    { name: '36', displayName: '36', sortOrder: 24 },
+    { name: '37', displayName: '37', sortOrder: 25 },
+    { name: '38', displayName: '38', sortOrder: 26 },
+    { name: '39', displayName: '39', sortOrder: 27 },
+    { name: '40', displayName: '40', sortOrder: 28 },
+    { name: '41', displayName: '41', sortOrder: 29 },
+    { name: '42', displayName: '42', sortOrder: 30 },
+    { name: '43', displayName: '43', sortOrder: 31 },
+    { name: '44', displayName: '44', sortOrder: 32 },
+    { name: '45', displayName: '45', sortOrder: 33 },
+    { name: '46', displayName: '46', sortOrder: 34 },
+  ];
+
+  const sizeMap: Record<string, number> = {};
+  for (const sizeData of sizes) {
+    const size = await prisma.productSize.create({
+      data: sizeData,
+    });
+    sizeMap[sizeData.name] = size.id;
+    console.log(`✅ Created size: ${size.displayName} (ID: ${size.id})`);
+  }
 
   // Create categories
   console.log('📁 Creating categories...');
@@ -268,6 +716,41 @@ async function main() {
     console.log(`✅ Created category: ${category.name} (ID: ${category.id})`);
   }
 
+  // Helper function to get sizes based on type
+  const getSizesForType = (sizeType: 'clothing' | 'shoes' | 'none'): string[] => {
+    if (sizeType === 'clothing') {
+      return ['S', 'M', 'L', 'XL', 'X2XL', 'X3XL'];
+    } else if (sizeType === 'shoes') {
+      return ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+    }
+    return [];
+  };
+
+  // Helper function to get colors based on product type
+  const getColorsForProduct = (category: string, sizeType: string) => {
+    const baseColors = [
+      { colorName: 'أسود', colorCode: '#000000' },
+      { colorName: 'أبيض', colorCode: '#FFFFFF' },
+    ];
+
+    if (sizeType === 'none') {
+      // Accessories, Electronics, Beauty, Home - no sizes, fewer colors
+      return [
+        { colorName: 'أسود', colorCode: '#000000' },
+        { colorName: 'أبيض', colorCode: '#FFFFFF' },
+        { colorName: 'فضي', colorCode: '#C0C0C0' },
+      ];
+    }
+
+    // Clothing and Shoes - more colors
+    return [
+      ...baseColors,
+      { colorName: 'أزرق', colorCode: '#0066CC' },
+      { colorName: 'أحمر', colorCode: '#CC0000' },
+      { colorName: 'رمادي', colorCode: '#808080' },
+    ];
+  };
+
   // Create products
   console.log('📦 Creating products...');
   for (const productData of sampleProducts) {
@@ -276,6 +759,33 @@ async function main() {
       console.warn(`⚠️  Category "${productData.category}" not found, skipping product: ${productData.productTitle}`);
       continue;
     }
+
+    const sizes = getSizesForType(productData.sizeType);
+    const colors = getColorsForProduct(productData.category, productData.sizeType);
+
+    // Create colors with variants
+    const colorsData = colors.map((color) => {
+      const variants = sizes.map((sizeName) => {
+        const sizeId = sizeMap[sizeName];
+        if (!sizeId) {
+          console.warn(`⚠️  Size "${sizeName}" not found for product: ${productData.productTitle}`);
+          return null;
+        }
+        // Generate random quantity
+        const quantity = productData.sizeType === 'shoes' 
+          ? Math.floor(Math.random() * 10) + 3  // Shoes: 3-12
+          : Math.floor(Math.random() * 20) + 5; // Clothing: 5-24
+        return { sizeId, quantity };
+      }).filter((v): v is { sizeId: number; quantity: number } => v !== null);
+
+      return {
+        colorName: color.colorName,
+        colorCode: color.colorCode,
+        variants: {
+          create: variants,
+        },
+      };
+    });
 
     const product = await prisma.product.create({
       data: {
@@ -291,49 +801,7 @@ async function main() {
           })),
         },
         colors: {
-          create: [
-            {
-              colorName: 'أسود',
-              colorCode: '#000000',
-              variants: {
-                create: [
-                  { size: 'S', quantity: Math.floor(Math.random() * 20) + 5 },
-                  { size: 'M', quantity: Math.floor(Math.random() * 20) + 10 },
-                  { size: 'L', quantity: Math.floor(Math.random() * 20) + 8 },
-                  { size: 'XL', quantity: Math.floor(Math.random() * 15) + 5 },
-                  { size: 'X2XL', quantity: Math.floor(Math.random() * 10) + 3 },
-                  { size: 'X3XL', quantity: Math.floor(Math.random() * 5) + 1 },
-                ],
-              },
-            },
-            {
-              colorName: 'أبيض',
-              colorCode: '#FFFFFF',
-              variants: {
-                create: [
-                  { size: 'S', quantity: Math.floor(Math.random() * 20) + 5 },
-                  { size: 'M', quantity: Math.floor(Math.random() * 20) + 10 },
-                  { size: 'L', quantity: Math.floor(Math.random() * 20) + 8 },
-                  { size: 'XL', quantity: Math.floor(Math.random() * 15) + 5 },
-                  { size: 'X2XL', quantity: Math.floor(Math.random() * 10) + 3 },
-                  { size: 'X3XL', quantity: Math.floor(Math.random() * 5) + 1 },
-                ],
-              },
-            },
-            {
-              colorName: 'أزرق',
-              colorCode: '#0066CC',
-              variants: {
-                create: [
-                  { size: 'S', quantity: Math.floor(Math.random() * 15) + 3 },
-                  { size: 'M', quantity: Math.floor(Math.random() * 15) + 8 },
-                  { size: 'L', quantity: Math.floor(Math.random() * 15) + 6 },
-                  { size: 'XL', quantity: Math.floor(Math.random() * 10) + 3 },
-                  { size: 'X2XL', quantity: Math.floor(Math.random() * 8) + 2 },
-                ],
-              },
-            },
-          ],
+          create: colorsData,
         },
       },
     });

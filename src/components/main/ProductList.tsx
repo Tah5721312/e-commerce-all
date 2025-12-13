@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
-import type { Product, ProductCategory, ProductSize } from '@/types/product';
+import type { Product, ProductCategory } from '@/types/product';
 import ProductCard from './ProductCard';
 import ProductDetails from './ProductDetails';
 import CartDrawer from '@/components/cart/CartDrawer';
@@ -25,7 +25,7 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(() => searchParams.get('category') || 'all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
-  const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartSource, setCartSource] = useState<'button' | 'icon'>('icon');
@@ -94,7 +94,7 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
 
     setSelectedProduct(product);
     setSelectedColorId(fallbackColor);
-    setSelectedSize(null);
+    setSelectedSizeId(null);
     setIsDetailsOpen(true);
   };
 
@@ -107,7 +107,7 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
         product.colors && product.colors.length > 0 ? product.colors[0].id : null;
       setSelectedProduct(product);
       setSelectedColorId(fallbackColor);
-      setSelectedSize(null);
+      setSelectedSizeId(null);
       setIsDetailsOpen(true);
     } else {
       // المنتجات بدون ألوان ومقاسات تضاف مباشرة ونفتح السلة
@@ -229,10 +229,10 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
               <ProductDetails
                 product={selectedProduct}
                 initialColorId={selectedColorId}
-                initialSize={selectedSize}
-                onSelectionChange={(colorId, size) => {
+                initialSizeId={selectedSizeId}
+                onSelectionChange={(colorId, sizeId) => {
                   setSelectedColorId(colorId);
-                  setSelectedSize(size);
+                  setSelectedSizeId(sizeId);
                 }}
               />
             </div>

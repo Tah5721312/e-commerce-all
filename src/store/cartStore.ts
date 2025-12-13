@@ -2,12 +2,12 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Product, ProductSize } from '@/types/product';
+import type { Product } from '@/types/product';
 
 export interface CartItem extends Product {
   quantity: number;
   selectedColor?: number;
-  selectedSize?: ProductSize;
+  selectedSizeId?: number;
 }
 
 interface CartStore {
@@ -15,34 +15,34 @@ interface CartStore {
   addToCart: (
     product: Product,
     selectedColor?: number,
-    selectedSize?: ProductSize
+    selectedSizeId?: number
   ) => void;
   removeFromCart: (
     productId: number,
     selectedColor?: number,
-    selectedSize?: ProductSize
+    selectedSizeId?: number
   ) => void;
   increaseQuantity: (
     productId: number,
     selectedColor?: number,
-    selectedSize?: ProductSize
+    selectedSizeId?: number
   ) => void;
   decreaseQuantity: (
     productId: number,
     selectedColor?: number,
-    selectedSize?: ProductSize
+    selectedSizeId?: number
   ) => void;
   clearCart: () => void;
   getTotal: () => number;
   getItemQuantity: (
     productId: number,
     selectedColor?: number,
-    selectedSize?: ProductSize
+    selectedSizeId?: number
   ) => number;
   isInCart: (
     productId: number,
     selectedColor?: number,
-    selectedSize?: ProductSize
+    selectedSizeId?: number
   ) => boolean;
 }
 
@@ -51,13 +51,13 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       cartItems: [],
 
-      addToCart: (product, selectedColor, selectedSize) => {
+      addToCart: (product, selectedColor, selectedSizeId) => {
         const cartItems = get().cartItems;
         const existingItem = cartItems.find(
           (item) =>
             item.id === product.id &&
             item.selectedColor === selectedColor &&
-            item.selectedSize === selectedSize
+            item.selectedSizeId === selectedSizeId
         );
 
         if (existingItem) {
@@ -65,7 +65,7 @@ export const useCartStore = create<CartStore>()(
             cartItems: cartItems.map((item) =>
               item.id === product.id &&
                 item.selectedColor === selectedColor &&
-                item.selectedSize === selectedSize
+                item.selectedSizeId === selectedSizeId
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
             ),
@@ -74,44 +74,44 @@ export const useCartStore = create<CartStore>()(
           set({
             cartItems: [
               ...cartItems,
-              { ...product, quantity: 1, selectedColor, selectedSize },
+              { ...product, quantity: 1, selectedColor, selectedSizeId },
             ],
           });
         }
       },
 
-      removeFromCart: (productId, selectedColor, selectedSize) => {
+      removeFromCart: (productId, selectedColor, selectedSizeId) => {
         set({
           cartItems: get().cartItems.filter(
             (item) =>
               !(
                 item.id === productId &&
                 item.selectedColor === selectedColor &&
-                item.selectedSize === selectedSize
+                item.selectedSizeId === selectedSizeId
               )
           ),
         });
       },
 
-      increaseQuantity: (productId, selectedColor, selectedSize) => {
+      increaseQuantity: (productId, selectedColor, selectedSizeId) => {
         set({
           cartItems: get().cartItems.map((item) =>
             item.id === productId &&
               item.selectedColor === selectedColor &&
-              item.selectedSize === selectedSize
+              item.selectedSizeId === selectedSizeId
               ? { ...item, quantity: item.quantity + 1 }
               : item
           ),
         });
       },
 
-      decreaseQuantity: (productId, selectedColor, selectedSize) => {
+      decreaseQuantity: (productId, selectedColor, selectedSizeId) => {
         const cartItems = get().cartItems;
         const item = cartItems.find(
           (item) =>
             item.id === productId &&
             item.selectedColor === selectedColor &&
-            item.selectedSize === selectedSize
+            item.selectedSizeId === selectedSizeId
         );
 
         if (item && item.quantity > 1) {
@@ -119,13 +119,13 @@ export const useCartStore = create<CartStore>()(
             cartItems: cartItems.map((item) =>
               item.id === productId &&
                 item.selectedColor === selectedColor &&
-                item.selectedSize === selectedSize
+                item.selectedSizeId === selectedSizeId
                 ? { ...item, quantity: item.quantity - 1 }
                 : item
             ),
           });
         } else if (item && item.quantity === 1) {
-          get().removeFromCart(productId, selectedColor, selectedSize);
+          get().removeFromCart(productId, selectedColor, selectedSizeId);
         }
       },
 
@@ -140,22 +140,22 @@ export const useCartStore = create<CartStore>()(
         );
       },
 
-      getItemQuantity: (productId, selectedColor, selectedSize) => {
+      getItemQuantity: (productId, selectedColor, selectedSizeId) => {
         const item = get().cartItems.find(
           (item) =>
             item.id === productId &&
             item.selectedColor === selectedColor &&
-            item.selectedSize === selectedSize
+            item.selectedSizeId === selectedSizeId
         );
         return item ? item.quantity : 0;
       },
 
-      isInCart: (productId, selectedColor, selectedSize) => {
+      isInCart: (productId, selectedColor, selectedSizeId) => {
         return get().cartItems.some(
           (item) =>
             item.id === productId &&
             item.selectedColor === selectedColor &&
-            item.selectedSize === selectedSize
+            item.selectedSizeId === selectedSizeId
         );
       },
     }),
