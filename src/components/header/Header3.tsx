@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import React from 'react';
 import {
   FiBook,
@@ -66,29 +66,29 @@ const Header3 = () => {
     { mainLink: 'User Account', subLinks: ['Link 1', 'Link 2', 'Link 3'] },
   ];
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          `${DOMAIN}/api/categories?activeOnly=true`
-        );
-        if (!response.ok) {
-          throw new Error('تعذر تحميل الفئات / Unable to load categories');
-        }
-        const data = await response.json();
-        setCategories(data.data || []);
-      } catch (err) {
-        // Error fetching categories
-        setError(
-          'تعذر تحميل الفئات. يرجى المحاولة مرة أخرى / Unable to load categories. Please try again.'
-        );
-      } finally {
-        setIsLoading(false);
+  const fetchCategories = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${DOMAIN}/api/categories?activeOnly=true`);
+      if (!response.ok) {
+        throw new Error('تعذر تحميل الفئات / Unable to load categories');
       }
-    };
-
-    fetchCategories();
+      const data = await response.json();
+      setCategories(data.data || []);
+      setError(null);
+    } catch (err) {
+      // Error fetching categories
+      setError(
+        'تعذر تحميل الفئات. يرجى المحاولة مرة أخرى / Unable to load categories. Please try again.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const getCategoryIcon = (categoryName: string): React.ReactNode => {
     const iconSize = 16;
