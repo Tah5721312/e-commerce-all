@@ -1,8 +1,9 @@
 'use client';
 
-import { FiX, FiHeart, FiTrash2 } from 'react-icons/fi';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FiHeart, FiTrash2,FiX } from 'react-icons/fi';
+
 import { useFavoritesStore } from '@/store/favoritesStore';
 
 interface FavoritesDrawerProps {

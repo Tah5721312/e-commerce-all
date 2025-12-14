@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiTwitter, FiFacebook, FiInstagram } from 'react-icons/fi';
+import { FiFacebook, FiInstagram,FiTwitter } from 'react-icons/fi';
 
 const Header1 = () => {
   const [selectedLang, setSelectedLang] = useState('EN');

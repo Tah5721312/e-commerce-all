@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { FiShoppingCart, FiHeart } from 'react-icons/fi';
-import type { Product } from '@/types/product';
+import { useMemo,useState } from 'react';
+import { FiHeart,FiShoppingCart } from 'react-icons/fi';
+
 import { useFavoritesStore } from '@/store/favoritesStore';
+
+import type { Product } from '@/types/product';
 
 interface ProductCardProps {
   product: Product;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllProducts, createProduct } from '@/lib/db/products';
+
+import { createProduct,getAllProducts } from '@/lib/db/products';
 
 export async function GET(request: NextRequest) {
   try {
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     // Ensure images is an array and filter out empty values
     const imagesArray = Array.isArray(images)
-      ? images.filter((url: any) => url && typeof url === 'string' && url.trim() !== '')
+      ? images.filter((url: unknown) => url && typeof url === 'string' && url.trim() !== '')
       : [];
 
     console.log('Creating product with images:', imagesArray);

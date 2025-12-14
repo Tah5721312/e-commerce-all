@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { FiSearch } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
-import type { Product, ProductCategory } from '@/types/product';
+import { useEffect, useRef,useState } from 'react';
+import { FiSearch } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import type { Product, ProductCategory } from '@/types/product';
 
 interface SearchBarProps {
   initialQuery?: string;

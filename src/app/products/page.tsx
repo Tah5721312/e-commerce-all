@@ -1,13 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import ProductList from '@/components/main/ProductList';
-import FilterSidebar from '@/components/filters/FilterSidebar';
-import SearchBar from '@/components/search/SearchBar';
+import { useEffect,useState } from 'react';
+
 import { DOMAIN } from '@/lib/constants';
 
-export default function ProductsPage() {
+import FilterSidebar from '@/components/filters/FilterSidebar';
+import ProductList from '@/components/main/ProductList';
+import SearchBar from '@/components/search/SearchBar';
+
+function ProductsPageContent() {
   const searchParams = useSearchParams();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [minRating, setMinRating] = useState(0);
@@ -86,6 +89,14 @@ export default function ProductsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <ProductsPageContent />
+    </Suspense>
   );
 }
 

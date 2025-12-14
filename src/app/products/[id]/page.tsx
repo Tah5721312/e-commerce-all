@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import type { Product, ProductReview } from '@/types/product';
-import ProductDetails from '@/components/main/ProductDetails';
+import { useEffect, useState } from 'react';
+
 import { DOMAIN } from '@/lib/constants';
+
+import ProductDetails from '@/components/main/ProductDetails';
+
+import type { Product, ProductReview } from '@/types/product';
 
 interface ReviewsResponse {
   data: ProductReview[];

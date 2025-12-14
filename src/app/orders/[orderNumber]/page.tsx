@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { FiPackage, FiMail, FiMapPin, FiCalendar, FiDollarSign, FiArrowLeft } from 'react-icons/fi';
 import Link from 'next/link';
-import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FiArrowLeft,FiCalendar, FiDollarSign, FiMail, FiMapPin, FiPackage } from 'react-icons/fi';
+
+import { DOMAIN } from '@/lib/constants';
 
 interface OrderItem {
   id: number;

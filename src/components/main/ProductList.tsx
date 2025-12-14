@@ -1,14 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { usePathname,useRouter, useSearchParams } from 'next/navigation';
+import { useEffect,useState } from 'react';
+
+import { DOMAIN } from '@/lib/constants';
+
+import CartButton from '@/components/cart/CartButton';
+import CartDrawer from '@/components/cart/CartDrawer';
+
 import { useCartStore } from '@/store/cartStore';
-import type { Product, ProductCategory } from '@/types/product';
+
 import ProductCard from './ProductCard';
 import ProductDetails from './ProductDetails';
-import CartDrawer from '@/components/cart/CartDrawer';
-import CartButton from '@/components/cart/CartButton';
-import { DOMAIN } from '@/lib/constants';
+
+import type { Product, ProductCategory } from '@/types/product';
 
 interface ProductListProps {
   priceRange: [number, number];

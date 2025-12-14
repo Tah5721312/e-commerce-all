@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiX, FiPlus, FiTrash2, FiEdit2, FiSave, FiXCircle } from 'react-icons/fi';
-import type { Product } from '@/types/product';
+import { useEffect,useState } from 'react';
+import { FiEdit2, FiPlus, FiSave, FiTrash2, FiX, FiXCircle } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import type { Product } from '@/types/product';
 
 interface ProductImage {
   id: number;

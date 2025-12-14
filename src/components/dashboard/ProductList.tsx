@@ -1,7 +1,8 @@
 'use client';
 
-import { FiEdit, FiTrash2, FiEye, FiImage } from 'react-icons/fi';
 import Image from 'next/image';
+import { FiEdit, FiImage,FiTrash2 } from 'react-icons/fi';
+
 import type { Product } from '@/types/product';
 
 interface ProductListProps {

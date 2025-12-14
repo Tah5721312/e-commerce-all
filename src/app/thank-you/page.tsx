@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { FiCheckCircle, FiPackage, FiMail, FiHome } from 'react-icons/fi';
 import Link from 'next/link';
+import { Suspense } from 'react';
+import { useRouter,useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FiCheckCircle, FiHome,FiMail, FiPackage } from 'react-icons/fi';
 
-export default function ThankYouPage() {
+function ThankYouPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderNumber = searchParams.get('order');
@@ -108,6 +109,14 @@ export default function ThankYouPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ThankYouPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <ThankYouPageContent />
+    </Suspense>
   );
 }
 

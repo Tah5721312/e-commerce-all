@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FiX, FiShoppingCart, FiTrash2, FiPlus, FiMinus } from 'react-icons/fi';
-import { useCartStore, type CartItem } from '@/store/cartStore';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FiMinus,FiPlus, FiShoppingCart, FiTrash2, FiX } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import { type CartItem,useCartStore } from '@/store/cartStore';
 
 interface CartDrawerProps {
   open: boolean;

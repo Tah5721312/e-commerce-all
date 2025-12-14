@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
 import { OrderStatus } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { prisma } from '@/lib/db/prisma';
 
 interface OrderItem {
   productId: number;
@@ -60,11 +61,13 @@ export async function POST(request: NextRequest) {
           });
 
           if (productColor) {
-            // Find the variant
+            // Find the variant by size name
             const variant = await prisma.productVariant.findFirst({
               where: {
                 productColorId: productColor.id,
-                size: item.size as any,
+                size: {
+                  name: item.size,
+                },
               },
             });
 

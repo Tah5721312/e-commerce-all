@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiPlus, FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
-import type { ProductCategory } from '@/types/product';
+import { useEffect,useState } from 'react';
+import { FiCheck, FiEdit, FiPlus, FiTrash2, FiX } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import type { ProductCategory } from '@/types/product';
 
 interface CategoriesTabProps {
   onCategoryChange?: () => void;

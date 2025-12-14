@@ -1,31 +1,30 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { useFavoritesStore } from '@/store/favoritesStore';
+import { useState } from 'react';
+
 import ProductCard from '@/components/main/ProductCard';
 import ProductDetails from '@/components/main/ProductDetails';
-import type { Product, ProductSize } from '@/types/product';
+
+import { useFavoritesStore } from '@/store/favoritesStore';
+
+import type { Product } from '@/types/product';
 
 const FavoritesPage = () => {
   const favorites = useFavoritesStore((state) => state.favorites);
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
-  const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null);
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const handleProductClick = (
-    product: Product,
-    colorId?: number | null,
-    size?: ProductSize | null
-  ) => {
+  const handleProductClick = (product: Product) => {
     const fallbackColor =
       product.colors && product.colors.length > 0 ? product.colors[0].id : null;
 
     setSelectedProduct(product);
-    setSelectedColorId(colorId !== undefined ? colorId : fallbackColor);
-    setSelectedSize(size !== undefined ? size : null);
+    setSelectedColorId(fallbackColor);
+    setSelectedSizeId(null);
     setIsDetailsOpen(true);
   };
 
@@ -58,12 +57,8 @@ const FavoritesPage = () => {
             <ProductCard
               key={product.id}
               product={product}
-              onImageClick={(colorId, size) =>
-                handleProductClick(product, colorId, size)
-              }
-              onAddToCart={(colorId, size) =>
-                handleProductClick(product, colorId, size)
-              }
+              onImageClick={() => handleProductClick(product)}
+              onAddToCart={() => handleProductClick(product)}
             />
           ))}
         </div>
@@ -107,10 +102,10 @@ const FavoritesPage = () => {
               <ProductDetails
                 product={selectedProduct}
                 initialColorId={selectedColorId}
-                initialSize={selectedSize}
-                onSelectionChange={(colorId, size) => {
+                initialSizeId={selectedSizeId}
+                onSelectionChange={(colorId, sizeId) => {
                   setSelectedColorId(colorId);
-                  setSelectedSize(size);
+                  setSelectedSizeId(sizeId);
                 }}
               />
             </div>

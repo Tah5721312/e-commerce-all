@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {
-  FiMenu, FiGrid, FiChevronRight, FiX, FiBox, FiMonitor, FiBook, FiHeadphones, FiSmartphone,
-  FiWatch, FiHome, FiHeart, FiGift, FiTruck, FiCamera, FiTool, FiCoffee, FiWifi, FiMusic,
-  FiShoppingBag
-} from 'react-icons/fi';
-import React from 'react';
 import Link from 'next/link';
+import { useEffect,useState } from 'react';
+import React from 'react';
+import {
+FiBook, FiBox, FiCamera, FiChevronRight, FiCoffee, FiGift, FiGrid, FiHeadphones, FiHeart, FiHome,   FiMenu, FiMonitor, FiMusic,
+  FiShoppingBag,
+FiSmartphone,
+FiTool, FiTruck,   FiWatch, FiWifi, FiX} from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
 
 interface Category {

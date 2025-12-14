@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { FiShoppingCart, FiUser, FiSettings, FiHeart } from 'react-icons/fi';
 import Link from 'next/link';
+import { FiHeart,FiSettings, FiShoppingCart, FiUser } from 'react-icons/fi';
+
+import SearchBar from '@/components/search/SearchBar';
+
 import { useCartStore } from '@/store/cartStore';
 import { useFavoritesStore } from '@/store/favoritesStore';
-import SearchBar from '@/components/search/SearchBar';
 
 interface Header2Props {
   onCartOpen?: () => void;
@@ -40,43 +41,43 @@ const Header2 = ({ onCartOpen, onFavoritesOpen }: Header2Props) => {
             title="المفضلة"
           >
             <FiHeart className="w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors" />
-            {favoritesCount > 0 && (
+          {favoritesCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
-                {favoritesCount}
-              </span>
-            )}
-          </button>
+              {favoritesCount}
+            </span>
+          )}
+        </button>
 
-          <button
+        <button
             onClick={() => onCartOpen?.()}
             className="relative p-2.5 hover:bg-gray-100 rounded-full transition-colors group"
-            aria-label="cart"
+          aria-label="cart"
             title="سلة التسوق"
-          >
+        >
             <FiShoppingCart className="w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors" />
-            {cartItems.length > 0 && (
+          {cartItems.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
-                {cartItems.length}
-              </span>
-            )}
-          </button>
+              {cartItems.length}
+            </span>
+          )}
+        </button>
 
-          <Link
-            href="/dashboard"
+        <Link
+          href="/dashboard"
             className="p-2.5 hover:bg-gray-100 rounded-full transition-colors group"
-            aria-label="dashboard"
+          aria-label="dashboard"
             title="لوحة التحكم"
-          >
+        >
             <FiSettings className="w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors" />
-          </Link>
+        </Link>
 
-          <button
+        <button
             className="p-2.5 hover:bg-gray-100 rounded-full transition-colors group"
-            aria-label="user"
+          aria-label="user"
             title="حسابي"
-          >
+        >
             <FiUser className="w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors" />
-          </button>
+        </button>
         </div>
       </div>
     </header>

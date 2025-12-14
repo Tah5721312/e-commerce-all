@@ -1,6 +1,6 @@
 'use client';
 
-import { FiZap, FiAward, FiClock, FiCreditCard } from 'react-icons/fi';
+import { FiAward, FiClock, FiCreditCard,FiZap } from 'react-icons/fi';
 
 interface IconBoxProps {
   icon: React.ReactNode;

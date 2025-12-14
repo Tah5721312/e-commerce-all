@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import { FiEdit2, FiPlus,FiTrash2 } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
 
 type HeroBanner = {

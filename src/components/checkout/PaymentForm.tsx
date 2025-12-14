@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import {
-  Elements,
   CardElement,
-  useStripe,
+  Elements,
   useElements,
+  useStripe,
 } from '@stripe/react-stripe-js';
+import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/store/cartStore';
-import { FiLock, FiCreditCard, FiCheckCircle } from 'react-icons/fi';
+import { FormEvent,useState } from 'react';
+import { FiCheckCircle,FiCreditCard, FiLock } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import { useCartStore } from '@/store/cartStore';
 
 // Initialize Stripe
 const stripePromise = loadStripe(

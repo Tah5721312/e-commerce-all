@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiX, FiPlus, FiTrash2 } from 'react-icons/fi';
-import type { Product, ProductSize, ProductCategory } from '@/types/product';
+import { useEffect,useState } from 'react';
+import { FiPlus, FiTrash2,FiX } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import type { Product, ProductCategory,ProductSize } from '@/types/product';
 
 interface ProductModalProps {
   product: Product | null;

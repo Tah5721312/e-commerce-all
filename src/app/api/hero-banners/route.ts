@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/db/prisma';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const heroBannerDelegate = (prisma as any).heroBanner;
 
 export async function GET() {

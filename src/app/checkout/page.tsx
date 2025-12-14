@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/store/cartStore';
-import PaymentForm from '@/components/checkout/PaymentForm';
-import { FiShoppingCart, FiArrowLeft } from 'react-icons/fi';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FiArrowLeft,FiShoppingCart } from 'react-icons/fi';
+
+import PaymentForm from '@/components/checkout/PaymentForm';
+
+import { useCartStore } from '@/store/cartStore';
 
 export default function CheckoutPage() {
   const router = useRouter();

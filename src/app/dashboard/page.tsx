@@ -1,34 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect,useState } from 'react';
 import {
-  FiPlus,
-  FiEdit,
-  FiTrash2,
   FiBarChart2,
-  FiPackage,
-  FiDollarSign,
-  FiStar,
-  FiShoppingBag,
-  FiLayers,
-  FiBriefcase,
   FiBox,
+  FiBriefcase,
+  FiLayers,
+  FiPackage,
+  FiPlus,
+  FiShoppingBag,
 } from 'react-icons/fi';
-import type { Product } from '@/types/product';
-import ProductModal from '@/components/dashboard/ProductModal';
-import ProductList from '@/components/dashboard/ProductList';
-import StatsCards from '@/components/dashboard/StatsCards';
+
 import { DOMAIN } from '@/lib/constants';
-import ProductImagesModal from '@/components/dashboard/ProductImagesModal';
+
+import CategoriesTab from '@/components/dashboard/CategoriesTab';
+import CompaniesTab from '@/components/dashboard/CompaniesTab';
+import HeroBannersTab from '@/components/dashboard/HeroBannersTab';
+import HeroContentTab from '@/components/dashboard/HeroContentTab';
+import InventoryTab from '@/components/dashboard/InventoryTab';
 import OrderList from '@/components/dashboard/OrderList';
 import OrderModal from '@/components/dashboard/OrderModal';
 import OrderStatsCards from '@/components/dashboard/OrderStatsCards';
-import HeroContentTab from '@/components/dashboard/HeroContentTab';
-import HeroBannersTab from '@/components/dashboard/HeroBannersTab';
-import CategoriesTab from '@/components/dashboard/CategoriesTab';
+import ProductImagesModal from '@/components/dashboard/ProductImagesModal';
+import ProductList from '@/components/dashboard/ProductList';
+import ProductModal from '@/components/dashboard/ProductModal';
 import SizesTab from '@/components/dashboard/SizesTab';
-import CompaniesTab from '@/components/dashboard/CompaniesTab';
-import InventoryTab from '@/components/dashboard/InventoryTab';
+import StatsCards from '@/components/dashboard/StatsCards';
+
+import type { Product } from '@/types/product';
 
 interface Stats {
   totalProducts: number;

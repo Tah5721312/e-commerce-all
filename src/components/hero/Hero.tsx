@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { useEffect, useState } from 'react';
 import { Autoplay, Pagination } from 'swiper/modules';
-
+import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-import IconSection from './IconSection';
 import { DOMAIN } from '@/lib/constants';
+
+import IconSection from './IconSection';
 
 type HeroSlide = {
   id?: number;

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { prisma } from '@/lib/db/prisma';
 
 // GET - Fetch a single company by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!process.env.DATABASE_URL) {
@@ -14,7 +15,8 @@ export async function GET(
       );
     }
 
-    const id = parseInt(params.id);
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json(
         { error: 'Invalid company ID' },
@@ -58,7 +60,7 @@ export async function GET(
 // PUT - Update a company
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!process.env.DATABASE_URL) {
@@ -68,7 +70,8 @@ export async function PUT(
       );
     }
 
-    const id = parseInt(params.id);
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json(
         { error: 'Invalid company ID' },
@@ -93,7 +96,7 @@ export async function PUT(
 
     // Check if name or slug conflicts with another company
     if (name || slug) {
-      const orConditions: any[] = [];
+      const orConditions: Array<{ name?: string; slug?: string }> = [];
       if (name) orConditions.push({ name });
       if (slug) orConditions.push({ slug });
 
@@ -143,7 +146,7 @@ export async function PUT(
 // DELETE - Delete a company
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!process.env.DATABASE_URL) {
@@ -153,7 +156,8 @@ export async function DELETE(
       );
     }
 
-    const id = parseInt(params.id);
+    const { id: idParam } = await params;
+    const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json(
         { error: 'Invalid company ID' },

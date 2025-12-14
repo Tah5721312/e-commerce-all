@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { FiSliders, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { useCallback,useEffect, useState } from 'react';
+import { FiChevronDown, FiChevronUp,FiSliders } from 'react-icons/fi';
 
 interface FilterSidebarProps {
   priceRange: [number, number];

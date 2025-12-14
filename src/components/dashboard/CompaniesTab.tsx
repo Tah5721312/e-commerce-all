@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiPlus, FiEdit, FiTrash2, FiBriefcase, FiSearch } from 'react-icons/fi';
-import type { Company } from '@/types/product';
+import { useEffect,useState } from 'react';
+import { FiBriefcase, FiEdit, FiPlus, FiSearch,FiTrash2 } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import type { Company } from '@/types/product';
 
 const CompaniesTab = () => {
   const [companies, setCompanies] = useState<Company[]>([]);

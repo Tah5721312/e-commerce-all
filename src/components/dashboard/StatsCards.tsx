@@ -1,6 +1,6 @@
 'use client';
 
-import { FiPackage, FiDollarSign, FiStar, FiBarChart2 } from 'react-icons/fi';
+import { FiBarChart2,FiDollarSign, FiPackage, FiStar } from 'react-icons/fi';
 
 interface Stats {
   totalProducts: number;

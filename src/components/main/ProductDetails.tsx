@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { FiShoppingCart, FiPlus, FiMinus } from 'react-icons/fi';
+import { useEffect,useMemo, useState } from 'react';
+import { FiMinus,FiPlus, FiShoppingCart } from 'react-icons/fi';
+
 import { useCartStore } from '@/store/cartStore';
+
 import type { Product } from '@/types/product';
 
 interface ProductDetailsProps {

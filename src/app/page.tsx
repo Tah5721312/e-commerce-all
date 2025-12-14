@@ -1,16 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+
+import CartDrawer from '@/components/cart/CartDrawer';
+import FavoritesDrawer from '@/components/favorites/FavoritesDrawer';
+import Footer from '@/components/footer/Footer';
 import Header1 from '@/components/header/Header1';
 import Header2 from '@/components/header/Header2';
 import Header3 from '@/components/header/Header3';
 import Hero from '@/components/hero/Hero';
-import Footer from '@/components/footer/Footer';
-import ScrollToTop from '@/components/scroll/ScrollToTop';
 import ProductList from '@/components/main/ProductList';
-import CartDrawer from '@/components/cart/CartDrawer';
-import FavoritesDrawer from '@/components/favorites/FavoritesDrawer';
+import ScrollToTop from '@/components/scroll/ScrollToTop';
 
 export default function HomePage() {
   const [priceRange] = useState<[number, number]>([0, 10000]);
@@ -32,7 +33,9 @@ export default function HomePage() {
       <Header3 />
       <div className="bg-white">
         <Hero />
-        <ProductList priceRange={priceRange} minRating={minRating} />
+        <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading products...</div>}>
+          <ProductList priceRange={priceRange} minRating={minRating} />
+        </Suspense>
       </div>
       <Footer />
       <ScrollToTop />

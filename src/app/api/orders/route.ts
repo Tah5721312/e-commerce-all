@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db/prisma';
 import { OrderStatus } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { prisma } from '@/lib/db/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: { status?: OrderStatus } | {} =
+    const where: { status?: OrderStatus } =
       status && status !== 'all'
         ? { status: status as OrderStatus }
         : {};

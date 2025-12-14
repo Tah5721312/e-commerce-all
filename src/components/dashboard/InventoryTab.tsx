@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiPackage, FiPlus, FiMinus, FiEdit2, FiSearch } from 'react-icons/fi';
-import type { Product } from '@/types/product';
+import { useEffect,useState } from 'react';
+import { FiEdit2, FiPackage, FiSearch } from 'react-icons/fi';
+
 import { DOMAIN } from '@/lib/constants';
+
+import type { Product } from '@/types/product';
 
 interface InventoryItem {
   id: number;

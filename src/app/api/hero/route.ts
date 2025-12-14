@@ -23,6 +23,7 @@ function validatePayload(payload: Record<string, unknown>) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const heroSlideDelegate = (prisma as any).heroSlide;
 
 export async function GET() {

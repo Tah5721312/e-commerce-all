@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProductById } from '@/lib/db/products';
+
 import { prisma } from '@/lib/db/prisma';
+import { getProductById } from '@/lib/db/products';
 
 export async function GET(
   request: NextRequest,
@@ -115,7 +116,7 @@ export async function PUT(
     }
 
     // Update product
-    const updatedProduct = await prisma.product.update({
+    await prisma.product.update({
       where: { id: productId },
       data: {
         productTitle,
@@ -236,36 +237,40 @@ export async function PUT(
         },
       });
 
+      if (!productWithImages) {
+        return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      }
+
       return NextResponse.json({
         data: {
-          id: productWithImages!.id,
-          productTitle: productWithImages!.productTitle,
-          productPrice: Number(productWithImages!.productPrice),
-          productDiscription: productWithImages!.productDiscription,
-          productRating: Number(productWithImages!.productRating),
+          id: productWithImages.id,
+          productTitle: productWithImages.productTitle,
+          productPrice: Number(productWithImages.productPrice),
+          productDiscription: productWithImages.productDiscription,
+          productRating: Number(productWithImages.productRating),
           category: {
-            id: productWithImages!.category.id,
-            name: productWithImages!.category.name,
-            slug: productWithImages!.category.slug,
-            description: productWithImages!.category.description,
-            isActive: productWithImages!.category.isActive,
-            sortOrder: productWithImages!.category.sortOrder,
-            createdAt: productWithImages!.category.createdAt.toISOString(),
-            updatedAt: productWithImages!.category.updatedAt.toISOString(),
+            id: productWithImages.category.id,
+            name: productWithImages.category.name,
+            slug: productWithImages.category.slug,
+            description: productWithImages.category.description,
+            isActive: productWithImages.category.isActive,
+            sortOrder: productWithImages.category.sortOrder,
+            createdAt: productWithImages.category.createdAt.toISOString(),
+            updatedAt: productWithImages.category.updatedAt.toISOString(),
           },
-          categoryId: productWithImages!.categoryId,
-          createdAt: productWithImages!.createdAt.toISOString(),
-          updatedAt: productWithImages!.updatedAt.toISOString(),
-          productimg: productWithImages!.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
+          categoryId: productWithImages.categoryId,
+          createdAt: productWithImages.createdAt.toISOString(),
+          updatedAt: productWithImages.updatedAt.toISOString(),
+          productimg: productWithImages.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
             id: img.id,
             url: img.imageUrl,
             image_order: img.imageOrder,
           })),
-          colors: productWithImages!.colors?.map((color: any) => ({
+          colors: productWithImages.colors?.map((color) => ({
             id: color.id,
             colorName: color.colorName,
             colorCode: color.colorCode,
-            variants: color.variants.map((variant: any) => ({
+            variants: color.variants.map((variant) => ({
               id: variant.id,
               size: variant.size,
               quantity: variant.quantity,
@@ -302,36 +307,40 @@ export async function PUT(
       },
     });
 
+    if (!productWithColors) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
     return NextResponse.json({
       data: {
-        id: productWithColors!.id,
-        productTitle: productWithColors!.productTitle,
-        productPrice: Number(productWithColors!.productPrice),
-        productDiscription: productWithColors!.productDiscription,
-        productRating: Number(productWithColors!.productRating),
+        id: productWithColors.id,
+        productTitle: productWithColors.productTitle,
+        productPrice: Number(productWithColors.productPrice),
+        productDiscription: productWithColors.productDiscription,
+        productRating: Number(productWithColors.productRating),
         category: {
-          id: productWithColors!.category.id,
-          name: productWithColors!.category.name,
-          slug: productWithColors!.category.slug,
-          description: productWithColors!.category.description,
-          isActive: productWithColors!.category.isActive,
-          sortOrder: productWithColors!.category.sortOrder,
-          createdAt: productWithColors!.category.createdAt.toISOString(),
-          updatedAt: productWithColors!.category.updatedAt.toISOString(),
+          id: productWithColors.category.id,
+          name: productWithColors.category.name,
+          slug: productWithColors.category.slug,
+          description: productWithColors.category.description,
+          isActive: productWithColors.category.isActive,
+          sortOrder: productWithColors.category.sortOrder,
+          createdAt: productWithColors.category.createdAt.toISOString(),
+          updatedAt: productWithColors.category.updatedAt.toISOString(),
         },
-        categoryId: productWithColors!.categoryId,
-        createdAt: productWithColors!.createdAt.toISOString(),
-        updatedAt: productWithColors!.updatedAt.toISOString(),
-        productimg: productWithColors!.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
+        categoryId: productWithColors.categoryId,
+        createdAt: productWithColors.createdAt.toISOString(),
+        updatedAt: productWithColors.updatedAt.toISOString(),
+        productimg: productWithColors.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
           id: img.id,
           url: img.imageUrl,
           image_order: img.imageOrder,
         })),
-        colors: productWithColors!.colors?.map((color: any) => ({
+        colors: productWithColors.colors?.map((color) => ({
           id: color.id,
           colorName: color.colorName,
           colorCode: color.colorCode,
-          variants: color.variants.map((variant: any) => ({
+          variants: color.variants.map((variant) => ({
             id: variant.id,
             size: variant.size,
             quantity: variant.quantity,

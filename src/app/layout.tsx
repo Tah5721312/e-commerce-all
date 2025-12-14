@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import * as React from 'react';
+import '@/lib/env';
 
 import '@/styles/globals.css';
-import '@/lib/env';
 
 import { siteConfig } from '@/constant/config';
 

@@ -1,8 +1,9 @@
 import { prisma } from './prisma';
-import type { Product, ProductCategory } from '@/types/product';
+
+import type { Product } from '@/types/product';
 
 export async function getAllProducts(categorySlug?: string): Promise<Product[]> {
-  const where: any = {};
+  const where: { categoryId?: number } = {};
 
   // Support filtering by either category slug or name
   if (categorySlug) {
@@ -64,7 +65,7 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
     },
   });
 
-  return products.map((product: any) => ({
+  return products.map((product) => ({
     id: product.id,
     productTitle: product.productTitle,
     productPrice: Number(product.productPrice),
@@ -98,7 +99,7 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
     quantity: product.quantity || 0, // For products without colors or sizes
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
-    productimg: product.images.map((img: any) => {
+    productimg: product.images.map((img) => {
       let imageUrl = img.imageUrl;
       // If it's not an external URL, ensure it starts with /
       if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
@@ -112,26 +113,32 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
         image_order: img.imageOrder,
       };
     }),
-    colors: product.colors?.map((color: any) => ({
+    colors: product.colors?.map((color) => ({
       id: color.id,
       quantity: color.quantity || 0,
       colorName: color.colorName,
       colorCode: color.colorCode,
-      variants: color.variants.map((variant: any) => ({
-        id: variant.id,
-        size: variant.size ? {
-          id: variant.size.id,
-          name: variant.size.name,
-          displayName: variant.size.displayName,
-          sortOrder: variant.size.sortOrder,
-          createdAt: variant.size.createdAt.toISOString(),
-          updatedAt: variant.size.updatedAt.toISOString(),
-        } : null,
-        sizeId: variant.sizeId,
-        quantity: variant.quantity,
-      })),
+      variants: color.variants
+        .filter((variant) => variant.size !== null)
+        .map((variant) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const size = variant.size!;
+          return {
+            id: variant.id,
+            size: {
+              id: size.id,
+              name: size.name,
+              displayName: size.displayName,
+              sortOrder: size.sortOrder,
+              createdAt: size.createdAt.toISOString(),
+              updatedAt: size.updatedAt.toISOString(),
+            },
+            sizeId: variant.sizeId,
+            quantity: variant.quantity,
+          };
+        }),
     })) || [],
-    reviews: product.reviews?.map((review: any) => ({
+    reviews: product.reviews?.map((review) => ({
       id: review.id,
       productId: review.productId,
       author: review.author,
@@ -234,19 +241,23 @@ export async function getProductById(id: number): Promise<Product | null> {
       quantity: color.quantity || 0,
       variants: color.variants
         .filter((variant) => variant.size !== null)
-        .map((variant) => ({
-          id: variant.id,
-          size: {
-            id: variant.size!.id,
-            name: variant.size!.name,
-            displayName: variant.size!.displayName,
-            sortOrder: variant.size!.sortOrder,
-            createdAt: variant.size!.createdAt.toISOString(),
-            updatedAt: variant.size!.updatedAt.toISOString(),
-          },
-          sizeId: variant.sizeId,
-          quantity: variant.quantity,
-        })),
+        .map((variant) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const size = variant.size!;
+          return {
+            id: variant.id,
+            size: {
+              id: size.id,
+              name: size.name,
+              displayName: size.displayName,
+              sortOrder: size.sortOrder,
+              createdAt: size.createdAt.toISOString(),
+              updatedAt: size.updatedAt.toISOString(),
+            },
+            sizeId: variant.sizeId,
+            quantity: variant.quantity,
+          };
+        }),
     })) || [],
     reviews:
       product.reviews?.map((review) => ({
@@ -425,7 +436,7 @@ export async function createProduct(product: {
   console.log('Product created successfully!');
   console.log('Product ID:', productWithImages.id);
   console.log('Images created:', productWithImages.images.length);
-  console.log('Image details:', productWithImages.images.map((img: any) => ({
+  console.log('Image details:', productWithImages.images.map((img) => ({
     id: img.id,
     url: img.imageUrl,
     order: img.imageOrder,
@@ -450,7 +461,7 @@ export async function createProduct(product: {
     categoryId: productWithImages.categoryId,
     createdAt: productWithImages.createdAt.toISOString(),
     updatedAt: productWithImages.updatedAt.toISOString(),
-    productimg: productWithImages.images.map((img: any) => {
+    productimg: productWithImages.images.map((img) => {
       let imageUrl = img.imageUrl;
       // If it's not an external URL, ensure it starts with /
       if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
@@ -464,23 +475,29 @@ export async function createProduct(product: {
         image_order: img.imageOrder,
       };
     }),
-    colors: productWithImages.colors?.map((color: any) => ({
+    colors: productWithImages.colors?.map((color) => ({
       id: color.id,
       colorName: color.colorName,
       colorCode: color.colorCode,
-      variants: color.variants.map((variant: any) => ({
-        id: variant.id,
-        size: variant.size ? {
-          id: variant.size.id,
-          name: variant.size.name,
-          displayName: variant.size.displayName,
-          sortOrder: variant.size.sortOrder,
-          createdAt: variant.size.createdAt.toISOString(),
-          updatedAt: variant.size.updatedAt.toISOString(),
-        } : null,
-        sizeId: variant.sizeId,
-        quantity: variant.quantity,
-      })),
+      variants: color.variants
+        .filter((variant) => variant.size !== null)
+        .map((variant) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const size = variant.size!;
+          return {
+            id: variant.id,
+            size: {
+              id: size.id,
+              name: size.name,
+              displayName: size.displayName,
+              sortOrder: size.sortOrder,
+              createdAt: size.createdAt.toISOString(),
+              updatedAt: size.updatedAt.toISOString(),
+            },
+            sizeId: variant.sizeId,
+            quantity: variant.quantity,
+          };
+        }),
     })) || [],
   };
 }

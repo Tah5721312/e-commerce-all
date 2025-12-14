@@ -1,6 +1,6 @@
 'use client';
 
-import { FiPackage, FiDollarSign, FiClock, FiTruck, FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import { FiCheckCircle, FiClock, FiDollarSign, FiPackage, FiTruck, FiXCircle } from 'react-icons/fi';
 
 interface OrderStats {
   totalOrders: number;
