@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -21,6 +19,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Initialize Stripe client only when needed
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     // Create Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
