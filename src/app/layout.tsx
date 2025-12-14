@@ -16,10 +16,10 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   icons: {
     icon: '/favicon/favicon.ico',
-    shortcut: '/favicon/favicon-16x16.png',
-    apple: '/favicon/apple-touch-icon.png',
+    shortcut: '/favicon/favicon.png',
+    apple: '/favicon/apple-icon.png',
   },
-  manifest: `/favicon/site.webmanifest`,
+  manifest: `/favicon/manifest.json`,
   openGraph: {
     url: siteConfig.url,
     title: siteConfig.title,
@@ -43,10 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        {children}
-      </body>
+    <html lang='en'>
+      <body>{children}</body>
     </html>
   );
 }

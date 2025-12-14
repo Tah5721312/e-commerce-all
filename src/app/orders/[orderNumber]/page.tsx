@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { FiArrowLeft,FiCalendar, FiDollarSign, FiMail, FiMapPin, FiPackage } from 'react-icons/fi';
+import { useParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  FiArrowLeft,
+  FiCalendar,
+  FiDollarSign,
+  FiMail,
+  FiMapPin,
+  FiPackage,
+} from 'react-icons/fi';
 
 import { DOMAIN } from '@/lib/constants';
 
@@ -33,19 +40,13 @@ interface Order {
 
 export default function OrderDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const orderNumber = params.orderNumber as string;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (orderNumber) {
-      fetchOrderDetails();
-    }
-  }, [orderNumber]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
+    if (!orderNumber) return;
     try {
       setLoading(true);
       const response = await fetch(`${DOMAIN}/api/orders/${orderNumber}`);
@@ -53,15 +54,37 @@ export default function OrderDetailsPage() {
 
       if (response.ok && data.order) {
         setOrder(data.order);
+        setError(null);
       } else {
-        setError(data.error || 'Order not found');
+        if (response.status === 404) {
+          setError(
+            'الطلب غير موجود. يرجى التحقق من رقم الطلب / Order not found. Please check the order number.'
+          );
+        } else {
+          setError(
+            data.error ||
+              'تعذر تحميل تفاصيل الطلب. يرجى المحاولة مرة أخرى / Unable to load order details. Please try again.'
+          );
+        }
       }
     } catch (err) {
-      setError('Failed to load order details');
+      if (err instanceof Error && err.message.includes('fetch')) {
+        setError(
+          'لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت / Unable to connect to server. Please check your internet connection.'
+        );
+      } else {
+        setError(
+          'تعذر تحميل تفاصيل الطلب. يرجى المحاولة مرة أخرى / Unable to load order details. Please try again.'
+        );
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderNumber]);
+
+  useEffect(() => {
+    fetchOrderDetails();
+  }, [fetchOrderDetails]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -99,11 +122,11 @@ export default function OrderDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">جاري التحميل... / Loading...</p>
+      <div className='min-h-screen bg-gray-50 py-12 px-4'>
+        <div className='max-w-4xl mx-auto'>
+          <div className='bg-white rounded-lg shadow-lg p-8 text-center'>
+            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto'></div>
+            <p className='mt-4 text-gray-600'>جاري التحميل... / Loading...</p>
           </div>
         </div>
       </div>
@@ -112,17 +135,17 @@ export default function OrderDetailsPage() {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">
+      <div className='min-h-screen bg-gray-50 py-12 px-4'>
+        <div className='max-w-4xl mx-auto'>
+          <div className='bg-white rounded-lg shadow-lg p-8 text-center'>
+            <h1 className='text-2xl font-bold text-red-600 mb-4'>
               {error || 'الطلب غير موجود / Order Not Found'}
             </h1>
             <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700"
+              href='/'
+              className='inline-flex items-center gap-2 text-purple-600 hover:text-purple-700'
             >
-              <FiArrowLeft className="w-5 h-5" />
+              <FiArrowLeft className='w-5 h-5' />
               العودة للصفحة الرئيسية / Back to Home
             </Link>
           </div>
@@ -132,28 +155,28 @@ export default function OrderDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className='min-h-screen bg-gray-50 py-12 px-4'>
+      <div className='max-w-4xl mx-auto'>
         {/* Header */}
-        <div className="mb-6">
+        <div className='mb-6'>
           <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            href='/'
+            className='inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4'
           >
-            <FiArrowLeft className="w-5 h-5" />
+            <FiArrowLeft className='w-5 h-5' />
             <span>العودة / Back</span>
           </Link>
-          <h1 className="text-3xl font-bold">تفاصيل الطلب / Order Details</h1>
+          <h1 className='text-3xl font-bold'>تفاصيل الطلب / Order Details</h1>
         </div>
 
         {/* Order Info Card */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-6 border-b">
+        <div className='bg-white rounded-lg shadow-lg p-6 mb-6'>
+          <div className='flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-6 border-b'>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className='text-2xl font-bold text-gray-900 mb-2'>
                 {order.orderNumber}
               </h2>
-              <p className="text-gray-600">
+              <p className='text-gray-600'>
                 {new Date(order.createdAt).toLocaleDateString('ar-EG', {
                   year: 'numeric',
                   month: 'long',
@@ -163,7 +186,7 @@ export default function OrderDetailsPage() {
                 })}
               </p>
             </div>
-            <div className="mt-4 md:mt-0">
+            <div className='mt-4 md:mt-0'>
               <span
                 className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
                   order.status
@@ -175,28 +198,30 @@ export default function OrderDetailsPage() {
           </div>
 
           {/* Customer Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <FiMail className="w-5 h-5" />
+              <h3 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                <FiMail className='w-5 h-5' />
                 معلومات العميل / Customer Info
               </h3>
-              <div className="space-y-2 text-gray-600">
+              <div className='space-y-2 text-gray-600'>
                 <p>
-                  <span className="font-medium">الاسم / Name:</span> {order.customerName}
+                  <span className='font-medium'>الاسم / Name:</span>{' '}
+                  {order.customerName}
                 </p>
                 <p>
-                  <span className="font-medium">البريد / Email:</span> {order.customerEmail}
+                  <span className='font-medium'>البريد / Email:</span>{' '}
+                  {order.customerEmail}
                 </p>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <FiMapPin className="w-5 h-5" />
+              <h3 className='text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                <FiMapPin className='w-5 h-5' />
                 العنوان / Address
               </h3>
-              <div className="space-y-2 text-gray-600">
+              <div className='space-y-2 text-gray-600'>
                 <p>{order.customerAddress}</p>
                 <p>
                   {order.customerCity}, {order.customerPostalCode}
@@ -208,31 +233,31 @@ export default function OrderDetailsPage() {
         </div>
 
         {/* Order Items */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <FiPackage className="w-6 h-6" />
+        <div className='bg-white rounded-lg shadow-lg p-6 mb-6'>
+          <h3 className='text-xl font-bold text-gray-900 mb-6 flex items-center gap-2'>
+            <FiPackage className='w-6 h-6' />
             المنتجات / Items
           </h3>
 
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {order.items.map((item) => (
               <div
                 key={item.id}
-                className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg"
+                className='flex flex-col md:flex-row gap-4 p-4 border rounded-lg'
               >
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 mb-1">
+                <div className='flex-1'>
+                  <h4 className='font-semibold text-gray-900 mb-1'>
                     {item.productTitle}
                   </h4>
-                  <p className="text-sm text-gray-600">
+                  <p className='text-sm text-gray-600'>
                     الكمية / Quantity: {item.quantity}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className='text-sm text-gray-600'>
                     السعر / Price: ${item.productPrice.toFixed(2)}
                   </p>
                 </div>
-                <div className="text-right md:text-left">
-                  <p className="text-lg font-bold text-purple-600">
+                <div className='text-right md:text-left'>
+                  <p className='text-lg font-bold text-purple-600'>
                     ${item.subtotal.toFixed(2)}
                   </p>
                 </div>
@@ -241,13 +266,13 @@ export default function OrderDetailsPage() {
           </div>
 
           {/* Total */}
-          <div className="mt-6 pt-6 border-t">
-            <div className="flex justify-between items-center">
-              <span className="text-xl font-semibold text-gray-900">
+          <div className='mt-6 pt-6 border-t'>
+            <div className='flex justify-between items-center'>
+              <span className='text-xl font-semibold text-gray-900'>
                 الإجمالي / Total:
               </span>
-              <span className="text-2xl font-bold text-purple-600 flex items-center gap-2">
-                <FiDollarSign className="w-6 h-6" />
+              <span className='text-2xl font-bold text-purple-600 flex items-center gap-2'>
+                <FiDollarSign className='w-6 h-6' />
                 {order.totalAmount.toFixed(2)}
               </span>
             </div>
@@ -255,9 +280,9 @@ export default function OrderDetailsPage() {
         </div>
 
         {/* Order Date */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="flex items-center gap-2 text-gray-600">
-            <FiCalendar className="w-5 h-5" />
+        <div className='bg-white rounded-lg shadow-lg p-6'>
+          <div className='flex items-center gap-2 text-gray-600'>
+            <FiCalendar className='w-5 h-5' />
             <span>
               تاريخ الطلب / Order Date:{' '}
               {new Date(order.createdAt).toLocaleDateString('ar-EG', {
@@ -274,4 +299,3 @@ export default function OrderDetailsPage() {
     </div>
   );
 }
-

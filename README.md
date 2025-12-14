@@ -2,6 +2,14 @@
 
 A modern e-commerce application built with Next.js, TypeScript, Tailwind CSS, and PostgreSQL.
 
+## Screenshots
+
+<div align="center">
+  <img src="./public/read_me1%20(1).png" alt="Screenshot 1" width="800"/>
+  <img src="./public/read_me1%20(2).png" alt="Screenshot 2" width="800"/>
+  <img src="./public/read_me1%20(3).png" alt="Screenshot 3" width="800"/>
+</div>
+
 ## Features
 
 - 🛍️ Product listing with category filtering
@@ -31,41 +39,49 @@ pnpm install
 ### 2. Database Setup
 
 1. Create a PostgreSQL database:
+
 ```sql
 CREATE DATABASE ecommerce_db;
 ```
 
 2. Set up your environment variables by copying `.env.example` to `.env`:
+
 ```bash
 cp .env.example .env
 ```
 
 3. Update `.env` with your database connection string:
+
 ```
 DATABASE_URL=postgresql://username:password@localhost:5432/ecommerce_db
 ```
 
 4. Generate Prisma Client:
+
 ```bash
 pnpm db:generate
 ```
 
 5. Push the schema to your database (or run migrations):
+
 ```bash
 pnpm db:push
 ```
 
 Or for production, use migrations:
+
 ```bash
 pnpm db:migrate
 ```
 
 6. (Optional) Open Prisma Studio to view/edit your database:
+
 ```bash
 pnpm db:studio
 ```
 
 7. Seed the database with sample products:
+
 ```bash
 pnpm db:seed
 ```
