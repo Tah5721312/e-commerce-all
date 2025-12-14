@@ -9,6 +9,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 import IconSection from './IconSection';
+import { DOMAIN } from '@/lib/constants';
 
 type HeroSlide = {
   id?: number;
@@ -91,7 +92,7 @@ const Hero = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const response = await fetch('/api/hero', { cache: 'no-store' });
+        const response = await fetch(`${DOMAIN}/api/hero`, { cache: 'no-store' });
         if (!response.ok) return;
 
         const data = await response.json();
@@ -118,7 +119,7 @@ const Hero = () => {
 
     const fetchBanners = async () => {
       try {
-        const response = await fetch('/api/hero-banners', { cache: 'no-store' });
+        const response = await fetch(`${DOMAIN}/api/hero-banners`, { cache: 'no-store' });
         if (!response.ok) return;
 
         const data = await response.json();

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FiX, FiPlus, FiTrash2, FiEdit2, FiSave, FiXCircle } from 'react-icons/fi';
 import type { Product } from '@/types/product';
+import { DOMAIN } from '@/lib/constants';
 
 interface ProductImage {
   id: number;
@@ -32,7 +33,7 @@ const ProductImagesModal = ({ product, onClose, onUpdate }: ProductImagesModalPr
   const fetchImages = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/products/${product.id}/images`);
+      const response = await fetch(`${DOMAIN}/api/products/${product.id}/images`);
       const data = await response.json();
       setImages(data.data || []);
     } catch (error) {
@@ -50,7 +51,7 @@ const ProductImagesModal = ({ product, onClose, onUpdate }: ProductImagesModalPr
     }
 
     try {
-      const response = await fetch(`/api/products/${product.id}/images`, {
+      const response = await fetch(`${DOMAIN}/api/products/${product.id}/images`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +82,7 @@ const ProductImagesModal = ({ product, onClose, onUpdate }: ProductImagesModalPr
 
     try {
       const response = await fetch(
-        `/api/products/${product.id}/images/${imageId}`,
+        `${DOMAIN}/api/products/${product.id}/images/${imageId}`,
         {
           method: 'DELETE',
         }
@@ -113,7 +114,7 @@ const ProductImagesModal = ({ product, onClose, onUpdate }: ProductImagesModalPr
 
     try {
       const response = await fetch(
-        `/api/products/${product.id}/images/${imageId}`,
+        `${DOMAIN}/api/products/${product.id}/images/${imageId}`,
         {
           method: 'PUT',
           headers: {

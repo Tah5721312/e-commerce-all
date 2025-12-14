@@ -595,7 +595,7 @@ const sampleProducts: ProductData[] = [
   
   // Fruits - بدون ألوان ولا مقاسات
   {
-    productTitle: 'Fresh Red Apples',
+    productTitle: 'Fresh fruits',
     productPrice: 4.99,
     productDiscription: 'Fresh and crisp red apples, perfect for snacking or cooking. Rich in vitamins and fiber.',
     productRating: 4.8,
@@ -604,76 +604,8 @@ const sampleProducts: ProductData[] = [
     hasColors: false, // بدون ألوان - كمية فقط
     images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
   },
-  {
-    productTitle: 'Sweet Oranges',
-    productPrice: 5.99,
-    productDiscription: 'Juicy and sweet oranges, packed with vitamin C. Perfect for a healthy breakfast or snack.',
-    productRating: 4.7,
-    category: 'fruits',
-    sizeType: 'none',
-    hasColors: false,
-    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
-  },
-  {
-    productTitle: 'Fresh Bananas',
-    productPrice: 3.99,
-    productDiscription: 'Ripe and sweet bananas, excellent source of potassium. Perfect for smoothies or as a healthy snack.',
-    productRating: 4.6,
-    category: 'fruits',
-    sizeType: 'none',
-    hasColors: false,
-    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
-  },
-  {
-    productTitle: 'Strawberries',
-    productPrice: 6.99,
-    productDiscription: 'Fresh and sweet strawberries, rich in antioxidants. Perfect for desserts or as a healthy treat.',
-    productRating: 4.9,
-    category: 'fruits',
-    sizeType: 'none',
-    hasColors: false,
-    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
-  },
-  {
-    productTitle: 'Grapes',
-    productPrice: 7.99,
-    productDiscription: 'Sweet and juicy grapes, perfect for snacking. Rich in vitamins and natural sugars.',
-    productRating: 4.7,
-    category: 'fruits',
-    sizeType: 'none',
-    hasColors: false,
-    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
-  },
-  {
-    productTitle: 'Watermelon',
-    productPrice: 8.99,
-    productDiscription: 'Fresh and refreshing watermelon, perfect for hot summer days. High water content and natural sweetness.',
-    productRating: 4.8,
-    category: 'fruits',
-    sizeType: 'none',
-    hasColors: false,
-    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
-  },
-  {
-    productTitle: 'Mangoes',
-    productPrice: 9.99,
-    productDiscription: 'Sweet and tropical mangoes, rich in vitamins A and C. Perfect for smoothies or eating fresh.',
-    productRating: 4.9,
-    category: 'fruits',
-    sizeType: 'none',
-    hasColors: false,
-    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
-  },
-  {
-    productTitle: 'Pineapple',
-    productPrice: 7.99,
-    productDiscription: 'Fresh and tropical pineapple, sweet and juicy. Rich in vitamin C and enzymes.',
-    productRating: 4.7,
-    category: 'fruits',
-    sizeType: 'none',
-    hasColors: false,
-    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
-  },
+  
+  
 ];
 
 const heroSlides = [

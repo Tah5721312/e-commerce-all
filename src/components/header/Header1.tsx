@@ -8,7 +8,7 @@ const Header1 = () => {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   return (
-    <div className="bg-[#2B3445] py-2 md:py-3 rounded-b-md sticky top-0 z-50 shadow">
+    <div className="bg-[#2B3445] py-2 md:py-3 rounded-b-md sticky top-0 z-30 shadow" style={{ zIndex: 30 }}>
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <span className="mr-2 px-3 py-1.5 bg-[#D23F57] rounded-2xl text-sm font-bold text-white tracking-wide">

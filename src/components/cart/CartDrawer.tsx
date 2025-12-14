@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiX, FiShoppingCart, FiTrash2, FiPlus, FiMinus } from 'react-icons/fi';
-import { useCartStore } from '@/store/cartStore';
+import { useCartStore, type CartItem } from '@/store/cartStore';
 import Image from 'next/image';
+import { DOMAIN } from '@/lib/constants';
 
 interface CartDrawerProps {
   open: boolean;
@@ -12,9 +13,25 @@ interface CartDrawerProps {
   cartSource: 'button' | 'icon';
 }
 
+interface Size {
+  id: number;
+  size: string;
+}
+
+interface Color {
+  id: number;
+  colorName: string;
+  colorCode: string;
+}
+
+type CartItemWithDetails = CartItem & {
+  sizes?: Size[];
+  colors?: Color[];
+}
+
 const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
   const router = useRouter();
-  const cartItems = useCartStore((state) => state.cartItems);
+  const cartItems = useCartStore((state) => state.cartItems) as CartItemWithDetails[];
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
@@ -28,24 +45,24 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
   useEffect(() => {
     const fetchQuantities = async () => {
       const quantities: Record<string, number> = {};
-      
+
       for (const item of cartItems) {
-        if (item.selectedColor && item.selectedSize) {
+        if (item.selectedColor && item.selectedSizeId) {
           try {
-            const response = await fetch('/api/products/variants/get-quantity', {
+            const response = await fetch(`${DOMAIN}/api/products/variants/get-quantity`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
                 productColorId: item.selectedColor,
-                size: item.selectedSize,
+                sizeId: item.selectedSizeId,
               }),
             });
-            
+
             if (response.ok) {
               const data = await response.json();
-              const key = `${item.id}-${item.selectedColor}-${item.selectedSize}`;
+              const key = `${item.id}-${item.selectedColor}-${item.selectedSizeId}`;
               quantities[key] = data.quantity;
             }
           } catch (error) {
@@ -53,7 +70,7 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
           }
         }
       }
-      
+
       setVariantQuantities(quantities);
     };
 
@@ -62,9 +79,9 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
     }
   }, [cartItems]);
 
-  const getAvailableQuantity = (item: { id: number; selectedColor?: number; selectedSize?: string | null }) => {
-    if (!item.selectedColor || !item.selectedSize) return null;
-    const key = `${item.id}-${item.selectedColor}-${item.selectedSize}`;
+  const getAvailableQuantity = (item: { id: number; selectedColor?: number; selectedSizeId?: number | null }) => {
+    if (!item.selectedColor || !item.selectedSizeId) return null;
+    const key = `${item.id}-${item.selectedColor}-${item.selectedSizeId}`;
     return variantQuantities[key] ?? null;
   };
 
@@ -93,7 +110,10 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div 
+      className="fixed inset-0 overflow-hidden" 
+      style={{ zIndex: 9999, position: 'fixed' }}
+    >
       <div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm"
         onClick={onClose}
@@ -104,9 +124,11 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 p-2 hover:text-red-500 transition-colors"
+          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors z-10"
+          aria-label="إغلاق سلة التسوق"
+          title="إغلاق"
         >
-          <FiX className="w-6 h-6" />
+          <FiX className="w-6 h-6 text-gray-600 hover:text-red-500" />
         </button>
 
         <div className="text-center mb-6 mt-8 flex-shrink-0">
@@ -137,10 +159,10 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                 const availableQuantity = getAvailableQuantity(item);
                 const isMaxQuantity = availableQuantity !== null && item.quantity >= availableQuantity;
                 const exceedsAvailable = availableQuantity !== null && item.quantity > availableQuantity;
-                
+
                 return (
                   <div
-                    key={`${item.id}-${item.selectedColor ?? 'noColor'}-${item.selectedSize ?? 'noSize'}`}
+                    key={`${item.id}-${item.selectedColor ?? 'noColor'}-${item.selectedSizeId ?? 'noSize'}`}
                     className="border-b border-gray-300 py-2 px-1 mb-2"
                   >
                     <div className="flex flex-col md:flex-row items-center gap-2">
@@ -167,7 +189,7 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                         <p className="text-sm font-medium truncate">
                           {item.productTitle}
                         </p>
-                        {(item.selectedColor || item.selectedSize) && (
+                        {(item.selectedColor || item.selectedSizeId) && (
                           <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                             {item.selectedColor && (
                               <span>
@@ -175,13 +197,9 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                                   'Color'}
                               </span>
                             )}
-                            {item.selectedSize && (
+                            {item.selectedSizeId && (
                               <span className="px-1.5 py-0.5 bg-gray-100 rounded">
-                                {item.selectedSize === 'X2XL'
-                                  ? '2XL'
-                                  : item.selectedSize === 'X3XL'
-                                    ? '3XL'
-                                    : item.selectedSize}
+                                {item.selectedSizeId}
                               </span>
                             )}
                           </div>
@@ -199,12 +217,12 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                             increaseQuantity(
                               item.id,
                               item.selectedColor,
-                              item.selectedSize
+                              item.selectedSizeId
                             )
                           }
                           disabled={isMaxQuantity}
-                          className={`p-1 rounded ${isMaxQuantity 
-                            ? 'opacity-50 cursor-not-allowed' 
+                          className={`p-1 rounded ${isMaxQuantity
+                            ? 'opacity-50 cursor-not-allowed'
                             : 'hover:bg-gray-100'}`}
                         >
                           <FiPlus className="w-4 h-4" />
@@ -217,7 +235,7 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                             decreaseQuantity(
                               item.id,
                               item.selectedColor,
-                              item.selectedSize
+                              item.selectedSizeId
                             )
                           }
                           className="p-1 hover:bg-gray-100 rounded"
@@ -226,27 +244,27 @@ const CartDrawer = ({ open, onClose, cartSource }: CartDrawerProps) => {
                         </button>
                       </div>
 
-                    <div className="flex-[0.2] text-center">
-                      <p className="text-sm">${item.productPrice.toFixed(2)}</p>
-                    </div>
+                      <div className="flex-[0.2] text-center">
+                        <p className="text-sm">${item.productPrice.toFixed(2)}</p>
+                      </div>
 
-                    <div className="flex-[0.2] text-center">
-                      <button
-                        onClick={() =>
-                          removeFromCart(
-                            item.id,
-                            item.selectedColor,
-                            item.selectedSize
-                          )
-                        }
-                        className="p-2 text-red-500 hover:bg-red-50 rounded"
-                        title="Remove item"
-                      >
-                        <FiTrash2 className="w-5 h-5" />
-                      </button>
+                      <div className="flex-[0.2] text-center">
+                        <button
+                          onClick={() =>
+                            removeFromCart(
+                              item.id,
+                              item.selectedColor,
+                              item.selectedSizeId
+                            )
+                          }
+                          className="p-2 text-red-500 hover:bg-red-50 rounded"
+                          title="Remove item"
+                        >
+                          <FiTrash2 className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
                 );
               })}
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FiX, FiPlus, FiTrash2 } from 'react-icons/fi';
 import type { Product, ProductSize, ProductCategory } from '@/types/product';
+import { DOMAIN } from '@/lib/constants';
 
 interface ProductModalProps {
   product: Product | null;
@@ -45,7 +46,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories?activeOnly=true');
+      const response = await fetch(`${DOMAIN}/api/categories?activeOnly=true`);
       if (response.ok) {
         const data = await response.json();
         setCategories(data.data || []);
@@ -60,7 +61,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
   const fetchSizes = async () => {
     try {
-      const response = await fetch('/api/sizes?sortBy=sortOrder&order=asc');
+      const response = await fetch(`${DOMAIN}/api/sizes?sortBy=sortOrder&order=asc`);
       if (response.ok) {
         const data = await response.json();
         setSizes(data.data || []);
@@ -72,7 +73,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
   const fetchCompanies = async () => {
     try {
-      const response = await fetch('/api/companies?activeOnly=true');
+      const response = await fetch(`${DOMAIN}/api/companies?activeOnly=true`);
       if (response.ok) {
         const data = await response.json();
         setCompanies(data.data || []);
@@ -116,8 +117,8 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
     try {
       const url = product
-        ? `/api/products/${product.id}`
-        : '/api/products';
+        ? `${DOMAIN}/api/products/${product.id}`
+        : `${DOMAIN}/api/products`;
       const method = product ? 'PUT' : 'POST';
 
       // Ensure images is always an array and filter out empty values
@@ -259,24 +260,25 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-100 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="sticky top-0 bg-gray-50 border-b px-6 py-4 flex justify-between items-center z-10 backdrop-blur-sm bg-opacity-95">
-          <h2 className="text-2xl font-bold text-gray-800">
-            {product ? 'Edit Product' : 'Add New Product'}
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-gray-100 rounded-lg max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="sticky top-0 bg-gray-50 border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center z-10 backdrop-blur-sm bg-opacity-95">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
+            {product ? 'تعديل المنتج' : 'إضافة منتج جديد'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-full transition-colors"
+            aria-label="إغلاق"
           >
-            <FiX className="w-6 h-6" />
+            <FiX className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Product Title *
+              عنوان المنتج *
             </label>
             <input
               type="text"
@@ -285,14 +287,14 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
               onChange={(e) =>
                 setFormData({ ...formData, productTitle: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price *
+                السعر *
               </label>
               <input
                 type="number"
@@ -302,13 +304,13 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                 onChange={(e) =>
                   setFormData({ ...formData, productPrice: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Rating
+                التقييم
               </label>
               <input
                 type="number"
@@ -319,15 +321,15 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                 onChange={(e) =>
                   setFormData({ ...formData, productRating: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category *
+                الفئة *
               </label>
               <select
                 required
@@ -338,10 +340,10 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                     category: e.target.value,
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 {categories.length === 0 ? (
-                  <option value="">Loading categories...</option>
+                  <option value="">جاري التحميل...</option>
                 ) : (
                   categories.map((cat) => (
                     <option key={cat.id} value={cat.slug}>
@@ -354,7 +356,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Company / الشركة
+                الشركة
               </label>
               <select
                 value={formData.company}
@@ -364,9 +366,9 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                     company: e.target.value,
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
-                <option value="">No Company / بدون شركة</option>
+                <option value="">بدون شركة</option>
                 {companies.map((company) => (
                   <option key={company.id} value={company.id}>
                     {company.name}
@@ -378,7 +380,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description *
+              الوصف *
             </label>
             <textarea
               required
@@ -387,36 +389,19 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
               onChange={(e) =>
                 setFormData({ ...formData, productDiscription: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-y"
             />
           </div>
 
-          {/* Quantity for products without colors */}
-          {(!colors || colors.length === 0) && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                الكمية / Quantity (للمنتجات بدون ألوان أو مقاسات)
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={formData.quantity}
-                onChange={(e) =>
-                  setFormData({ ...formData, quantity: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Images
+              الصور
             </label>
-            <div className="flex gap-2 mb-2">
+            <div className="flex flex-col sm:flex-row gap-2 mb-2">
               <input
                 type="text"
-                placeholder="Image URL (e.g., /images/1.jpg)"
+                placeholder="رابط الصورة (مثال: /images/1.jpg)"
                 value={imageInput}
                 onChange={(e) => setImageInput(e.target.value)}
                 onKeyPress={(e) => {
@@ -425,14 +410,17 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                     handleAddImage();
                   }
                 }}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="flex-1 px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
+
+  
+          
               <button
                 type="button"
                 onClick={handleAddImage}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base whitespace-nowrap"
               >
-                Add
+                إضافة
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -441,7 +429,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                   key={index}
                   className="relative group bg-gray-100 rounded-lg p-2"
                 >
-                  <div className="w-20 h-20 relative rounded overflow-hidden">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 relative rounded overflow-hidden">
                     <img
                       src={
                         url.startsWith('http://') || url.startsWith('https://')
@@ -450,7 +438,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                             ? url
                             : `/${url}`
                       }
-                      alt={`Image ${index + 1}`}
+                      alt={`صورة ${index + 1}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
@@ -461,25 +449,46 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(index)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    aria-label="حذف الصورة"
                   >
-                    <FiX className="w-4 h-4" />
+                    <FiX className="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               ))}
             </div>
           </div>
 
+
+
+          {/* Quantity for products without colors */}
+          {(!colors || colors.length === 0) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                الكمية (للمنتجات بدون ألوان أو مقاسات)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={formData.quantity}
+                onChange={(e) =>
+                  setFormData({ ...formData, quantity: e.target.value })
+                }
+                className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          )}
+
           {/* Colors and Variants Section */}
           <div>
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
               <label className="block text-sm font-medium text-gray-700">
-                الألوان والمقاسات / Colors & Sizes
+                الألوان والمقاسات
               </label>
               <button
                 type="button"
                 onClick={handleAddColor}
-                className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-1"
+                className="w-full sm:w-auto px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors flex items-center justify-center gap-1"
               >
                 <FiPlus className="w-4 h-4" />
                 إضافة لون
@@ -490,9 +499,9 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
               {colors.map((color, colorIndex) => (
                 <div
                   key={colorIndex}
-                  className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                  className="border border-gray-200 rounded-lg p-3 sm:p-4 bg-gray-50"
                 >
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-3">
                     <input
                       type="text"
                       placeholder="اسم اللون (مثال: أحمر)"
@@ -500,49 +509,52 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                       onChange={(e) =>
                         handleUpdateColor(colorIndex, 'colorName', e.target.value)
                       }
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
-                    <input
-                      type="color"
-                      value={color.colorCode}
-                      onChange={(e) =>
-                        handleUpdateColor(colorIndex, 'colorCode', e.target.value)
-                      }
-                      className="w-16 h-10 rounded border border-gray-300"
-                    />
-                    {color.variants.length === 0 && (
-                      <div className="flex items-center gap-2">
-                        <label className="text-xs text-gray-600 whitespace-nowrap">الكمية:</label>
-                        <input
-                          type="number"
-                          min="0"
-                          placeholder="0"
-                          value={color.quantity}
-                          onChange={(e) =>
-                            handleUpdateColor(colorIndex, 'quantity', parseInt(e.target.value) || 0)
-                          }
-                          className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        />
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveColor(colorIndex)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <FiTrash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={color.colorCode}
+                        onChange={(e) =>
+                          handleUpdateColor(colorIndex, 'colorCode', e.target.value)
+                        }
+                        className="w-12 h-10 sm:w-16 sm:h-10 rounded border border-gray-300 flex-shrink-0"
+                      />
+                      {color.variants.length === 0 && (
+                        <div className="flex items-center gap-2 flex-1">
+                          <label className="text-xs text-gray-600 whitespace-nowrap">الكمية:</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            value={color.quantity}
+                            onChange={(e) =>
+                              handleUpdateColor(colorIndex, 'quantity', parseInt(e.target.value) || 0)
+                            }
+                            className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveColor(colorIndex)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                        aria-label="حذف اللون"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <label className="text-xs font-medium text-gray-600">
                         المقاسات والكميات
                       </label>
                       <button
                         type="button"
                         onClick={() => handleAddVariant(colorIndex)}
-                        className="px-2 py-1 text-xs bg-primary-500 text-white rounded hover:bg-primary-600 transition-colors flex items-center gap-1"
+                        className="w-full sm:w-auto px-2 py-1 text-xs bg-primary-500 text-white rounded hover:bg-primary-600 transition-colors flex items-center justify-center gap-1"
                       >
                         <FiPlus className="w-3 h-3" />
                         إضافة مقاس
@@ -554,7 +566,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                       return (
                         <div
                           key={variantIndex}
-                          className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200"
+                          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-white p-2 rounded border border-gray-200"
                         >
                           <div className="flex items-center gap-2 flex-1">
                             <span className="text-xs font-medium text-gray-600 whitespace-nowrap">المقاس:</span>
@@ -598,7 +610,8 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
                           <button
                             type="button"
                             onClick={() => handleRemoveVariant(colorIndex, variantIndex)}
-                            className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                            className="p-1.5 sm:p-1 text-red-500 hover:bg-red-50 rounded transition-colors flex items-center justify-center sm:flex-shrink-0"
+                            aria-label="حذف المقاس"
                           >
                             <FiX className="w-4 h-4" />
                           </button>
@@ -623,20 +636,20 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base"
             >
-              Cancel
+              إلغاء
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
             >
-              {loading ? 'Saving...' : product ? 'Update' : 'Create'}
+              {loading ? 'جاري الحفظ...' : product ? 'تحديث' : 'إنشاء'}
             </button>
           </div>
         </form>

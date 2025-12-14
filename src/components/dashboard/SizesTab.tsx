@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FiPlus, FiEdit, FiTrash2, FiCheck, FiX } from 'react-icons/fi';
 import type { ProductSize } from '@/types/product';
+import { DOMAIN } from '@/lib/constants';
 
 interface SizesTabProps {
   onSizeChange?: () => void;
@@ -26,7 +27,7 @@ const SizesTab = ({ onSizeChange }: SizesTabProps) => {
   const fetchSizes = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/sizes?sortBy=sortOrder&order=asc');
+      const response = await fetch(`${DOMAIN}/api/sizes?sortBy=sortOrder&order=asc`);
       if (response.ok) {
         const data = await response.json();
         setSizes(data.data || []);
@@ -78,8 +79,8 @@ const SizesTab = ({ onSizeChange }: SizesTabProps) => {
 
     try {
       const url = editingId
-        ? `/api/sizes/${editingId}`
-        : '/api/sizes';
+        ? `${DOMAIN}/api/sizes/${editingId}`
+        : `${DOMAIN}/api/sizes`;
       const method = editingId ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -110,7 +111,7 @@ const SizesTab = ({ onSizeChange }: SizesTabProps) => {
     }
 
     try {
-      const response = await fetch(`/api/sizes/${id}`, {
+      const response = await fetch(`${DOMAIN}/api/sizes/${id}`, {
         method: 'DELETE',
       });
 

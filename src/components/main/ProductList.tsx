@@ -8,6 +8,7 @@ import ProductCard from './ProductCard';
 import ProductDetails from './ProductDetails';
 import CartDrawer from '@/components/cart/CartDrawer';
 import CartButton from '@/components/cart/CartButton';
+import { DOMAIN } from '@/lib/constants';
 
 interface ProductListProps {
   priceRange: [number, number];
@@ -38,7 +39,7 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
 
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategory, priceRange, minRating]);
+  }, [selectedCategory, priceRange, minRating, searchParams]);
 
   // Sync selected category with URL query (?category=slug)
   useEffect(() => {
@@ -48,7 +49,7 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories?activeOnly=true');
+      const response = await fetch(`${DOMAIN}/api/categories?activeOnly=true`);
       if (response.ok) {
         const data = await response.json();
         setCategories(data.data || []);
@@ -63,6 +64,12 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
       setLoading(true);
       const params = new URLSearchParams();
 
+      // Get search query from URL
+      const searchQuery = searchParams.get('search');
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
       if (selectedCategory !== 'all') {
         params.append('category', selectedCategory);
       }
@@ -75,7 +82,7 @@ const ProductList = ({ priceRange, minRating }: ProductListProps) => {
       }
 
       const queryString = params.toString();
-      const url = `/api/products${queryString ? `?${queryString}` : ''}`;
+      const url = `${DOMAIN}/api/products${queryString ? `?${queryString}` : ''}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch products');
       const data = await response.json();

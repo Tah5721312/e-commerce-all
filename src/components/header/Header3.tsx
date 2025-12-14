@@ -2,29 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import {
-  FiMenu,
-  FiGrid,
-  FiChevronRight,
-  FiX,
-  FiBox,
-  FiMonitor,
-  FiBook,
-  FiHeadphones,
-  FiSmartphone,
-  FiWatch,
-  FiHome,
-  FiHeart,
-  FiGift,
-  FiTruck,
-  FiCamera,
-  FiTool,
-  FiCoffee,
-  FiWifi,
-  FiMusic,
+  FiMenu, FiGrid, FiChevronRight, FiX, FiBox, FiMonitor, FiBook, FiHeadphones, FiSmartphone,
+  FiWatch, FiHome, FiHeart, FiGift, FiTruck, FiCamera, FiTool, FiCoffee, FiWifi, FiMusic,
   FiShoppingBag
 } from 'react-icons/fi';
 import React from 'react';
 import Link from 'next/link';
+import { DOMAIN } from '@/lib/constants';
 
 interface Category {
   id: string;
@@ -32,7 +16,17 @@ interface Category {
   slug: string;
   isActive: boolean;
   sortOrder: number;
-};
+}
+
+interface MenuSubLink {
+  label: string;
+  href: string;
+}
+
+type MenuItem =
+  | { mainLink: string; subLinks: MenuSubLink[]; mainHref?: never }
+  | { mainLink: string; subLinks: string[]; mainHref?: never }
+  | { mainLink: string; subLinks: never[]; mainHref: string };
 
 const Header3 = () => {
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
@@ -43,19 +37,17 @@ const Header3 = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const menuItems = [
-    { mainLink: 'Home', subLinks: ['Link 1', 'Link 2', 'Link 3'] },
-    { mainLink: 'Mega Menu', subLinks: ['Link 1', 'Link 2', 'Link 3'] },
-    { mainLink: 'Full Screen Menu', subLinks: ['Link 1', 'Link 2', 'Link 3'] },
-    { mainLink: 'Pages', subLinks: ['Link 1', 'Link 2', 'Link 3'] },
+  const menuItems: MenuItem[] = [
+    {
+      mainLink: 'Pages', subLinks: [{ label: 'المنتجات', href: '/products' },
+      { label: 'المفضلة', href: '/favorites' } ] },
     { mainLink: 'User Account', subLinks: ['Link 1', 'Link 2', 'Link 3'] },
-    { mainLink: 'Vendor Account', subLinks: ['Link 1', 'Link 2', 'Link 3'] },
   ];
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories?activeOnly=true');
+        const response = await fetch(`${DOMAIN}/api/categories?activeOnly=true`);
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -138,7 +130,7 @@ const Header3 = () => {
                   href={`/products?category=${category.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-3"
+                  className="flex w-full text-left px-4 py-2 hover:bg-gray-100 items-center gap-3"
                 >
                   <span className="text-[#D23F57]">
                     {getCategoryIcon(category.name.toLowerCase())}
@@ -153,6 +145,7 @@ const Header3 = () => {
       </div>
 
       {/* Desktop Menu */}
+
       <div className="hidden xl:flex items-center gap-8">
         {menuItems.map((item, index) => (
           <div
@@ -161,43 +154,65 @@ const Header3 = () => {
             onMouseEnter={() => setHoveredMenuItem(index)}
             onMouseLeave={() => setHoveredMenuItem(null)}
           >
-            <Link
-              href="#"
-              className="hover:text-[#D23F57] transition-colors flex items-center gap-1"
-            >
-              {item.mainLink}
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {item.mainHref ? (
+              <Link
+                href={item.mainHref}
+                className="hover:text-[#D23F57] transition-colors flex items-center gap-1"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </Link>
-            {hoveredMenuItem === index && item.subLinks.length > 0 && (
-              <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg z-50 min-w-[200px] border border-gray-200">
-                {item.subLinks.map((link) => (
-                  <Link
-                    key={link}
-                    href="#"
-                    className="block px-4 py-2 hover:bg-gray-50 hover:text-[#D23F57] transition-colors first:rounded-t-lg last:rounded-b-lg"
-                  >
-                    {link}
-                  </Link>
-                ))}
-              </div>
+                {item.mainLink}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="#"
+                  className="hover:text-[#D23F57] transition-colors flex items-center gap-1"
+                >
+                  {item.mainLink}
+                  {item.subLinks.length > 0 && (
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  )}
+                </Link>
+                {hoveredMenuItem === index && item.subLinks.length > 0 && (
+                  <div className="absolute top-full left-0 pt-2 bg-transparent z-50">
+                    <div className="bg-white rounded-lg shadow-lg min-w-[200px] border border-gray-200">
+                      {item.subLinks.map((link, linkIndex) => {
+                        const linkHref = typeof link === 'string' ? '#' : link.href;
+                        const linkLabel = typeof link === 'string' ? link : link.label;
+                        return (
+                          <Link
+                            key={linkIndex}
+                            href={linkHref}
+                            target={typeof link === 'object' && link.href ? '_blank' : undefined}
+                            rel={typeof link === 'object' && link.href ? 'noopener noreferrer' : undefined}
+                            className="block px-4 py-2 hover:bg-gray-50 hover:text-[#D23F57] transition-colors first:rounded-t-lg last:rounded-b-lg text-right"
+                          >
+                            {linkLabel}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         ))}
       </div>
 
       {/* Mobile Menu Button */}
+
       <button
         onClick={() => setIsMobileMenuOpen(true)}
         className="xl:hidden p-2 hover:bg-gray-100 rounded"
@@ -206,6 +221,7 @@ const Header3 = () => {
       </button>
 
       {/* Mobile Drawer */}
+
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 xl:hidden">
           <div className="absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-xl overflow-y-auto">
@@ -219,36 +235,57 @@ const Header3 = () => {
 
               {menuItems.map((item, index) => (
                 <div key={item.mainLink} className="border-b">
-                  <button
-                    onClick={() => toggleExpanded(index)}
-                    className="w-full flex items-center justify-between py-4 text-left"
-                  >
-                    <span>{item.mainLink}</span>
-                    <svg
-                      className={`w-5 h-5 transition-transform ${expandedItems.includes(index) ? 'rotate-180' : ''
-                        }`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                  {item.mainHref ? (
+                    <Link
+                      href={item.mainHref}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-between py-4 text-left hover:text-[#D23F57] transition-colors"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                  {expandedItems.includes(index) && (
-                    <div className="pb-2">
-                      {item.subLinks.map((link) => (
-                        <Link
-                          key={link}
-                          href="#"
-                          className="block py-2 pl-4 hover:bg-gray-50"
-                        >
-                          {link}
-                        </Link>
-                      ))}
-                    </div>
+                      <span>{item.mainLink}</span>
+                    </Link>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => toggleExpanded(index)}
+                        className="w-full flex items-center justify-between py-4 text-left"
+                      >
+                        <span>{item.mainLink}</span>
+                        {item.subLinks.length > 0 && (
+                          <svg
+                            className={`w-5 h-5 transition-transform ${expandedItems.includes(index) ? 'rotate-180' : ''
+                              }`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                      {expandedItems.includes(index) && item.subLinks.length > 0 && (
+                        <div className="pb-2">
+                          {item.subLinks.map((link, linkIndex) => {
+                            const linkHref = typeof link === 'string' ? '#' : link.href;
+                            const linkLabel = typeof link === 'string' ? link : link.label;
+                            return (
+                              <Link
+                                key={linkIndex}
+                                href={linkHref}
+                                target={typeof link === 'object' && link.href ? '_blank' : undefined}
+                                rel={typeof link === 'object' && link.href ? 'noopener noreferrer' : undefined}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="block py-2 pl-4 hover:bg-gray-50 hover:text-[#D23F57] transition-colors text-right"
+                              >
+                                {linkLabel}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ))}
@@ -256,6 +293,8 @@ const Header3 = () => {
           </div>
         </div>
       )}
+
+
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import type { Product, ProductReview } from '@/types/product';
 import ProductDetails from '@/components/main/ProductDetails';
+import { DOMAIN } from '@/lib/constants';
 
 interface ReviewsResponse {
   data: ProductReview[];
@@ -29,8 +30,8 @@ const ProductReviewsPage = () => {
       try {
         setLoading(true);
         const [productRes, reviewsRes] = await Promise.all([
-          fetch(`/api/products/${productId}`),
-          fetch(`/api/products/${productId}/reviews`),
+          fetch(`${DOMAIN}/api/products/${productId}`),
+          fetch(`${DOMAIN}/api/products/${productId}/reviews`),
         ]);
 
         if (!productRes.ok) {
@@ -62,7 +63,7 @@ const ProductReviewsPage = () => {
 
     try {
       setSubmitting(true);
-      const res = await fetch(`/api/products/${productId}/reviews`, {
+      const res = await fetch(`${DOMAIN}/api/products/${productId}/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ author: author || 'ضيف', rating, comment }),
@@ -90,7 +91,7 @@ const ProductReviewsPage = () => {
 
     try {
       const res = await fetch(
-        `/api/products/${productId}/reviews?reviewId=${reviewId}`,
+        `${DOMAIN}/api/products/${productId}/reviews?reviewId=${reviewId}`,
         { method: 'DELETE' }
       );
       const data = await res.json();

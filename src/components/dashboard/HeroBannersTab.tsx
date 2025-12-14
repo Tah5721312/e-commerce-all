@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
+import { DOMAIN } from '@/lib/constants';
 
 type HeroBanner = {
   id: number;
@@ -39,7 +40,7 @@ export default function HeroBannersTab() {
   const fetchBanners = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/hero-banners', { cache: 'no-store' });
+      const response = await fetch(`${DOMAIN}/api/hero-banners`, { cache: 'no-store' });
       if (!response.ok) {
         console.error('Failed to fetch hero banners, status:', response.status);
         setBanners([]);
@@ -77,7 +78,7 @@ export default function HeroBannersTab() {
         sortOrder: Number(bannerFormData.sortOrder),
       };
       const response = await fetch(
-        editingBannerId ? `/api/hero-banners/${editingBannerId}` : '/api/hero-banners',
+        editingBannerId ? `${DOMAIN}/api/hero-banners/${editingBannerId}` : `${DOMAIN}/api/hero-banners`,
         {
           method: editingBannerId ? 'PATCH' : 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -117,7 +118,7 @@ export default function HeroBannersTab() {
   const handleBannerDelete = async (id: number) => {
     if (!confirm('مسح هذا البانر؟')) return;
     try {
-      const response = await fetch(`/api/hero-banners/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${DOMAIN}/api/hero-banners/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('تعذر حذف البانر');
       await fetchBanners();
     } catch (error) {

@@ -18,6 +18,7 @@ import type { Product } from '@/types/product';
 import ProductModal from '@/components/dashboard/ProductModal';
 import ProductList from '@/components/dashboard/ProductList';
 import StatsCards from '@/components/dashboard/StatsCards';
+import { DOMAIN } from '@/lib/constants';
 import ProductImagesModal from '@/components/dashboard/ProductImagesModal';
 import OrderList from '@/components/dashboard/OrderList';
 import OrderModal from '@/components/dashboard/OrderModal';
@@ -96,7 +97,7 @@ export default function DashboardPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products');
+      const response = await fetch(`${DOMAIN}/api/products`);
       const data = await response.json();
       setProducts(data.data || []);
     } catch (error) {
@@ -108,7 +109,7 @@ export default function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/stats');
+      const response = await fetch(`${DOMAIN}/api/stats`);
       const data = await response.json();
       setStats(data.data);
     } catch (error) {
@@ -119,7 +120,7 @@ export default function DashboardPage() {
   const fetchOrders = async () => {
     try {
       setOrdersLoading(true);
-      const response = await fetch('/api/orders');
+      const response = await fetch(`${DOMAIN}/api/orders`);
       const data = await response.json();
       setOrders(data.data || []);
     } catch (error) {
@@ -131,7 +132,7 @@ export default function DashboardPage() {
 
   const fetchOrderStats = async () => {
     try {
-      const response = await fetch('/api/orders/stats');
+      const response = await fetch(`${DOMAIN}/api/orders/stats`);
       const data = await response.json();
       setOrderStats(data.data);
     } catch (error) {
@@ -141,7 +142,7 @@ export default function DashboardPage() {
 
   const handleUpdateOrderStatus = async (orderNumber: string, status: string) => {
     try {
-      const response = await fetch(`/api/orders/${orderNumber}/update`, {
+      const response = await fetch(`${DOMAIN}/api/orders/${orderNumber}/update`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +164,7 @@ export default function DashboardPage() {
 
   const handleDeleteOrder = async (orderNumber: string) => {
     try {
-      const response = await fetch(`/api/orders/${orderNumber}/delete`, {
+      const response = await fetch(`${DOMAIN}/api/orders/${orderNumber}/delete`, {
         method: 'DELETE',
       });
 
@@ -209,7 +210,7 @@ export default function DashboardPage() {
     }
 
     try {
-      const response = await fetch(`/api/products/${id}`, {
+      const response = await fetch(`${DOMAIN}/api/products/${id}`, {
         method: 'DELETE',
       });
 

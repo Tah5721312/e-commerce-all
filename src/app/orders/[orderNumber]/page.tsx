@@ -47,7 +47,7 @@ export default function OrderDetailsPage() {
   const fetchOrderDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/orders/${orderNumber}`);
+      const response = await fetch(`${DOMAIN}/api/orders/${orderNumber}`);
       const data = await response.json();
 
       if (response.ok && data.order) {

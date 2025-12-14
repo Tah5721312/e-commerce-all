@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FiPlus, FiEdit, FiTrash2, FiBriefcase, FiSearch } from 'react-icons/fi';
 import type { Company } from '@/types/product';
+import { DOMAIN } from '@/lib/constants';
 
 const CompaniesTab = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -28,7 +29,7 @@ const CompaniesTab = () => {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/companies');
+      const response = await fetch(`${DOMAIN}/api/companies`);
       if (response.ok) {
         const data = await response.json();
         setCompanies(data.data || []);
@@ -78,8 +79,8 @@ const CompaniesTab = () => {
     e.preventDefault();
     try {
       const url = editingCompany
-        ? `/api/companies/${editingCompany.id}`
-        : '/api/companies';
+        ? `${DOMAIN}/api/companies/${editingCompany.id}`
+        : `${DOMAIN}/api/companies`;
       const method = editingCompany ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -110,7 +111,7 @@ const CompaniesTab = () => {
     }
 
     try {
-      const response = await fetch(`/api/companies/${id}`, {
+      const response = await fetch(`${DOMAIN}/api/companies/${id}`, {
         method: 'DELETE',
       });
 
@@ -193,11 +194,10 @@ const CompaniesTab = () => {
                 </div>
               </div>
               <span
-                className={`px-2 py-1 text-xs font-medium rounded ${
-                  company.isActive
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}
+                className={`px-2 py-1 text-xs font-medium rounded ${company.isActive
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-gray-100 text-gray-800'
+                  }`}
               >
                 {company.isActive ? 'نشط' : 'غير نشط'}
               </span>
@@ -253,9 +253,9 @@ const CompaniesTab = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+        <div className="fixed inset-0 bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-100 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-gray-50 border-b px-6 py-4 flex justify-between items-center z-10 backdrop-blur-sm bg-opacity-95">
               <h2 className="text-xl font-bold text-gray-800">
                 {editingCompany ? 'تعديل شركة' : 'إضافة شركة جديدة'}
               </h2>

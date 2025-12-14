@@ -12,11 +12,20 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
+    const search = searchParams.get('search');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const minRating = searchParams.get('minRating');
 
     let products = await getAllProducts(category || undefined);
+
+    // Filter by search query (product title)
+    if (search && search.trim()) {
+      const searchLower = search.toLowerCase().trim();
+      products = products.filter((p) =>
+        p.productTitle.toLowerCase().includes(searchLower)
+      );
+    }
 
     // Filter by price range
     if (minPrice || maxPrice) {

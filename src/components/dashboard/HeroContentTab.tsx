@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
+import { DOMAIN } from '@/lib/constants';
 
 type HeroSlide = {
   id: number;
@@ -43,7 +44,7 @@ export default function HeroContentTab() {
   const fetchSlides = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/hero', { cache: 'no-store' });
+      const response = await fetch(`${DOMAIN}/api/hero`, { cache: 'no-store' });
       if (!response.ok) {
         setSlides([]);
         return;
@@ -79,7 +80,7 @@ export default function HeroContentTab() {
         sortOrder: Number(formData.sortOrder),
       };
       const response = await fetch(
-        editingId ? `/api/hero/${editingId}` : '/api/hero',
+        editingId ? `${DOMAIN}/api/hero/${editingId}` : `${DOMAIN}/api/hero`,
         {
           method: editingId ? 'PATCH' : 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -121,7 +122,7 @@ export default function HeroContentTab() {
   const handleDelete = async (id: number) => {
     if (!confirm('مسح هذا السلايد؟')) return;
     try {
-      const response = await fetch(`/api/hero/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${DOMAIN}/api/hero/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('تعذر حذف السلايد');
       await fetchSlides();
     } catch (error) {

@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { FiLock, FiCreditCard, FiCheckCircle } from 'react-icons/fi';
+import { DOMAIN } from '@/lib/constants';
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -52,7 +53,7 @@ function CheckoutForm({ total }: PaymentFormProps) {
 
     try {
       // Create payment intent
-      const response = await fetch('/api/payments/create-intent', {
+      const response = await fetch(`${DOMAIN}/api/payments/create-intent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ function CheckoutForm({ total }: PaymentFormProps) {
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
         // Create order in database
         try {
-          const orderResponse = await fetch('/api/orders/create', {
+          const orderResponse = await fetch(`${DOMAIN}/api/orders/create`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -116,7 +117,7 @@ function CheckoutForm({ total }: PaymentFormProps) {
                   productPrice: item.productPrice,
                   quantity: item.quantity,
                   colorId: item.selectedColor,
-                  size: item.selectedSize,
+                  sizeId: item.selectedSizeId,
                 })),
                 totalAmount: total,
                 stripePaymentIntentId: paymentIntent.id,
@@ -130,7 +131,7 @@ function CheckoutForm({ total }: PaymentFormProps) {
 
             // Send confirmation email
             try {
-              await fetch('/api/orders/send-confirmation', {
+              await fetch(`${DOMAIN}/api/orders/send-confirmation`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
