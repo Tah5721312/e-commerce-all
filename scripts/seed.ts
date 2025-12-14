@@ -41,9 +41,10 @@ interface ProductData {
   productPrice: number;
   productDiscription: string;
   productRating: number;
-  category: 'men' | 'women' | 'children' | 'accessories' | 'shoes' | 'electronics' | 'beauty' | 'home';
+  category: 'men' | 'women' | 'children' | 'accessories' | 'shoes' | 'electronics' | 'beauty' | 'home' | 'fruits';
   images: string[];
   sizeType: 'clothing' | 'shoes' | 'none'; // نوع المقاسات
+  hasColors?: boolean; // إذا كان false، المنتج بدون ألوان (كمية فقط في Product.quantity)
 }
 
 const sampleProducts: ProductData[] = [
@@ -132,113 +133,125 @@ const sampleProducts: ProductData[] = [
     images: ['/images/shoes3/1.jpg', '/images/shoes3/2.jpg'],
   },
   
-  // Men's Accessories
+  // Men's Accessories - بدون ألوان (كمية فقط)
   {
     productTitle: 'Men\'s Luxury Watch',
     productPrice: 129.99,
-    productDiscription: 'Elegant luxury men\'s watch with premium design and water-resistant features. Perfect for formal occasions and daily wear.',
+    productDiscription: 'Elegant luxury men\'s watch with premium design and water-resistant features. Swiss movement and genuine leather strap. Perfect for formal occasions and daily wear.',
     productRating: 4.9,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories1/3.jpg', '/images/Accessories1/4.jpg', '/images/Accessories1/final.jpg'],
   },
   {
     productTitle: 'Men\'s Classic Watch',
     productPrice: 49.99,
-    productDiscription: 'Classic men\'s watch with timeless design. Durable and stylish, perfect for everyday use.',
+    productDiscription: 'Classic men\'s watch with timeless design. Durable stainless steel case and comfortable strap. Perfect for everyday use and professional settings.',
     productRating: 4.6,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories2/1.jpg', '/images/Accessories2/2.jpg'],
   },
   {
     productTitle: 'Men\'s Sport Watch',
     productPrice: 59.99,
-    productDiscription: 'Modern sport watch with advanced features. Water-resistant and durable for active lifestyle.',
+    productDiscription: 'Modern sport watch with advanced features including stopwatch and date display. Water-resistant up to 100m and durable for active lifestyle.',
     productRating: 4.7,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories3/1.jpg', '/images/Accessories3/2.jpg', '/images/Accessories3/3.jpg'],
   },
   {
-    productTitle: 'Men\'s Bracelet',
+    productTitle: 'Men\'s Leather Bracelet',
     productPrice: 39.99,
-    productDiscription: 'Stylish men\'s bracelet with elegant design. Made from premium materials for durability and comfort.',
+    productDiscription: 'Stylish men\'s bracelet with elegant design. Made from premium genuine leather for durability and comfort. Adjustable size fits all wrists.',
     productRating: 4.6,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories4/1.jpg', '/images/Accessories4/2.jpg'],
   },
   {
     productTitle: 'Men\'s Silver Earrings',
     productPrice: 24.99,
-    productDiscription: 'Elegant silver earrings for men with modern design. Perfect for adding a stylish touch to your look.',
+    productDiscription: 'Elegant silver earrings for men with modern minimalist design. Hypoallergenic material. Perfect for adding a stylish touch to your look.',
     productRating: 4.5,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories5/1.jpg', '/images/Accessories5/2.jpg'],
   },
   {
     productTitle: 'Men\'s Gold Earrings',
     productPrice: 69.99,
-    productDiscription: 'Premium gold earrings for men with sophisticated design. Perfect for special occasions and formal events.',
+    productDiscription: 'Premium gold-plated earrings for men with sophisticated design. High-quality materials ensure long-lasting shine. Perfect for special occasions.',
     productRating: 4.7,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories6/1.jpg', '/images/Accessories6/2.jpg', '/images/Accessories6/3.jpg'],
   },
   {
     productTitle: 'Men\'s Chain Necklace',
     productPrice: 34.99,
-    productDiscription: 'Classic chain necklace for men with adjustable length. Made from high-quality materials for lasting durability.',
+    productDiscription: 'Classic chain necklace for men with adjustable length. Made from high-quality stainless steel for lasting durability and shine.',
     productRating: 4.6,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories7/1.jpg', '/images/Accessories7/2.jpg'],
   },
   {
     productTitle: 'Men\'s Aviator Sunglasses',
     productPrice: 44.99,
-    productDiscription: 'Classic aviator sunglasses with UV protection. Stylish design perfect for sunny days and outdoor activities.',
+    productDiscription: 'Classic aviator sunglasses with 100% UV protection. Polarized lenses reduce glare. Stylish design perfect for sunny days and outdoor activities.',
     productRating: 4.7,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories8/2.jpg', '/images/Accessories8/3.jpg', '/images/Accessories8/final.jpg'],
   },
   {
     productTitle: 'Men\'s Wayfarer Sunglasses',
     productPrice: 29.99,
-    productDiscription: 'Timeless wayfarer sunglasses with UV protection. Classic design that never goes out of style.',
+    productDiscription: 'Timeless wayfarer sunglasses with UV400 protection. Classic design that never goes out of style. Durable frame and scratch-resistant lenses.',
     productRating: 4.5,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories9/1.jpg', '/images/Accessories9/2.jpg'],
   },
   {
     productTitle: 'Men\'s Leather Messenger Bag',
     productPrice: 49.99,
-    productDiscription: 'Premium leather messenger bag with spacious compartments. Perfect for work, travel, and daily use.',
+    productDiscription: 'Premium genuine leather messenger bag with spacious compartments and laptop sleeve. Perfect for work, travel, and daily use. Adjustable shoulder strap.',
     productRating: 4.6,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories10/1.jpg', '/images/Accessories10/2.jpg', '/images/Accessories10/4.jpg', '/images/Accessories10/final.jpg'],
   },
   {
     productTitle: 'Men\'s Crossbody Bag',
     productPrice: 39.99,
-    productDiscription: 'Stylish crossbody bag with modern design. Compact and functional, perfect for everyday essentials.',
+    productDiscription: 'Stylish crossbody bag with modern design and multiple pockets. Compact and functional, perfect for everyday essentials. Water-resistant material.',
     productRating: 4.5,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories11/1.jpg', '/images/Accessories11/2.jpg'],
   },
   {
-    productTitle: 'Men\'s Small Wallet Bag',
+    productTitle: 'Men\'s Slim Wallet',
     productPrice: 19.99,
-    productDiscription: 'Compact wallet bag with multiple card slots. Sleek design perfect for minimalists and daily use.',
+    productDiscription: 'Compact slim wallet with multiple card slots and cash compartment. RFID blocking technology. Sleek design perfect for minimalists and daily use.',
     productRating: 4.4,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories12/1.jpg', '/images/Accessories12/2.jpg'],
   },
   
@@ -355,32 +368,35 @@ const sampleProducts: ProductData[] = [
     images: ['/images/shoes3/1.jpg', '/images/shoes3/2.jpg'],
   },
   
-  // Women's Accessories
+  // Women's Accessories - بدون ألوان (كمية فقط)
   {
     productTitle: 'Women\'s Elegant Watch',
     productPrice: 79.99,
-    productDiscription: 'Beautiful elegant watch for women with premium design. Perfect for both casual and formal occasions.',
+    productDiscription: 'Beautiful elegant watch for women with premium design and mother-of-pearl dial. Perfect for both casual and formal occasions. Water-resistant up to 30m.',
     productRating: 4.6,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories1/3.jpg', '/images/Accessories1/4.jpg', '/images/Accessories1/final.jpg'],
   },
   {
     productTitle: 'Women\'s Classic Watch',
     productPrice: 49.99,
-    productDiscription: 'Timeless classic watch for women with sophisticated design. Water-resistant and durable for daily wear.',
+    productDiscription: 'Timeless classic watch for women with sophisticated design. Water-resistant and durable for daily wear. Elegant rose gold finish.',
     productRating: 4.7,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories2/1.jpg', '/images/Accessories2/2.jpg'],
   },
   {
     productTitle: 'Women\'s Fashion Watch',
     productPrice: 29.99,
-    productDiscription: 'Stylish fashion watch for women with modern design. Perfect accessory to complement any outfit.',
+    productDiscription: 'Stylish fashion watch for women with modern minimalist design. Perfect accessory to complement any outfit. Lightweight and comfortable.',
     productRating: 4.6,
     category: 'accessories',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Accessories3/1.jpg', '/images/Accessories3/2.jpg', '/images/Accessories3/3.jpg'],
   },
   
@@ -451,108 +467,119 @@ const sampleProducts: ProductData[] = [
     images: ['/images/shoes2/1.jpg', '/images/shoes2/2.jpg'],
   },
   
-  // Electronics
+  // Electronics - بدون ألوان (كمية فقط)
   {
     productTitle: 'Wireless Earbuds',
     productPrice: 79.99,
-    productDiscription: 'High-quality wireless earbuds with noise cancellation. Perfect for music lovers.',
+    productDiscription: 'High-quality wireless earbuds with active noise cancellation. Perfect for music lovers. Long battery life and crystal-clear sound quality.',
     productRating: 4.8,
     category: 'electronics',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Electronics1/1.jpg', '/images/Electronics1/2.jpg'],
   },
   {
     productTitle: 'Smart Watch',
     productPrice: 199.99,
-    productDiscription: 'Feature-rich smartwatch with fitness tracking. Water-resistant and durable.',
+    productDiscription: 'Feature-rich smartwatch with advanced fitness tracking. Water-resistant and durable. Monitor your health and stay connected.',
     productRating: 4.7,
     category: 'electronics',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Electronics2/1.jpg', '/images/Electronics2/2.jpg'],
   },
   {
-    productTitle: 'Phone Case',
+    productTitle: 'Protective Phone Case',
     productPrice: 19.99,
-    productDiscription: 'Protective phone case with elegant design. Available in multiple colors.',
+    productDiscription: 'Durable protective phone case with elegant design. Shock-absorbent material protects your device from drops and scratches.',
     productRating: 4.5,
     category: 'electronics',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Electronics3/1.jpg', '/images/Electronics3/2.jpg'],
   },
   {
-    productTitle: 'Wireless Charger',
+    productTitle: 'Fast Wireless Charger',
     productPrice: 34.99,
-    productDiscription: 'Fast wireless charger with sleek design. Compatible with all devices.',
+    productDiscription: 'Fast wireless charger with sleek modern design. Compatible with all Qi-enabled devices. Charge your phone without cables.',
     productRating: 4.6,
     category: 'electronics',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/Electronics4/1.jpg', '/images/Electronics4/2.jpg'],
   },
   
-  // Beauty
+  // Beauty - بدون ألوان (كمية فقط)
   {
-    productTitle: 'Face Moisturizer',
+    productTitle: 'Hydrating Face Moisturizer',
     productPrice: 29.99,
-    productDiscription: 'Hydrating face moisturizer with natural ingredients. Perfect for all skin types.',
+    productDiscription: 'Deeply hydrating face moisturizer with natural ingredients. Perfect for all skin types. Keeps your skin soft and glowing all day.',
     productRating: 4.6,
     category: 'beauty',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/beauty1/1.jpg', '/images/beauty1/2.jpg'],
   },
   {
-    productTitle: 'Lipstick Set',
+    productTitle: 'Premium Lipstick Set',
     productPrice: 39.99,
-    productDiscription: 'Premium lipstick set with multiple shades. Long-lasting and vibrant colors.',
+    productDiscription: 'Luxury lipstick set with multiple shades. Long-lasting formula with vibrant colors. Perfect for any occasion.',
     productRating: 4.7,
     category: 'beauty',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/beauty2/1.jpg', '/images/beauty2/2.jpg'],
   },
   {
-    productTitle: 'Face Serum',
+    productTitle: 'Vitamin C Face Serum',
     productPrice: 49.99,
-    productDiscription: 'Anti-aging face serum with vitamin C. Brightens and rejuvenates skin.',
+    productDiscription: 'Anti-aging face serum enriched with vitamin C. Brightens and rejuvenates skin. Reduces fine lines and dark spots.',
     productRating: 4.8,
     category: 'beauty',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/beauty3/1.jpg', '/images/beauty3/2.jpg'],
   },
   
-  // Home
+  // Home - بدون ألوان (كمية فقط)
   {
     productTitle: 'Decorative Pillow',
     productPrice: 24.99,
-    productDiscription: 'Soft decorative pillow with elegant design. Perfect for home decoration.',
+    productDiscription: 'Soft decorative pillow with elegant design. Perfect for home decoration. Made from premium materials for comfort and style.',
     productRating: 4.5,
     category: 'home',
     sizeType: 'none',
+    hasColors: false, // بدون ألوان - كمية فقط
     images: ['/images/home1/1.jpg', '/images/home1/2.jpg'],
   },
   {
-    productTitle: 'Table Lamp',
+    productTitle: 'Modern Table Lamp',
     productPrice: 49.99,
-    productDiscription: 'Modern table lamp with elegant design. Perfect for home and office.',
+    productDiscription: 'Sleek modern table lamp with elegant design and adjustable brightness. Perfect for home and office. Energy-efficient LED technology.',
     productRating: 4.6,
     category: 'home',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/home2/1.jpg', '/images/home2/2.jpg'],
   },
   {
-    productTitle: 'Wall Clock',
+    productTitle: 'Elegant Wall Clock',
     productPrice: 39.99,
-    productDiscription: 'Elegant wall clock with modern design. Perfect for any room.',
+    productDiscription: 'Stylish wall clock with modern minimalist design. Silent movement mechanism. Perfect for any room in your home or office.',
     productRating: 4.5,
     category: 'home',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/home3/1.jpg', '/images/home3/2.jpg'],
   },
   {
-    productTitle: 'Vase Set',
+    productTitle: 'Ceramic Vase Set',
     productPrice: 34.99,
-    productDiscription: 'Beautiful vase set with elegant design. Perfect for home decoration.',
+    productDiscription: 'Beautiful ceramic vase set with elegant design. Handcrafted with attention to detail. Perfect for home decoration and flower arrangements.',
     productRating: 4.6,
     category: 'home',
     sizeType: 'none',
+    hasColors: false,
     images: ['/images/home4/1.jpg', '/images/home4/2.jpg'],
   },
   {
@@ -562,7 +589,90 @@ const sampleProducts: ProductData[] = [
     productRating: 4.5,
     category: 'home',
     sizeType: 'none',
+    hasColors: false, // بدون ألوان - كمية فقط
     images: ['/images/home5/1.jpg', '/images/home5/2.jpg'],
+  },
+  
+  // Fruits - بدون ألوان ولا مقاسات
+  {
+    productTitle: 'Fresh Red Apples',
+    productPrice: 4.99,
+    productDiscription: 'Fresh and crisp red apples, perfect for snacking or cooking. Rich in vitamins and fiber.',
+    productRating: 4.8,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false, // بدون ألوان - كمية فقط
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
+  },
+  {
+    productTitle: 'Sweet Oranges',
+    productPrice: 5.99,
+    productDiscription: 'Juicy and sweet oranges, packed with vitamin C. Perfect for a healthy breakfast or snack.',
+    productRating: 4.7,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false,
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
+  },
+  {
+    productTitle: 'Fresh Bananas',
+    productPrice: 3.99,
+    productDiscription: 'Ripe and sweet bananas, excellent source of potassium. Perfect for smoothies or as a healthy snack.',
+    productRating: 4.6,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false,
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
+  },
+  {
+    productTitle: 'Strawberries',
+    productPrice: 6.99,
+    productDiscription: 'Fresh and sweet strawberries, rich in antioxidants. Perfect for desserts or as a healthy treat.',
+    productRating: 4.9,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false,
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
+  },
+  {
+    productTitle: 'Grapes',
+    productPrice: 7.99,
+    productDiscription: 'Sweet and juicy grapes, perfect for snacking. Rich in vitamins and natural sugars.',
+    productRating: 4.7,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false,
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
+  },
+  {
+    productTitle: 'Watermelon',
+    productPrice: 8.99,
+    productDiscription: 'Fresh and refreshing watermelon, perfect for hot summer days. High water content and natural sweetness.',
+    productRating: 4.8,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false,
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
+  },
+  {
+    productTitle: 'Mangoes',
+    productPrice: 9.99,
+    productDiscription: 'Sweet and tropical mangoes, rich in vitamins A and C. Perfect for smoothies or eating fresh.',
+    productRating: 4.9,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false,
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
+  },
+  {
+    productTitle: 'Pineapple',
+    productPrice: 7.99,
+    productDiscription: 'Fresh and tropical pineapple, sweet and juicy. Rich in vitamin C and enzymes.',
+    productRating: 4.7,
+    category: 'fruits',
+    sizeType: 'none',
+    hasColors: false,
+    images: ['/images/Fruites/1.jpg', '/images/Fruites/2.jpg'],
   },
 ];
 
@@ -706,6 +816,7 @@ async function main() {
     { name: 'Electronics', slug: 'electronics', description: 'Electronic devices and gadgets', sortOrder: 6 },
     { name: 'Beauty', slug: 'beauty', description: 'Beauty and personal care products', sortOrder: 7 },
     { name: 'Home', slug: 'home', description: 'Home and living products', sortOrder: 8 },
+    { name: 'Fruits', slug: 'fruits', description: 'Fresh fruits and produce', sortOrder: 9 },
   ];
 
   const categoryMap: Record<string, number> = {};
@@ -788,39 +899,57 @@ async function main() {
     const companyId = companyMap[companySlugs[companyIndex % companySlugs.length]] || null;
     companyIndex++;
 
-    const sizes = getSizesForType(productData.sizeType);
-    const colors = getColorsForProduct(productData.category, productData.sizeType);
+    // Check if product has colors or not
+    const hasColors = productData.hasColors !== false; // Default to true if not specified
+    
+    let productQuantity = 0;
+    let colorsData: any[] = [];
 
-    // Create colors with variants
-    const colorsData = colors.map((color) => {
-      const hasSizes = sizes.length > 0;
-      const variants = hasSizes ? sizes.map((sizeName) => {
-        const sizeId = sizeMap[sizeName];
-        if (!sizeId) {
-          console.warn(`⚠️  Size "${sizeName}" not found for product: ${productData.productTitle}`);
-          return null;
-        }
-        // Generate random quantity
-        const quantity = productData.sizeType === 'shoes' 
-          ? Math.floor(Math.random() * 10) + 3  // Shoes: 3-12
-          : Math.floor(Math.random() * 20) + 5; // Clothing: 5-24
-        return { sizeId, quantity };
-      }).filter((v): v is { sizeId: number; quantity: number } => v !== null) : [];
+    if (hasColors) {
+      // Product has colors
+      const sizes = getSizesForType(productData.sizeType);
+      const colors = getColorsForProduct(productData.category, productData.sizeType);
 
-      // For products without sizes, set quantity on color
-      const colorQuantity = !hasSizes 
-        ? (productData.sizeType === 'none' ? Math.floor(Math.random() * 50) + 10 : 0) // Accessories: 10-60
-        : 0;
+      // Create colors with variants
+      colorsData = colors.map((color) => {
+        const hasSizes = sizes.length > 0;
+        const variants = hasSizes ? sizes.map((sizeName) => {
+          const sizeId = sizeMap[sizeName];
+          if (!sizeId) {
+            console.warn(`⚠️  Size "${sizeName}" not found for product: ${productData.productTitle}`);
+            return null;
+          }
+          // Generate random quantity
+          const quantity = productData.sizeType === 'shoes' 
+            ? Math.floor(Math.random() * 10) + 3  // Shoes: 3-12
+            : Math.floor(Math.random() * 20) + 5; // Clothing: 5-24
+          return { sizeId, quantity };
+        }).filter((v): v is { sizeId: number; quantity: number } => v !== null) : [];
 
-      return {
-        colorName: color.colorName,
-        colorCode: color.colorCode,
-        quantity: colorQuantity,
-        variants: {
-          create: variants,
-        },
-      };
-    });
+        // For products without sizes, set quantity on color
+        const colorQuantity = !hasSizes 
+          ? (productData.sizeType === 'none' ? Math.floor(Math.random() * 50) + 10 : 0) // Accessories: 10-60
+          : 0;
+
+        return {
+          colorName: color.colorName,
+          colorCode: color.colorCode,
+          quantity: colorQuantity,
+          variants: {
+            create: variants,
+          },
+        };
+      });
+    } else {
+      // Product without colors - set quantity directly on product
+      if (productData.category === 'fruits') {
+        productQuantity = Math.floor(Math.random() * 200) + 50; // Fruits: 50-250
+      } else if (productData.category === 'home') {
+        productQuantity = Math.floor(Math.random() * 30) + 10; // Home: 10-40
+      } else {
+        productQuantity = Math.floor(Math.random() * 50) + 10; // Default: 10-60
+      }
+    }
 
     const product = await prisma.product.create({
       data: {
@@ -830,15 +959,16 @@ async function main() {
         productRating: productData.productRating,
         categoryId: categoryId,
         companyId: companyId,
+        quantity: productQuantity, // Set quantity for products without colors
         images: {
           create: productData.images.map((imageUrl, index) => ({
             imageUrl,
             imageOrder: index,
           })),
         },
-        colors: {
+        colors: hasColors ? {
           create: colorsData,
-        },
+        } : undefined, // Don't create colors if hasColors is false
       },
     });
     console.log(`✅ Created product: ${product.productTitle} (ID: ${product.id})`);

@@ -95,6 +95,7 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
       createdAt: product.company.createdAt.toISOString(),
       updatedAt: product.company.updatedAt.toISOString(),
     } : null,
+    quantity: product.quantity || 0, // For products without colors or sizes
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
     productimg: product.images.map((img: any) => {
@@ -209,6 +210,7 @@ export async function getProductById(id: number): Promise<Product | null> {
       createdAt: product.company.createdAt.toISOString(),
       updatedAt: product.company.updatedAt.toISOString(),
     } : null,
+    quantity: product.quantity || 0, // For products without colors or sizes
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
     productimg: product.images.map((img) => {
@@ -302,6 +304,7 @@ export async function createProduct(product: {
   productRating: number;
   categoryId: number;
   companyId?: number | null;
+  quantity?: number; // For products without colors or sizes
   images: string[];
   colors?: Array<{
     colorName: string;
@@ -336,6 +339,7 @@ export async function createProduct(product: {
       productRating: product.productRating,
       categoryId: product.categoryId,
       companyId: product.companyId || null,
+      quantity: (!product.colors || product.colors.length === 0) ? (product.quantity || 0) : 0, // Only set quantity if no colors
     },
   });
 

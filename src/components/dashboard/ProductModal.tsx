@@ -30,6 +30,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
     productRating: '0',
     category: '',
     company: '',
+    quantity: '0', // For products without colors or sizes
     images: [] as string[],
   });
   const [colors, setColors] = useState<ColorFormData[]>([]);
@@ -90,6 +91,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
         productRating: product.productRating.toString(),
         category: typeof product.category === 'string' ? product.category : product.category.slug,
         company: product.companyId?.toString() || '',
+        quantity: product.quantity?.toString() || '0',
         images: product.productimg?.map((img) => img.url) || [],
       });
       setColors(
@@ -135,6 +137,7 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
         ...formData,
         category: selectedCategory.id, // Send category ID
         company: formData.company ? parseInt(formData.company) : null, // Send company ID or null
+        quantity: (!colors || colors.length === 0) ? parseInt(formData.quantity) || 0 : 0, // Only set quantity if no colors
         images: imagesToSend,
         colors: colors.map((color) => ({
           colorName: color.colorName,
@@ -387,6 +390,24 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
+
+          {/* Quantity for products without colors */}
+          {(!colors || colors.length === 0) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                الكمية / Quantity (للمنتجات بدون ألوان أو مقاسات)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={formData.quantity}
+                onChange={(e) =>
+                  setFormData({ ...formData, quantity: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">

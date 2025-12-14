@@ -73,6 +73,7 @@ export interface Product {
   categoryId?: number;
   companyId?: number | null;
   company?: Company | null;
+  quantity?: number; // For products without colors or sizes
   productimg: ProductImage[];
   colors?: ProductColor[];
   reviews?: ProductReview[];

@@ -34,6 +34,7 @@ model Product {
   productRating      Decimal         @default(0) @map("product_rating") @db.Decimal(3, 2)
   categoryId         Int             @map("category_id")
   companyId          Int?            @map("company_id")
+  quantity           Int             @default(0) // For products without colors or sizes
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
   category           ProductCategory @relation(fields: [categoryId], references: [id])

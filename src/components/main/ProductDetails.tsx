@@ -85,6 +85,11 @@ const ProductDetails = ({
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
   const getAvailableQuantity = () => {
+    // If product has no colors at all, get quantity from product itself
+    if (!product.colors || product.colors.length === 0) {
+      return product.quantity ?? null;
+    }
+    
     if (!selectedColorData) return null;
     
     // If product has sizes, get quantity from variant
@@ -320,7 +325,7 @@ const ProductDetails = ({
 
         {/* Add to Cart Section */}
         <div className="border-t border-gray-200 pt-6">
-          {selectedColorData && (availableSizes.length === 0 || selectedSizeId) ? (
+          {(!product.colors || product.colors.length === 0 || (selectedColorData && (availableSizes.length === 0 || selectedSizeId))) ? (
             isInCart ? (
               <div className="flex items-center justify-center sm:justify-start gap-4 bg-primary-50 px-6 py-4 rounded-xl border border-primary-200">
                 {(() => {
@@ -389,9 +394,9 @@ const ProductDetails = ({
             )
           ) : (
             <div className="px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-700 text-center">
-              {!selectedColorData
+              {product.colors && product.colors.length > 0 && !selectedColorData
                 ? '⚠️ يرجى اختيار لون أولاً'
-                : availableSizes.length > 0 && !selectedSizeId
+                : product.colors && product.colors.length > 0 && availableSizes.length > 0 && !selectedSizeId
                   ? '⚠️ يرجى اختيار مقاس'
                   : ''}
             </div>
