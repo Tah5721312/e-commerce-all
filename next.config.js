@@ -1,13 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    dirs: ['src'],
-  },
-
   reactStrictMode: true,
 
   images: {
-    domains: ['localhost'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -66,6 +61,9 @@ const nextConfig = {
 
     return config;
   },
+
+  // Turbopack config (empty to use webpack for now)
+  turbopack: {},
 };
 
 module.exports = nextConfig;
