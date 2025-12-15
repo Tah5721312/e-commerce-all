@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { User, LogIn, LogOut, LayoutDashboard } from "lucide-react";
+import { FiSettings } from "react-icons/fi";
 
 export default function AuthButtons() {
   const { data: session, status } = useSession();
@@ -21,13 +22,17 @@ export default function AuthButtons() {
         <>
           {/* زرار Dashboard - يظهر للأدمن فقط */}
           {session.user?.role === "ADMIN" && (
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <LayoutDashboard size={18} />
-              <span className="hidden sm:inline">لوحة التحكم</span>
-            </Link>
+             <Link
+            href='/dashboard'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='p-2.5 hover:bg-gray-100 rounded-full transition-colors group'
+            aria-label='dashboard'
+            title='لوحة التحكم'
+          >
+            <FiSettings className='w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors' />
+          </Link>
+
           )}
 
           {/* معلومات المستخدم وزرار تسجيل الخروج */}

@@ -99,8 +99,8 @@ export default function DashboardPage() {
     status: string;
   } | null>(null);
 
-
-   useEffect(() => {
+  // Auth check
+  useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/signin");
     }
@@ -110,6 +110,18 @@ export default function DashboardPage() {
       router.push("/"); // توجيه غير الأدمن للصفحة الرئيسية
     }
   }, [status, session, router]);
+
+  // Fetch data when tab changes
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role === "ADMIN") {
+      fetchProducts();
+      fetchStats();
+      if (activeTab === 'orders') {
+        fetchOrders();
+        fetchOrderStats();
+      }
+    }
+  }, [activeTab, status, session]);
 
   if (status === "loading") {
     return (
@@ -122,16 +134,6 @@ export default function DashboardPage() {
   if (!session || session.user?.role !== "ADMIN") {
     return null;
   }
-
-  
-  useEffect(() => {
-    fetchProducts();
-    fetchStats();
-    if (activeTab === 'orders') {
-      fetchOrders();
-      fetchOrderStats();
-    }
-  }, [activeTab]);
 
   const fetchProducts = async () => {
     try {

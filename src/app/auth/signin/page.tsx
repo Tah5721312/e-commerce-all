@@ -32,7 +32,8 @@ export default function SignIn() {
         return;
       }
 
-      router.push("/dashboard");
+      // router.push/("/dashboard");
+      router.push("/");
       router.refresh();
     } catch (error) {
       setError("حدث خطأ أثناء تسجيل الدخول");
@@ -41,7 +42,8 @@ export default function SignIn() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/dashboard" });
+    // signIn("google", { callbackUrl: "/dashboard" });
+    signIn("google", { callbackUrl: "/" });
   };
 
   return (

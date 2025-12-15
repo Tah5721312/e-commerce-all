@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FiHeart, FiSettings, FiShoppingCart, FiUser } from 'react-icons/fi';
+import { FiHeart,  FiShoppingCart } from 'react-icons/fi';
 
 import SearchBar from '@/components/search/SearchBar';
 
@@ -67,25 +67,19 @@ const Header2 = ({ onCartOpen, onFavoritesOpen }: Header2Props) => {
             )}
           </button>
 
-          <Link
+          {/* <Link
             href='/dashboard'
             className='p-2.5 hover:bg-gray-100 rounded-full transition-colors group'
             aria-label='dashboard'
             title='لوحة التحكم'
           >
             <FiSettings className='w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors' />
-          </Link>
+          </Link> */}
 
           {/* Auth Buttons */}
           <AuthButtons />
           
-          <button
-            className='p-2.5 hover:bg-gray-100 rounded-full transition-colors group'
-            aria-label='user'
-            title='حسابي'
-          >
-            <FiUser className='w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors' />
-          </button>
+         
         </div>
       </div>
     </header>
