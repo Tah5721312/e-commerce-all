@@ -206,7 +206,7 @@ model HeroBanner {
 
 
 model Account {
-  id                String  @id
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -223,8 +223,9 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+
 model User {
-  id            String    @id
+  id            String    @id @default(cuid())
   name          String?
   email         String    @unique
   emailVerified DateTime?
@@ -232,9 +233,11 @@ model User {
   password      String?
   role          Role      @default(USER)
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime
+  updatedAt     DateTime  @updatedAt
   Account       Account[]
 }
+
+
 
 enum OrderStatus {
   pending
