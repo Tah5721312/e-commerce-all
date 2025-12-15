@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FiBarChart2,
   FiBox,
@@ -70,7 +70,14 @@ interface OrderStats {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<
-    'products' | 'orders' | 'hero' | 'heroBanners' | 'categories' | 'sizes' | 'companies' | 'inventory'
+    | 'products'
+    | 'orders'
+    | 'hero'
+    | 'heroBanners'
+    | 'categories'
+    | 'sizes'
+    | 'companies'
+    | 'inventory'
   >('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -83,7 +90,10 @@ export default function DashboardPage() {
   const [isImagesModalOpen, setIsImagesModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<{ orderNumber: string; status: string } | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<{
+    orderNumber: string;
+    status: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -139,15 +149,21 @@ export default function DashboardPage() {
     }
   };
 
-  const handleUpdateOrderStatus = async (orderNumber: string, status: string) => {
+  const handleUpdateOrderStatus = async (
+    orderNumber: string,
+    status: string
+  ) => {
     try {
-      const response = await fetch(`${DOMAIN}/api/orders/${orderNumber}/update`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      });
+      const response = await fetch(
+        `${DOMAIN}/api/orders/${orderNumber}/update`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status }),
+        }
+      );
 
       if (response.ok) {
         fetchOrders();
@@ -163,9 +179,12 @@ export default function DashboardPage() {
 
   const handleDeleteOrder = async (orderNumber: string) => {
     try {
-      const response = await fetch(`${DOMAIN}/api/orders/${orderNumber}/delete`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `${DOMAIN}/api/orders/${orderNumber}/delete`,
+        {
+          method: 'DELETE',
+        }
+      );
 
       if (response.ok) {
         fetchOrders();
@@ -246,108 +265,118 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500' />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">لوحة التحكم / Dashboard</h1>
+    <div className='min-h-screen bg-gray-50'>
+      <div className='container mx-auto px-4 py-8'>
+        <div className='flex justify-between items-center mb-8'>
+          <h1 className='text-3xl font-bold text-gray-800'>
+            لوحة التحكم / Dashboard
+          </h1>
           {activeTab === 'products' && (
             <button
               onClick={handleAddProduct}
-              className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+              className='flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors'
             >
-              <FiPlus className="w-5 h-5" />
+              <FiPlus className='w-5 h-5' />
               Add Product
             </button>
           )}
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b flex-wrap">
+        <div className='flex gap-4 mb-8 border-b flex-wrap'>
           <button
             onClick={() => setActiveTab('products')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'products'
-              ? 'border-purple-600 text-purple-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'products'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
           >
-            <FiPackage className="inline-block w-5 h-5 mr-2" />
+            <FiPackage className='inline-block w-5 h-5 mr-2' />
             المنتجات / Products
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'orders'
-              ? 'border-purple-600 text-purple-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'orders'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
           >
-            <FiShoppingBag className="inline-block w-5 h-5 mr-2" />
+            <FiShoppingBag className='inline-block w-5 h-5 mr-2' />
             الطلبات / Orders
           </button>
           <button
             onClick={() => setActiveTab('hero')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'hero'
-              ? 'border-purple-600 text-purple-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'hero'
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
           >
-            <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
+            <FiBarChart2 className='inline-block w-5 h-5 mr-2' />
             Hero Slider
           </button>
           <button
             onClick={() => setActiveTab('heroBanners')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'heroBanners'
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'heroBanners'
                 ? 'border-purple-600 text-purple-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            }`}
           >
-            <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
+            <FiBarChart2 className='inline-block w-5 h-5 mr-2' />
             Hero Side Banners
           </button>
           <button
             onClick={() => setActiveTab('categories')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'categories'
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'categories'
                 ? 'border-purple-600 text-purple-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            }`}
           >
-            <FiBarChart2 className="inline-block w-5 h-5 mr-2" />
+            <FiBarChart2 className='inline-block w-5 h-5 mr-2' />
             Categories
           </button>
           <button
             onClick={() => setActiveTab('sizes')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'sizes'
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'sizes'
                 ? 'border-purple-600 text-purple-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            }`}
           >
-            <FiLayers className="inline-block w-5 h-5 mr-2" />
+            <FiLayers className='inline-block w-5 h-5 mr-2' />
             Sizes / المقاسات
           </button>
           <button
             onClick={() => setActiveTab('companies')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'companies'
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'companies'
                 ? 'border-purple-600 text-purple-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            }`}
           >
-            <FiBriefcase className="inline-block w-5 h-5 mr-2" />
+            <FiBriefcase className='inline-block w-5 h-5 mr-2' />
             Companies / الشركات
           </button>
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${activeTab === 'inventory'
+            className={`px-6 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === 'inventory'
                 ? 'border-purple-600 text-purple-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+            }`}
           >
-            <FiBox className="inline-block w-5 h-5 mr-2" />
+            <FiBox className='inline-block w-5 h-5 mr-2' />
             Inventory / المخزون
           </button>
         </div>
@@ -356,7 +385,7 @@ export default function DashboardPage() {
         {activeTab === 'products' && (
           <>
             {stats && <StatsCards stats={stats} />}
-            <div className="mt-8">
+            <div className='mt-8'>
               <ProductList
                 products={products}
                 onEdit={handleEditProduct}
@@ -371,10 +400,10 @@ export default function DashboardPage() {
         {activeTab === 'orders' && (
           <>
             {orderStats && <OrderStatsCards stats={orderStats} />}
-            <div className="mt-8">
+            <div className='mt-8'>
               {ordersLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+                <div className='flex items-center justify-center py-12'>
+                  <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500'></div>
                 </div>
               ) : (
                 <OrderList
@@ -389,53 +418,54 @@ export default function DashboardPage() {
         )}
 
         {activeTab === 'hero' && (
-          <div className="mt-8">
+          <div className='mt-8'>
             <HeroContentTab />
           </div>
         )}
 
         {activeTab === 'heroBanners' && (
-          <div className="mt-8">
+          <div className='mt-8'>
             <HeroBannersTab />
           </div>
         )}
 
         {activeTab === 'categories' && (
-          <div className="mt-8">
-            <CategoriesTab onCategoryChange={() => {
-              fetchProducts();
-              fetchStats();
-            }} />
+          <div className='mt-8'>
+            <CategoriesTab
+              onCategoryChange={() => {
+                fetchProducts();
+                fetchStats();
+              }}
+            />
           </div>
         )}
 
         {activeTab === 'sizes' && (
-          <div className="mt-8">
-            <SizesTab onSizeChange={() => {
-              fetchProducts();
-              fetchStats();
-            }} />
+          <div className='mt-8'>
+            <SizesTab
+              onSizeChange={() => {
+                fetchProducts();
+                fetchStats();
+              }}
+            />
           </div>
         )}
 
         {activeTab === 'companies' && (
-          <div className="mt-8">
+          <div className='mt-8'>
             <CompaniesTab />
           </div>
         )}
 
         {activeTab === 'inventory' && (
-          <div className="mt-8">
+          <div className='mt-8'>
             <InventoryTab />
           </div>
         )}
 
         {/* Modals */}
         {isModalOpen && (
-          <ProductModal
-            product={editingProduct}
-            onClose={handleModalClose}
-          />
+          <ProductModal product={editingProduct} onClose={handleModalClose} />
         )}
 
         {isImagesModalOpen && selectedProduct && (
@@ -458,4 +488,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

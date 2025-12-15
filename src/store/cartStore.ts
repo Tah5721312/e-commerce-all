@@ -65,8 +65,8 @@ export const useCartStore = create<CartStore>()(
           set({
             cartItems: cartItems.map((item) =>
               item.id === product.id &&
-                item.selectedColor === selectedColor &&
-                item.selectedSizeId === selectedSizeId
+              item.selectedColor === selectedColor &&
+              item.selectedSizeId === selectedSizeId
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
             ),
@@ -98,8 +98,8 @@ export const useCartStore = create<CartStore>()(
         set({
           cartItems: get().cartItems.map((item) =>
             item.id === productId &&
-              item.selectedColor === selectedColor &&
-              item.selectedSizeId === selectedSizeId
+            item.selectedColor === selectedColor &&
+            item.selectedSizeId === selectedSizeId
               ? { ...item, quantity: item.quantity + 1 }
               : item
           ),
@@ -119,8 +119,8 @@ export const useCartStore = create<CartStore>()(
           set({
             cartItems: cartItems.map((item) =>
               item.id === productId &&
-                item.selectedColor === selectedColor &&
-                item.selectedSizeId === selectedSizeId
+              item.selectedColor === selectedColor &&
+              item.selectedSizeId === selectedSizeId
                 ? { ...item, quantity: item.quantity - 1 }
                 : item
             ),
@@ -165,4 +165,3 @@ export const useCartStore = create<CartStore>()(
     }
   )
 );
-

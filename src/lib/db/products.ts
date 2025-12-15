@@ -2,7 +2,9 @@ import { prisma } from './prisma';
 
 import type { Product } from '@/types/product';
 
-export async function getAllProducts(categorySlug?: string): Promise<Product[]> {
+export async function getAllProducts(
+  categorySlug?: string
+): Promise<Product[]> {
   const where: { categoryId?: number } = {};
 
   // Support filtering by either category slug or name
@@ -83,19 +85,21 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
     },
     categoryId: product.categoryId,
     companyId: product.companyId,
-    company: product.company ? {
-      id: product.company.id,
-      name: product.company.name,
-      slug: product.company.slug,
-      description: product.company.description,
-      email: product.company.email,
-      phone: product.company.phone,
-      address: product.company.address,
-      website: product.company.website,
-      isActive: product.company.isActive,
-      createdAt: product.company.createdAt.toISOString(),
-      updatedAt: product.company.updatedAt.toISOString(),
-    } : null,
+    company: product.company
+      ? {
+          id: product.company.id,
+          name: product.company.name,
+          slug: product.company.slug,
+          description: product.company.description,
+          email: product.company.email,
+          phone: product.company.phone,
+          address: product.company.address,
+          website: product.company.website,
+          isActive: product.company.isActive,
+          createdAt: product.company.createdAt.toISOString(),
+          updatedAt: product.company.updatedAt.toISOString(),
+        }
+      : null,
     quantity: product.quantity || 0, // For products without colors or sizes
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
@@ -113,39 +117,41 @@ export async function getAllProducts(categorySlug?: string): Promise<Product[]> 
         image_order: img.imageOrder,
       };
     }),
-    colors: product.colors?.map((color) => ({
-      id: color.id,
-      quantity: color.quantity || 0,
-      colorName: color.colorName,
-      colorCode: color.colorCode,
-      variants: color.variants
-        .filter((variant) => variant.size !== null)
-        .map((variant) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const size = variant.size!;
-          return {
-            id: variant.id,
-            size: {
-              id: size.id,
-              name: size.name,
-              displayName: size.displayName,
-              sortOrder: size.sortOrder,
-              createdAt: size.createdAt.toISOString(),
-              updatedAt: size.updatedAt.toISOString(),
-            },
-            sizeId: variant.sizeId,
-            quantity: variant.quantity,
-          };
-        }),
-    })) || [],
-    reviews: product.reviews?.map((review) => ({
-      id: review.id,
-      productId: review.productId,
-      author: review.author,
-      rating: review.rating,
-      comment: review.comment,
-      createdAt: review.createdAt.toISOString(),
-    })) || [],
+    colors:
+      product.colors?.map((color) => ({
+        id: color.id,
+        quantity: color.quantity || 0,
+        colorName: color.colorName,
+        colorCode: color.colorCode,
+        variants: color.variants
+          .filter((variant) => variant.size !== null)
+          .map((variant) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const size = variant.size!;
+            return {
+              id: variant.id,
+              size: {
+                id: size.id,
+                name: size.name,
+                displayName: size.displayName,
+                sortOrder: size.sortOrder,
+                createdAt: size.createdAt.toISOString(),
+                updatedAt: size.updatedAt.toISOString(),
+              },
+              sizeId: variant.sizeId,
+              quantity: variant.quantity,
+            };
+          }),
+      })) || [],
+    reviews:
+      product.reviews?.map((review) => ({
+        id: review.id,
+        productId: review.productId,
+        author: review.author,
+        rating: review.rating,
+        comment: review.comment,
+        createdAt: review.createdAt.toISOString(),
+      })) || [],
   }));
 }
 
@@ -204,19 +210,21 @@ export async function getProductById(id: number): Promise<Product | null> {
     },
     categoryId: product.categoryId,
     companyId: product.companyId,
-    company: product.company ? {
-      id: product.company.id,
-      name: product.company.name,
-      slug: product.company.slug,
-      description: product.company.description,
-      email: product.company.email,
-      phone: product.company.phone,
-      address: product.company.address,
-      website: product.company.website,
-      isActive: product.company.isActive,
-      createdAt: product.company.createdAt.toISOString(),
-      updatedAt: product.company.updatedAt.toISOString(),
-    } : null,
+    company: product.company
+      ? {
+          id: product.company.id,
+          name: product.company.name,
+          slug: product.company.slug,
+          description: product.company.description,
+          email: product.company.email,
+          phone: product.company.phone,
+          address: product.company.address,
+          website: product.company.website,
+          isActive: product.company.isActive,
+          createdAt: product.company.createdAt.toISOString(),
+          updatedAt: product.company.updatedAt.toISOString(),
+        }
+      : null,
     quantity: product.quantity || 0, // For products without colors or sizes
     createdAt: product.createdAt.toISOString(),
     updatedAt: product.updatedAt.toISOString(),
@@ -234,31 +242,32 @@ export async function getProductById(id: number): Promise<Product | null> {
         image_order: img.imageOrder,
       };
     }),
-    colors: product.colors?.map((color) => ({
-      id: color.id,
-      colorName: color.colorName,
-      colorCode: color.colorCode,
-      quantity: color.quantity || 0,
-      variants: color.variants
-        .filter((variant) => variant.size !== null)
-        .map((variant) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const size = variant.size!;
-          return {
-            id: variant.id,
-            size: {
-              id: size.id,
-              name: size.name,
-              displayName: size.displayName,
-              sortOrder: size.sortOrder,
-              createdAt: size.createdAt.toISOString(),
-              updatedAt: size.updatedAt.toISOString(),
-            },
-            sizeId: variant.sizeId,
-            quantity: variant.quantity,
-          };
-        }),
-    })) || [],
+    colors:
+      product.colors?.map((color) => ({
+        id: color.id,
+        colorName: color.colorName,
+        colorCode: color.colorCode,
+        quantity: color.quantity || 0,
+        variants: color.variants
+          .filter((variant) => variant.size !== null)
+          .map((variant) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const size = variant.size!;
+            return {
+              id: variant.id,
+              size: {
+                id: size.id,
+                name: size.name,
+                displayName: size.displayName,
+                sortOrder: size.sortOrder,
+                createdAt: size.createdAt.toISOString(),
+                updatedAt: size.updatedAt.toISOString(),
+              },
+              sizeId: variant.sizeId,
+              quantity: variant.quantity,
+            };
+          }),
+      })) || [],
     reviews:
       product.reviews?.map((review) => ({
         id: review.id,
@@ -293,7 +302,10 @@ export async function updateProductRating(productId: number): Promise<void> {
   // حساب المتوسط
   let averageRating = 0;
   if (reviews.length > 0) {
-    const sum = reviews.reduce((acc: number, review: { rating: number }) => acc + review.rating, 0);
+    const sum = reviews.reduce(
+      (acc: number, review: { rating: number }) => acc + review.rating,
+      0
+    );
     averageRating = sum / reviews.length;
     // تقريب إلى رقمين عشريين
     averageRating = Math.round(averageRating * 100) / 100;
@@ -350,7 +362,10 @@ export async function createProduct(product: {
       productRating: product.productRating,
       categoryId: product.categoryId,
       companyId: product.companyId || null,
-      quantity: (!product.colors || product.colors.length === 0) ? (product.quantity || 0) : 0, // Only set quantity if no colors
+      quantity:
+        !product.colors || product.colors.length === 0
+          ? product.quantity || 0
+          : 0, // Only set quantity if no colors
     },
   });
 
@@ -385,7 +400,7 @@ export async function createProduct(product: {
           productId: newProduct.id,
           colorName: colorData.colorName,
           colorCode: colorData.colorCode,
-          quantity: hasVariants ? 0 : (colorData.quantity || 0), // Set quantity only if no variants
+          quantity: hasVariants ? 0 : colorData.quantity || 0, // Set quantity only if no variants
         },
       });
 
@@ -436,11 +451,14 @@ export async function createProduct(product: {
   console.log('Product created successfully!');
   console.log('Product ID:', productWithImages.id);
   console.log('Images created:', productWithImages.images.length);
-  console.log('Image details:', productWithImages.images.map((img) => ({
-    id: img.id,
-    url: img.imageUrl,
-    order: img.imageOrder,
-  })));
+  console.log(
+    'Image details:',
+    productWithImages.images.map((img) => ({
+      id: img.id,
+      url: img.imageUrl,
+      order: img.imageOrder,
+    }))
+  );
 
   return {
     id: productWithImages.id,
@@ -475,29 +493,30 @@ export async function createProduct(product: {
         image_order: img.imageOrder,
       };
     }),
-    colors: productWithImages.colors?.map((color) => ({
-      id: color.id,
-      colorName: color.colorName,
-      colorCode: color.colorCode,
-      variants: color.variants
-        .filter((variant) => variant.size !== null)
-        .map((variant) => {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const size = variant.size!;
-          return {
-            id: variant.id,
-            size: {
-              id: size.id,
-              name: size.name,
-              displayName: size.displayName,
-              sortOrder: size.sortOrder,
-              createdAt: size.createdAt.toISOString(),
-              updatedAt: size.updatedAt.toISOString(),
-            },
-            sizeId: variant.sizeId,
-            quantity: variant.quantity,
-          };
-        }),
-    })) || [],
+    colors:
+      productWithImages.colors?.map((color) => ({
+        id: color.id,
+        colorName: color.colorName,
+        colorCode: color.colorCode,
+        variants: color.variants
+          .filter((variant) => variant.size !== null)
+          .map((variant) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const size = variant.size!;
+            return {
+              id: variant.id,
+              size: {
+                id: size.id,
+                name: size.name,
+                displayName: size.displayName,
+                sortOrder: size.sortOrder,
+                createdAt: size.createdAt.toISOString(),
+                updatedAt: size.updatedAt.toISOString(),
+              },
+              sizeId: variant.sizeId,
+              quantity: variant.quantity,
+            };
+          }),
+      })) || [],
   };
 }

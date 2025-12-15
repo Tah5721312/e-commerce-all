@@ -8,8 +8,8 @@ import {
 } from '@stripe/react-stripe-js';
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { useRouter } from 'next/navigation';
-import { FormEvent,useState } from 'react';
-import { FiCheckCircle,FiCreditCard, FiLock } from 'react-icons/fi';
+import { FormEvent, useState } from 'react';
+import { FiCheckCircle, FiCreditCard, FiLock } from 'react-icons/fi';
 
 import { DOMAIN } from '@/lib/constants';
 
@@ -111,19 +111,19 @@ function CheckoutForm({ total }: PaymentFormProps) {
             headers: {
               'Content-Type': 'application/json',
             },
-              body: JSON.stringify({
-                customerInfo,
-                items: cartItems.map((item) => ({
-                  productId: item.id,
-                  productTitle: item.productTitle,
-                  productPrice: item.productPrice,
-                  quantity: item.quantity,
-                  colorId: item.selectedColor,
-                  sizeId: item.selectedSizeId,
-                })),
-                totalAmount: total,
-                stripePaymentIntentId: paymentIntent.id,
-              }),
+            body: JSON.stringify({
+              customerInfo,
+              items: cartItems.map((item) => ({
+                productId: item.id,
+                productTitle: item.productTitle,
+                productPrice: item.productPrice,
+                quantity: item.quantity,
+                colorId: item.selectedColor,
+                sizeId: item.selectedSizeId,
+              })),
+              totalAmount: total,
+              stripePaymentIntentId: paymentIntent.id,
+            }),
           });
 
           const orderData = await orderResponse.json();
@@ -160,7 +160,9 @@ function CheckoutForm({ total }: PaymentFormProps) {
           }
         } catch (orderError) {
           console.error('Error creating order:', orderError);
-          setError('Payment succeeded but failed to save order. Please contact support.');
+          setError(
+            'Payment succeeded but failed to save order. Please contact support.'
+          );
           setLoading(false);
         }
       }
@@ -187,95 +189,95 @@ function CheckoutForm({ total }: PaymentFormProps) {
 
   if (success) {
     return (
-      <div className="text-center py-12">
-        <FiCheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-2xl font-bold text-green-600 mb-2">
+      <div className='text-center py-12'>
+        <FiCheckCircle className='w-16 h-16 text-green-500 mx-auto mb-4' />
+        <h3 className='text-2xl font-bold text-green-600 mb-2'>
           Payment Successful!
         </h3>
-        <p className="text-gray-600">Redirecting to home page...</p>
+        <p className='text-gray-600'>Redirecting to home page...</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className='space-y-6'>
       {/* Customer Information */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Customer Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className='space-y-4'>
+        <h3 className='text-lg font-semibold'>Customer Information</h3>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
               Full Name *
             </label>
             <input
-              type="text"
+              type='text'
               required
               value={customerInfo.name}
               onChange={(e) =>
                 setCustomerInfo({ ...customerInfo, name: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="John Doe"
+              className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent'
+              placeholder='John Doe'
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
               Email *
             </label>
             <input
-              type="email"
+              type='email'
               required
               value={customerInfo.email}
               onChange={(e) =>
                 setCustomerInfo({ ...customerInfo, email: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="john@example.com"
+              className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent'
+              placeholder='john@example.com'
             />
           </div>
         </div>
       </div>
 
       {/* Billing Address */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Billing Address</h3>
+      <div className='space-y-4'>
+        <h3 className='text-lg font-semibold'>Billing Address</h3>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className='block text-sm font-medium text-gray-700 mb-1'>
             Address *
           </label>
           <input
-            type="text"
+            type='text'
             required
             value={customerInfo.address}
             onChange={(e) =>
               setCustomerInfo({ ...customerInfo, address: e.target.value })
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            placeholder="123 Main St"
+            className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent'
+            placeholder='123 Main St'
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
               City *
             </label>
             <input
-              type="text"
+              type='text'
               required
               value={customerInfo.city}
               onChange={(e) =>
                 setCustomerInfo({ ...customerInfo, city: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="New York"
+              className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent'
+              placeholder='New York'
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
               Postal Code *
             </label>
             <input
-              type="text"
+              type='text'
               required
               value={customerInfo.postalCode}
               onChange={(e) =>
@@ -284,12 +286,12 @@ function CheckoutForm({ total }: PaymentFormProps) {
                   postalCode: e.target.value,
                 })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="10001"
+              className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent'
+              placeholder='10001'
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
               Country *
             </label>
             <select
@@ -298,55 +300,55 @@ function CheckoutForm({ total }: PaymentFormProps) {
               onChange={(e) =>
                 setCustomerInfo({ ...customerInfo, country: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent'
             >
-              <option value="US">United States</option>
-              <option value="EG">Egypt</option>
-              <option value="GB">United Kingdom</option>
-              <option value="CA">Canada</option>
-              <option value="AU">Australia</option>
+              <option value='US'>United States</option>
+              <option value='EG'>Egypt</option>
+              <option value='GB'>United Kingdom</option>
+              <option value='CA'>Canada</option>
+              <option value='AU'>Australia</option>
             </select>
           </div>
         </div>
       </div>
 
       {/* Card Details */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <FiCreditCard className="w-5 h-5" />
+      <div className='space-y-4'>
+        <h3 className='text-lg font-semibold flex items-center gap-2'>
+          <FiCreditCard className='w-5 h-5' />
           Card Details
         </h3>
-        <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
+        <div className='p-4 border border-gray-300 rounded-lg bg-gray-50'>
           <CardElement options={cardElementOptions} />
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg'>
           {error}
         </div>
       )}
 
       <button
-        type="submit"
+        type='submit'
         disabled={!stripe || loading}
-        className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className='w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2'
       >
         {loading ? (
           <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
             Processing...
           </>
         ) : (
           <>
-            <FiLock className="w-5 h-5" />
+            <FiLock className='w-5 h-5' />
             Pay ${total.toFixed(2)}
           </>
         )}
       </button>
 
-      <p className="text-xs text-gray-500 text-center flex items-center justify-center gap-1">
-        <FiLock className="w-3 h-3" />
+      <p className='text-xs text-gray-500 text-center flex items-center justify-center gap-1'>
+        <FiLock className='w-3 h-3' />
         Your payment information is secure and encrypted
       </p>
     </form>
@@ -366,4 +368,3 @@ export default function PaymentForm({ total }: PaymentFormProps) {
     </Elements>
   );
 }
-

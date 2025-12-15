@@ -21,9 +21,9 @@ export default function HomePage() {
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className='min-h-screen bg-white'>
       <Header1 />
-      <Header2 
+      <Header2
         onCartOpen={() => {
           setIsCartOpen(true);
           setCartSource('icon');
@@ -31,15 +31,21 @@ export default function HomePage() {
         onFavoritesOpen={() => setIsFavoritesOpen(true)}
       />
       <Header3 />
-      <div className="bg-white">
+      <div className='bg-white'>
         <Hero />
-        <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading products...</div>}>
+        <Suspense
+          fallback={
+            <div className='container mx-auto px-4 py-8'>
+              Loading products...
+            </div>
+          }
+        >
           <ProductList priceRange={priceRange} minRating={minRating} />
         </Suspense>
       </div>
       <Footer />
       <ScrollToTop />
-      
+
       {/* Drawers rendered at page level to ensure proper z-index */}
       <CartDrawer
         open={isCartOpen}

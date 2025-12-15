@@ -92,7 +92,9 @@ const Hero = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const response = await fetch(`${DOMAIN}/api/hero`, { cache: 'no-store' });
+        const response = await fetch(`${DOMAIN}/api/hero`, {
+          cache: 'no-store',
+        });
         if (!response.ok) return;
 
         const data = await response.json();
@@ -109,7 +111,7 @@ const Hero = () => {
               buttonLink: slide.buttonLink,
               imageUrl: slide.imageUrl,
               accentColor: slide.accentColor ?? '#D23F57',
-            })),
+            }))
           );
         }
       } catch (error) {
@@ -119,7 +121,9 @@ const Hero = () => {
 
     const fetchBanners = async () => {
       try {
-        const response = await fetch(`${DOMAIN}/api/hero-banners`, { cache: 'no-store' });
+        const response = await fetch(`${DOMAIN}/api/hero-banners`, {
+          cache: 'no-store',
+        });
         if (!response.ok) return;
 
         const data = await response.json();
@@ -134,7 +138,7 @@ const Hero = () => {
               buttonLink: banner.buttonLink,
               imageUrl: banner.imageUrl,
               textColor: banner.textColor ?? '#2B3445',
-            })),
+            }))
           );
         }
       } catch (error) {
@@ -147,8 +151,8 @@ const Hero = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="pt-4 mt-4 flex items-start gap-4 flex-col lg:flex-row">
+    <div className='container mx-auto px-4'>
+      <div className='pt-4 mt-4 flex items-start gap-4 flex-col lg:flex-row'>
         <Swiper
           loop
           autoplay={{
@@ -157,39 +161,44 @@ const Hero = () => {
           }}
           pagination={{ clickable: true, dynamicBullets: true }}
           modules={[Pagination, Autoplay]}
-          className="mySwiper flex-1 w-full lg:w-2/3 rounded-3xl overflow-hidden shadow-lg"
+          className='mySwiper flex-1 w-full lg:w-2/3 rounded-3xl overflow-hidden shadow-lg'
         >
           {slides.map((item, index) => (
             <SwiperSlide key={item.id ?? index}>
-              <div className="relative w-full h-[360px] md:h-[480px]">
+              <div className='relative w-full h-[360px] md:h-[480px]'>
                 <Image
                   src={item.imageUrl}
                   alt={item.title}
                   fill
-                  className="object-cover"
+                  className='object-cover'
                   priority={index === 0}
-                  sizes="(max-width: 1024px) 100vw, 66vw"
+                  sizes='(max-width: 1024px) 100vw, 66vw'
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
-                <div className="absolute inset-0 flex items-center">
-                  <div className="px-6 md:px-12 text-white max-w-xl">
-                    <p className="text-sm md:text-base tracking-[0.3em] text-gray-200">
+                <div className='absolute inset-0 bg-gradient-to-r from-black/60 to-transparent' />
+                <div className='absolute inset-0 flex items-center'>
+                  <div className='px-6 md:px-12 text-white max-w-xl'>
+                    <p className='text-sm md:text-base tracking-[0.3em] text-gray-200'>
                       {item.tagLine}
                     </p>
-                    <h3 className="text-4xl md:text-6xl font-semibold mt-2">
+                    <h3 className='text-4xl md:text-6xl font-semibold mt-2'>
                       {item.title}
                     </h3>
-                    <div className="flex flex-wrap items-center gap-2 mt-4 text-xl md:text-2xl">
-                      <span className="text-white">{item.highlight}</span>
-                      <span style={{ color: item.accentColor }}>{item.saleText}</span>
+                    <div className='flex flex-wrap items-center gap-2 mt-4 text-xl md:text-2xl'>
+                      <span className='text-white'>{item.highlight}</span>
+                      <span style={{ color: item.accentColor }}>
+                        {item.saleText}
+                      </span>
                     </div>
-                    <p className="text-sm md:text-base text-gray-100 mt-3 leading-relaxed">
+                    <p className='text-sm md:text-base text-gray-100 mt-3 leading-relaxed'>
                       {item.description}
                     </p>
                     <a
                       href={item.buttonLink}
-                      className="inline-flex px-6 py-2 mt-6 rounded-full text-sm md:text-base font-semibold shadow-lg"
-                      style={{ backgroundColor: item.accentColor, color: '#111' }}
+                      className='inline-flex px-6 py-2 mt-6 rounded-full text-sm md:text-base font-semibold shadow-lg'
+                      style={{
+                        backgroundColor: item.accentColor,
+                        color: '#111',
+                      }}
                     >
                       {item.buttonText}
                     </a>
@@ -200,37 +209,50 @@ const Hero = () => {
           ))}
         </Swiper>
 
-        <div className="hidden lg:flex lg:flex-col min-w-[30%] space-y-4">
+        <div className='hidden lg:flex lg:flex-col min-w-[30%] space-y-4'>
           {banners.map((banner, index) => (
             <div
               key={banner.id ?? index}
-              className="relative h-[220px] rounded-3xl overflow-hidden shadow-lg"
+              className='relative h-[220px] rounded-3xl overflow-hidden shadow-lg'
             >
-              <Image src={banner.imageUrl} alt={banner.title} fill className="object-cover" />
-              <div className="absolute inset-0 bg-black/10" />
+              <Image
+                src={banner.imageUrl}
+                alt={banner.title}
+                fill
+                className='object-cover'
+              />
+              <div className='absolute inset-0 bg-black/10' />
               <div
-                className="absolute top-1/2 -translate-y-1/2 left-8 drop-shadow"
+                className='absolute top-1/2 -translate-y-1/2 left-8 drop-shadow'
                 style={{ color: banner.textColor }}
               >
-                <p className="text-lg font-semibold tracking-wide">{banner.title}</p>
+                <p className='text-lg font-semibold tracking-wide'>
+                  {banner.title}
+                </p>
                 {banner.subtitle && (
-                  <h6 className="text-3xl font-bold mt-1 whitespace-pre-line">
+                  <h6 className='text-3xl font-bold mt-1 whitespace-pre-line'>
                     {banner.subtitle}
                   </h6>
                 )}
                 {banner.description && (
-                  <p className="text-sm font-light mt-1">{banner.description}</p>
+                  <p className='text-sm font-light mt-1'>
+                    {banner.description}
+                  </p>
                 )}
                 <a
                   href={banner.buttonLink}
-                  className="text-sm flex items-center gap-1 mt-3 hover:text-[#D23F57] transition-colors"
+                  className='text-sm flex items-center gap-1 mt-3 hover:text-[#D23F57] transition-colors'
                 >
                   {banner.buttonText}
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <svg
+                    className='w-3 h-3'
+                    fill='currentColor'
+                    viewBox='0 0 20 20'
+                  >
                     <path
-                      fillRule="evenodd"
-                      d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 </a>
@@ -246,4 +268,3 @@ const Hero = () => {
 };
 
 export default Hero;
-

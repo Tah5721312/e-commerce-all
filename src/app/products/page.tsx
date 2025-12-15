@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useEffect,useState } from 'react';
+import { Suspense } from 'react';
+import { useEffect, useState } from 'react';
 
 import { DOMAIN } from '@/lib/constants';
 
@@ -30,8 +30,8 @@ function ProductsPageContent() {
           const data = await response.json();
           if (data.data && data.data.length > 0) {
             // Find the maximum price from all products
-            const prices = data.data.map((p: { productPrice: number | string }) =>
-              Number(p.productPrice)
+            const prices = data.data.map(
+              (p: { productPrice: number | string }) => Number(p.productPrice)
             );
             const max = Math.max(...prices);
 
@@ -55,11 +55,11 @@ function ProductsPageContent() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col lg:flex-row gap-4">
+    <main className='min-h-screen bg-gray-50'>
+      <div className='container mx-auto px-4 py-4'>
+        <div className='flex flex-col lg:flex-row gap-4'>
           {/* Filter Sidebar - Left */}
-          <div className="w-full lg:w-80 flex-shrink-0">
+          <div className='w-full lg:w-80 flex-shrink-0'>
             <FilterSidebar
               priceRange={priceRange}
               onPriceChange={setPriceRange}
@@ -70,19 +70,19 @@ function ProductsPageContent() {
           </div>
 
           {/* Right Side - Search Bar and Products */}
-          <div className="flex-1 min-w-0 flex flex-col gap-4">
+          <div className='flex-1 min-w-0 flex flex-col gap-4'>
             {/* Search Bar */}
             <div>
               <SearchBar
                 initialQuery={searchQuery}
                 initialCategory={categorySlug}
                 showResults={true}
-                className="w-full"
+                className='w-full'
               />
             </div>
 
             {/* Products Grid */}
-            <div className="flex-1">
+            <div className='flex-1'>
               <ProductList priceRange={priceRange} minRating={minRating} />
             </div>
           </div>
@@ -94,9 +94,14 @@ function ProductsPageContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+          Loading...
+        </div>
+      }
+    >
       <ProductsPageContent />
     </Suspense>
   );
 }
-

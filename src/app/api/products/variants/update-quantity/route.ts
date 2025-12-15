@@ -29,10 +29,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!variant) {
-      return NextResponse.json(
-        { error: 'Variant not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Variant not found' }, { status: 404 });
     }
 
     // Calculate new quantity
@@ -70,4 +67,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

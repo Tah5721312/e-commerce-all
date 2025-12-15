@@ -30,7 +30,9 @@ export async function apiFetch<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = endpoint.startsWith('http') ? endpoint : `${DOMAIN}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  const url = endpoint.startsWith('http')
+    ? endpoint
+    : `${DOMAIN}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
