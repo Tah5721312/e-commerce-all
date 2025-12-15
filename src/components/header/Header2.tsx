@@ -75,8 +75,10 @@ const Header2 = ({ onCartOpen, onFavoritesOpen }: Header2Props) => {
           >
             <FiSettings className='w-5 h-5 text-gray-600 group-hover:text-[#D23F57] transition-colors' />
           </Link>
+
           {/* Auth Buttons */}
           <AuthButtons />
+          
           <button
             className='p-2.5 hover:bg-gray-100 rounded-full transition-colors group'
             aria-label='user'

@@ -32,16 +32,16 @@ model Product {
   productPrice       Decimal         @map("product_price") @db.Decimal(10, 2)
   productDiscription String          @map("product_discription")
   productRating      Decimal         @default(0) @map("product_rating") @db.Decimal(3, 2)
-  categoryId         Int             @map("category_id")
-  companyId          Int?            @map("company_id")
-  quantity           Int             @default(0) // For products without colors or sizes
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
-  category           ProductCategory @relation(fields: [categoryId], references: [id])
-  company            Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  categoryId         Int             @map("category_id")
+  companyId          Int?            @map("company_id")
+  quantity           Int             @default(0)
   colors             ProductColor[]
   images             ProductImage[]
   reviews            ProductReview[]
+  category           ProductCategory @relation(fields: [categoryId], references: [id])
+  company            Company?        @relation(fields: [companyId], references: [id])
 
   @@index([categoryId])
   @@index([companyId])
@@ -81,9 +81,9 @@ model ProductColor {
   productId Int              @map("product_id")
   colorName String           @map("color_name") @db.VarChar(100)
   colorCode String           @map("color_code") @db.VarChar(7)
-  quantity  Int              @default(0) // For products without sizes
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime         @updatedAt @map("updated_at")
+  quantity  Int              @default(0)
   product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
   variants  ProductVariant[]
 
@@ -107,10 +107,10 @@ model ProductSize {
 model ProductVariant {
   id             Int          @id @default(autoincrement())
   productColorId Int          @map("product_color_id")
-  sizeId         Int          @map("size_id")
   quantity       Int          @default(0)
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime     @updatedAt @map("updated_at")
+  sizeId         Int          @map("size_id")
   productColor   ProductColor @relation(fields: [productColorId], references: [id], onDelete: Cascade)
   size           ProductSize  @relation(fields: [sizeId], references: [id], onDelete: Cascade)
 
@@ -204,10 +204,47 @@ model HeroBanner {
   @@map("hero_banners")
 }
 
+
+model Account {
+  id                String  @id
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model User {
+  id            String    @id
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  Account       Account[]
+}
+
 enum OrderStatus {
   pending
   processing
   shipped
   delivered
   cancelled
+}
+
+enum Role {
+  USER
+  ADMIN
 }

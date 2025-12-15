@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -46,6 +47,42 @@ interface ProductData {
   sizeType: 'clothing' | 'shoes' | 'none'; // نوع المقاسات
   hasColors?: boolean; // إذا كان false، المنتج بدون ألوان (كمية فقط في Product.quantity)
 }
+
+
+// بيانات المستخدمين
+const users = [
+  {
+    name: 'Tah57',
+    email: 'tah@gmail.com',
+    password: '123456',
+    role: 'ADMIN',
+  },
+  {
+    name: 'Ali',
+    email: 'ali@gmail.com',
+    password: '123456',
+    role: 'USER',
+  },
+  {
+    name: 'سارة علي',
+    email: 'sara@gmail.com',
+    password: '123456',
+    role: 'USER',
+  },
+  {
+    name: 'محمد حسن',
+    email: 'mohamed@example.com',
+    password: 'User@123',
+    role: 'USER',
+  },
+  {
+    name: 'فاطمة عبدالله',
+    email: 'fatima@example.com',
+    password: 'User@123',
+    role: 'USER',
+  },
+];
+
 
 const sampleProducts: ProductData[] = [
   // Men's Clothing
@@ -658,30 +695,45 @@ const heroBanners = [
   },
 ];
 
+
+// بيانات التقييمات للمراجعات
+const reviewComments = [
+  { rating: 5, comments: ['منتج ممتاز جداً، الجودة عالية والتغليف رائع. أنصح بشرائه بشدة!', 'رائع! تجربة ممتازة، جودة عالية وسعر مناسب.'] },
+  { rating: 4, comments: ['الخامة جيدة جداً والمقاس مناسب، لكن الشحن تأخر قليلاً.', 'منتج جيد، يستحق السعر. راضي عن الشراء.'] },
+  { rating: 3, comments: ['منتج عادي، مقبول لكن توقعت أفضل من ذلك.', 'جودة متوسطة، السعر مبالغ فيه قليلاً.'] },
+];
+
+
 async function main() {
   console.log('🌱 Starting seed...');
 
   // Clear existing data
   console.log('🗑️  Clearing existing data...');
-  // First clear hero slides so constraints don't conflict
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   try {
     await (prisma as any).heroSlide?.deleteMany?.();
   } catch (e) {
     console.warn('⚠️  Could not clear hero slides:', (e as Error).message);
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   try {
     await (prisma as any).heroBanner?.deleteMany?.();
   } catch (e) {
     console.warn('⚠️  Could not clear hero banners:', (e as Error).message);
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+  try {
+    await prisma.order.deleteMany();
+  } catch (e) {
+    console.warn('⚠️  Could not clear orders:', (e as Error).message);
+  }
+
   try {
     await (prisma as any).productReview?.deleteMany?.();
   } catch (e) {
     console.warn('⚠️  Could not clear product reviews:', (e as Error).message);
   }
+
   await prisma.productVariant.deleteMany();
   await prisma.productColor.deleteMany();
   await prisma.productImage.deleteMany();
@@ -690,17 +742,42 @@ async function main() {
   await prisma.productCategory.deleteMany();
   await prisma.company.deleteMany();
 
+  // Clear authentication tables
+  try {
+    await prisma.account.deleteMany();
+    await prisma.user.deleteMany();
+  } catch (e) {
+    console.warn('⚠️  Could not clear auth tables:', (e as Error).message);
+  }
+
+  // Create users
+  console.log('👥 Creating users...');
+  const createdUsers: any[] = [];
+
+  for (const userData of users) {
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const user = await prisma.user.create({
+      data: {
+        name: userData.name,
+        email: userData.email,
+        password: hashedPassword,
+        role: userData.role as any,
+        emailVerified: new Date(),
+      },
+    });
+    createdUsers.push(user);
+    console.log(`✅ Created user: ${user.name} (${user.email}) - Role: ${user.role}`);
+  }
+
   // Create sizes
   console.log('📏 Creating sizes...');
   const sizes = [
-    // Clothing sizes
     { name: 'S', displayName: 'S', sortOrder: 1 },
     { name: 'M', displayName: 'M', sortOrder: 2 },
     { name: 'L', displayName: 'L', sortOrder: 3 },
     { name: 'XL', displayName: 'XL', sortOrder: 4 },
     { name: 'X2XL', displayName: '2XL', sortOrder: 5 },
     { name: 'X3XL', displayName: '3XL', sortOrder: 6 },
-    // Shoe sizes (22-46)
     { name: '22', displayName: '22', sortOrder: 10 },
     { name: '23', displayName: '23', sortOrder: 11 },
     { name: '24', displayName: '24', sortOrder: 12 },
@@ -780,7 +857,7 @@ async function main() {
     console.log(`✅ Created company: ${company.name} (ID: ${company.id})`);
   }
 
-  // Helper function to get sizes based on type
+  // Helper functions
   const getSizesForType = (sizeType: 'clothing' | 'shoes' | 'none'): string[] => {
     if (sizeType === 'clothing') {
       return ['S', 'M', 'L', 'XL', 'X2XL', 'X3XL'];
@@ -790,7 +867,6 @@ async function main() {
     return [];
   };
 
-  // Helper function to get colors based on product type
   const getColorsForProduct = (category: string, sizeType: string) => {
     const baseColors = [
       { colorName: 'أسود', colorCode: '#000000' },
@@ -798,7 +874,6 @@ async function main() {
     ];
 
     if (sizeType === 'none') {
-      // Accessories, Electronics, Beauty, Home - no sizes, fewer colors
       return [
         { colorName: 'أسود', colorCode: '#000000' },
         { colorName: 'أبيض', colorCode: '#FFFFFF' },
@@ -806,7 +881,6 @@ async function main() {
       ];
     }
 
-    // Clothing and Shoes - more colors
     return [
       ...baseColors,
       { colorName: 'أزرق', colorCode: '#0066CC' },
@@ -819,7 +893,7 @@ async function main() {
   console.log('📦 Creating products...');
   const companySlugs = Object.keys(companyMap);
   let companyIndex = 0;
-  
+
   for (const productData of sampleProducts) {
     const categoryId = categoryMap[productData.category];
     if (!categoryId) {
@@ -827,22 +901,18 @@ async function main() {
       continue;
     }
 
-    // Assign company randomly
     const companyId = companyMap[companySlugs[companyIndex % companySlugs.length]] || null;
     companyIndex++;
 
-    // Check if product has colors or not
-    const hasColors = productData.hasColors !== false; // Default to true if not specified
-    
+    const hasColors = productData.hasColors !== false;
+
     let productQuantity = 0;
     let colorsData: any[] = [];
 
     if (hasColors) {
-      // Product has colors
       const sizes = getSizesForType(productData.sizeType);
       const colors = getColorsForProduct(productData.category, productData.sizeType);
 
-      // Create colors with variants
       colorsData = colors.map((color) => {
         const hasSizes = sizes.length > 0;
         const variants = hasSizes ? sizes.map((sizeName) => {
@@ -851,16 +921,14 @@ async function main() {
             console.warn(`⚠️  Size "${sizeName}" not found for product: ${productData.productTitle}`);
             return null;
           }
-          // Generate random quantity
-          const quantity = productData.sizeType === 'shoes' 
-            ? Math.floor(Math.random() * 10) + 3  // Shoes: 3-12
-            : Math.floor(Math.random() * 20) + 5; // Clothing: 5-24
+          const quantity = productData.sizeType === 'shoes'
+            ? Math.floor(Math.random() * 10) + 3
+            : Math.floor(Math.random() * 20) + 5;
           return { sizeId, quantity };
         }).filter((v): v is { sizeId: number; quantity: number } => v !== null) : [];
 
-        // For products without sizes, set quantity on color
-        const colorQuantity = !hasSizes 
-          ? (productData.sizeType === 'none' ? Math.floor(Math.random() * 50) + 10 : 0) // Accessories: 10-60
+        const colorQuantity = !hasSizes
+          ? (productData.sizeType === 'none' ? Math.floor(Math.random() * 50) + 10 : 0)
           : 0;
 
         return {
@@ -873,13 +941,12 @@ async function main() {
         };
       });
     } else {
-      // Product without colors - set quantity directly on product
       if (productData.category === 'fruits') {
-        productQuantity = Math.floor(Math.random() * 200) + 50; // Fruits: 50-250
+        productQuantity = Math.floor(Math.random() * 200) + 50;
       } else if (productData.category === 'home') {
-        productQuantity = Math.floor(Math.random() * 30) + 10; // Home: 10-40
+        productQuantity = Math.floor(Math.random() * 30) + 10;
       } else {
-        productQuantity = Math.floor(Math.random() * 50) + 10; // Default: 10-60
+        productQuantity = Math.floor(Math.random() * 50) + 10;
       }
     }
 
@@ -891,7 +958,7 @@ async function main() {
         productRating: productData.productRating,
         categoryId: categoryId,
         companyId: companyId,
-        quantity: productQuantity, // Set quantity for products without colors
+        quantity: productQuantity,
         images: {
           create: productData.images.map((imageUrl, index) => ({
             imageUrl,
@@ -900,61 +967,118 @@ async function main() {
         },
         colors: hasColors ? {
           create: colorsData,
-        } : undefined, // Don't create colors if hasColors is false
+        } : undefined,
       },
     });
     console.log(`✅ Created product: ${product.productTitle} (ID: ${product.id})`);
 
-    // Seed some reviews for each product
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (prisma as any).productReview?.createMany?.({
-      data: [
-        {
-          productId: product.id,
-          author: 'أحمد',
-          rating: Math.floor(Math.random() * 2) + 4,
-          comment: 'منتج ممتاز، الجودة عالية والتغليف رائع. أنصح بشرائه.',
-        },
-        {
-          productId: product.id,
-          author: 'سارة',
-          rating: Math.floor(Math.random() * 3) + 3,
-          comment: 'الخامة جيدة جداً والمقاس مناسب، لكن الشحن تأخر قليلاً.',
-        },
-      ],
-    });
+    // إنشاء مراجعات متعددة من مستخدمين مختلفين
+    const numReviews = Math.floor(Math.random() * 3) + 2; // 2-4 reviews
+    const userIndices = new Set<number>();
 
-    // تحديث متوسط التقييمات للمنتج
+    while (userIndices.size < Math.min(numReviews, createdUsers.length - 1)) {
+      const randomIndex = Math.floor(Math.random() * (createdUsers.length - 1)) + 1; // تجنب Admin
+      userIndices.add(randomIndex);
+    }
+
+    for (const userIndex of userIndices) {
+      const user = createdUsers[userIndex];
+      const reviewData = reviewComments[Math.floor(Math.random() * reviewComments.length)];
+      const comment = reviewData.comments[Math.floor(Math.random() * reviewData.comments.length)];
+
+      await (prisma as any).productReview?.create?.({
+        data: {
+          productId: product.id,
+          author: user.name,
+          rating: reviewData.rating,
+          comment: comment,
+        },
+      });
+    }
+
     await updateProductRating(product.id);
   }
 
+  // Create sample orders
+  console.log('🛒 Creating sample orders...');
+  const orderStatuses: any[] = ['pending', 'processing', 'shipped', 'delivered'];
+
+  for (let i = 0; i < 10; i++) {
+    const userIndex = Math.floor(Math.random() * (createdUsers.length - 1)) + 1;
+    const user = createdUsers[userIndex];
+
+    const products = await prisma.product.findMany({
+      take: Math.floor(Math.random() * 3) + 1,
+      skip: Math.floor(Math.random() * 10),
+    });
+
+    let totalAmount = 0;
+    const orderItems = products.map((product) => {
+      const quantity = Math.floor(Math.random() * 3) + 1;
+      const subtotal = Number(product.productPrice) * quantity;
+      totalAmount += subtotal;
+
+      return {
+        productId: product.id,
+        productTitle: product.productTitle,
+        productPrice: product.productPrice,
+        quantity: quantity,
+        subtotal: subtotal,
+      };
+    });
+
+    await prisma.order.create({
+      data: {
+        orderNumber: `ORD-${Date.now()}-${i}`,
+        customerName: user.name || 'Guest',
+        customerEmail: user.email,
+        customerAddress: `${Math.floor(Math.random() * 100)} شارع الرئيسي`,
+        customerCity: 'القاهرة',
+        customerPostalCode: '11511',
+        customerCountry: 'Egypt',
+        totalAmount: totalAmount,
+        status: orderStatuses[Math.floor(Math.random() * orderStatuses.length)],
+        items: {
+          create: orderItems,
+        },
+      },
+    });
+  }
+  console.log('✅ Created 10 sample orders');
+
   // Seed hero slides
   console.log('🎞️ Seeding hero slides...');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const heroDelegate = (prisma as any).heroSlide;
   if (heroDelegate) {
     for (const slide of heroSlides) {
       const created = await heroDelegate.create({ data: slide });
       console.log(`✅ Created hero slide: ${created.title} (ID: ${created.id})`);
     }
-  } else {
-    console.warn('⚠️ heroSlide model not found on Prisma client. Did you run `npx prisma generate`?');
   }
 
-  // Seed hero side banners
+  // Seed hero banners
   console.log('🖼️ Seeding hero side banners...');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bannerDelegate = (prisma as any).heroBanner;
   if (bannerDelegate) {
     for (const banner of heroBanners) {
       const created = await bannerDelegate.create({ data: banner });
       console.log(`✅ Created hero banner: ${created.title} (ID: ${created.id})`);
     }
-  } else {
-    console.warn('⚠️ heroBanner model not found on Prisma client. Did you run `npx prisma generate`?');
   }
 
   console.log('✨ Seed completed successfully!');
+  console.log('\n📊 Summary:');
+  console.log(`👥 Users: ${createdUsers.length}`);
+  console.log(`📁 Categories: ${categories.length}`);
+  console.log(`🏢 Companies: ${companies.length}`);
+  console.log(`📏 Sizes: ${sizes.length}`);
+  console.log(`📦 Products: ${sampleProducts.length}`);
+  console.log(`🛒 Orders: 10`);
+  console.log(`🎞️ Hero Slides: ${heroSlides.length}`);
+  console.log(`🖼️ Hero Banners: ${heroBanners.length}`);
+  console.log('\n🔐 Login Credentials:');
+  console.log('Admin: admin@example.com / Admin@123');
+  console.log('User: ahmed@example.com / User@123');
 }
 
 main()
@@ -965,4 +1089,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

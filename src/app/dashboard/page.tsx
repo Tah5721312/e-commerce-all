@@ -10,6 +10,8 @@ import {
   FiPlus,
   FiShoppingBag,
 } from 'react-icons/fi';
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { DOMAIN } from '@/lib/constants';
 
@@ -69,6 +71,8 @@ interface OrderStats {
 }
 
 export default function DashboardPage() {
+   const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<
     | 'products'
     | 'orders'
@@ -95,6 +99,31 @@ export default function DashboardPage() {
     status: string;
   } | null>(null);
 
+
+   useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+    
+    // التحقق من أن المستخدم أدمن
+    if (status === "authenticated" && session?.user?.role !== "ADMIN") {
+      router.push("/"); // توجيه غير الأدمن للصفحة الرئيسية
+    }
+  }, [status, session, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">جاري التحميل...</div>
+      </div>
+    );
+  }
+
+  if (!session || session.user?.role !== "ADMIN") {
+    return null;
+  }
+
+  
   useEffect(() => {
     fetchProducts();
     fetchStats();

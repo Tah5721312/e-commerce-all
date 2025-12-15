@@ -5,8 +5,8 @@ import '@/lib/env';
 import '@/styles/globals.css';
 
 import { siteConfig } from '@/constant/config';
+import { Providers } from '@/app/providers';
 
-import { Providers } from './providers';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
