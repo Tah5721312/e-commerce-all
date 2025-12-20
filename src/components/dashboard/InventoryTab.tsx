@@ -19,7 +19,11 @@ interface InventoryItem {
   type: 'variant' | 'color'; // variant = has size, color = no size
 }
 
-const InventoryTab = () => {
+interface InventoryTabProps {
+  externalSearchQuery?: string;
+}
+
+const InventoryTab = ({ externalSearchQuery = '' }: InventoryTabProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +31,9 @@ const InventoryTab = () => {
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [quantityChange, setQuantityChange] = useState<number>(0);
   const [operation, setOperation] = useState<'set' | 'add' | 'subtract'>('set');
+
+  // Use external search query if provided, otherwise use internal search
+  const effectiveSearchTerm = externalSearchQuery || searchTerm;
 
   useEffect(() => {
     fetchProducts();
@@ -145,9 +152,9 @@ const InventoryTab = () => {
 
   const filteredInventory = inventory.filter(
     (item) =>
-      item.productTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.colorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.sizeName?.toLowerCase().includes(searchTerm.toLowerCase())
+      item.productTitle.toLowerCase().includes(effectiveSearchTerm.toLowerCase()) ||
+      item.colorName?.toLowerCase().includes(effectiveSearchTerm.toLowerCase()) ||
+      item.sizeName?.toLowerCase().includes(effectiveSearchTerm.toLowerCase())
   );
 
   const totalItems = inventory.reduce(
@@ -219,19 +226,21 @@ const InventoryTab = () => {
         </div>
       </div>
 
-      {/* Search */}
-      <div className='bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100'>
-        <div className='relative'>
-          <FiSearch className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5' />
-          <input
-            type='text'
-            placeholder='ابحث عن منتج، لون، أو مقاس...'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className='w-full pr-9 sm:pr-10 pl-3 sm:pl-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent'
-          />
+      {/* Search - only show if no external search */}
+      {!externalSearchQuery && (
+        <div className='bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100'>
+          <div className='relative'>
+            <FiSearch className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5' />
+            <input
+              type='text'
+              placeholder='ابحث عن منتج، لون، أو مقاس...'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className='w-full pr-9 sm:pr-10 pl-3 sm:pl-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent'
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Inventory Table - Desktop */}
       <div className='hidden lg:block bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden'>

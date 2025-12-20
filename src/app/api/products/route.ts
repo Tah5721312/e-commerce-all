@@ -17,8 +17,9 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const minRating = searchParams.get('minRating');
+    const includeOutOfStock = searchParams.get('includeOutOfStock') === 'true';
 
-    let products = await getAllProducts(category || undefined);
+    let products = await getAllProducts(category || undefined, includeOutOfStock);
 
     // Filter by search query (product title)
     if (search && search.trim()) {

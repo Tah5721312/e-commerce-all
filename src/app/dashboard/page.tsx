@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   FiBarChart2,
   FiBox,
@@ -10,7 +10,7 @@ import {
   FiPlus,
   FiShoppingBag,
 } from 'react-icons/fi';
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import { DOMAIN } from '@/lib/constants';
@@ -30,6 +30,7 @@ import SizesTab from '@/components/dashboard/SizesTab';
 import StatsCards from '@/components/dashboard/StatsCards';
 
 import type { Product } from '@/types/product';
+import DashboardSearchBar from '@/components/dashboard/DashboardSearchBar';
 
 interface Stats {
   totalProducts: number;
@@ -98,6 +99,10 @@ export default function DashboardPage() {
     orderNumber: string;
     status: string;
   } | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [inventorySearchQuery, setInventorySearchQuery] = useState('');
 
   // Auth check
   useEffect(() => {
@@ -111,17 +116,42 @@ export default function DashboardPage() {
     }
   }, [status, session, router]);
 
+  const fetchProducts = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append('includeOutOfStock', 'true');
+      
+      if (searchQuery.trim()) {
+        params.append('search', searchQuery.trim());
+      }
+      
+      if (selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+
+      const response = await fetch(`${DOMAIN}/api/products?${params.toString()}`);
+      const data = await response.json();
+      setProducts(data.data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery, selectedCategory]);
+
   // Fetch data when tab changes
   useEffect(() => {
     if (status === "authenticated" && session?.user?.role === "ADMIN") {
-      fetchProducts();
+      if (activeTab === 'products') {
+        fetchProducts();
+      }
       fetchStats();
       if (activeTab === 'orders') {
         fetchOrders();
         fetchOrderStats();
       }
     }
-  }, [activeTab, status, session]);
+  }, [activeTab, status, session, fetchProducts]);
 
   if (status === "loading") {
     return (
@@ -134,18 +164,6 @@ export default function DashboardPage() {
   if (!session || session.user?.role !== "ADMIN") {
     return null;
   }
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch(`${DOMAIN}/api/products`);
-      const data = await response.json();
-      setProducts(data.data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchStats = async () => {
     try {
@@ -305,10 +323,11 @@ export default function DashboardPage() {
   return (
     <div className='min-h-screen bg-gray-50'>
       <div className='container mx-auto px-4 py-8'>
-        <div className='flex justify-between items-center mb-8'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8'>
           <h1 className='text-3xl font-bold text-gray-800'>
             لوحة التحكم / Dashboard
           </h1>
+          
           {activeTab === 'products' && (
             <button
               onClick={handleAddProduct}
@@ -415,6 +434,16 @@ export default function DashboardPage() {
         {/* Products Tab */}
         {activeTab === 'products' && (
           <>
+            {/* Search Bar - sticky */}
+            <div className='sticky top-0 z-40 bg-gray-50 py-4 mb-6 -mx-4 px-4 border-b border-gray-200'>
+              <DashboardSearchBar 
+                className='w-full sm:max-w-2xl mx-auto' 
+                onSearchChange={(query, category) => {
+                  setSearchQuery(query);
+                  setSelectedCategory(category);
+                }}
+              />
+            </div>
             {stats && <StatsCards stats={stats} />}
             <div className='mt-8'>
               <ProductList
@@ -430,6 +459,18 @@ export default function DashboardPage() {
         {/* Orders Tab */}
         {activeTab === 'orders' && (
           <>
+            {/* Search Bar - sticky */}
+            <div className='sticky top-0 z-40 bg-gray-50 py-4 mb-6 -mx-4 px-4 border-b border-gray-200'>
+              <div className='max-w-2xl mx-auto'>
+                <input
+                  type='text'
+                  placeholder='ابحث عن طلب (رقم الطلب، اسم العميل، أو البريد)...'
+                  value={orderSearchQuery}
+                  onChange={(e) => setOrderSearchQuery(e.target.value)}
+                  className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent'
+                />
+              </div>
+            </div>
             {orderStats && <OrderStatsCards stats={orderStats} />}
             <div className='mt-8'>
               {ordersLoading ? (
@@ -442,6 +483,7 @@ export default function DashboardPage() {
                   onUpdateStatus={handleOpenOrderModal}
                   onDelete={handleDeleteOrder}
                   onView={handleViewOrder}
+                  externalSearchQuery={orderSearchQuery}
                 />
               )}
             </div>
@@ -489,9 +531,23 @@ export default function DashboardPage() {
         )}
 
         {activeTab === 'inventory' && (
-          <div className='mt-8'>
-            <InventoryTab />
-          </div>
+          <>
+            {/* Search Bar - sticky */}
+            <div className='sticky top-0 z-40 bg-gray-50 py-4 mb-6 -mx-4 px-4 border-b border-gray-200'>
+              <div className='max-w-2xl mx-auto'>
+                <input
+                  type='text'
+                  placeholder='ابحث عن منتج، لون، أو مقاس...'
+                  value={inventorySearchQuery}
+                  onChange={(e) => setInventorySearchQuery(e.target.value)}
+                  className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent'
+                />
+              </div>
+            </div>
+            <div className='mt-8'>
+              <InventoryTab externalSearchQuery={inventorySearchQuery} />
+            </div>
+          </>
         )}
 
         {/* Modals */}

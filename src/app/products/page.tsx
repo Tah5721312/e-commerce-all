@@ -72,7 +72,7 @@ function ProductsPageContent() {
           {/* Right Side - Search Bar and Products */}
           <div className='flex-1 min-w-0 flex flex-col gap-4'>
             {/* Search Bar */}
-            <div>
+            <div className='sticky top-2 z-50 bg-gray-50 pb-4'>
               <SearchBar
                 initialQuery={searchQuery}
                 initialCategory={categorySlug}

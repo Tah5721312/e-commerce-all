@@ -67,6 +67,7 @@ export async function PUT(
       company,
       images,
       colors,
+      quantity,
     } = body;
 
     // Check if product exists
@@ -125,6 +126,8 @@ export async function PUT(
         productRating: parseFloat(productRating) || 0,
         ...(categoryId && { categoryId }),
         ...(companyId !== undefined && { companyId }),
+        // Update quantity only if no colors (for products without colors or sizes)
+        ...(quantity !== undefined && (!colors || colors.length === 0) && { quantity: parseInt(quantity) || 0 }),
       },
       include: {
         images: {
@@ -259,6 +262,7 @@ export async function PUT(
             updatedAt: productWithImages.category.updatedAt.toISOString(),
           },
           categoryId: productWithImages.categoryId,
+          quantity: productWithImages.quantity || 0,
           createdAt: productWithImages.createdAt.toISOString(),
           updatedAt: productWithImages.updatedAt.toISOString(),
           productimg: productWithImages.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
@@ -270,6 +274,7 @@ export async function PUT(
             id: color.id,
             colorName: color.colorName,
             colorCode: color.colorCode,
+            quantity: (color as any).quantity || 0,
             variants: color.variants.map((variant) => ({
               id: variant.id,
               size: variant.size,
@@ -329,6 +334,7 @@ export async function PUT(
           updatedAt: productWithColors.category.updatedAt.toISOString(),
         },
         categoryId: productWithColors.categoryId,
+        quantity: productWithColors.quantity || 0,
         createdAt: productWithColors.createdAt.toISOString(),
         updatedAt: productWithColors.updatedAt.toISOString(),
         productimg: productWithColors.images.map((img: { id: number; imageUrl: string; imageOrder: number }) => ({
@@ -340,6 +346,7 @@ export async function PUT(
           id: color.id,
           colorName: color.colorName,
           colorCode: color.colorCode,
+          quantity: (color as any).quantity || 0,
           variants: color.variants.map((variant) => ({
             id: variant.id,
             size: variant.size,

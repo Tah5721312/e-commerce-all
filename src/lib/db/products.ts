@@ -3,7 +3,8 @@ import { prisma } from './prisma';
 import type { Product } from '@/types/product';
 
 export async function getAllProducts(
-  categorySlug?: string
+  categorySlug?: string,
+  includeOutOfStock: boolean = false
 ): Promise<Product[]> {
   const where: { categoryId?: number } = {};
 
@@ -67,7 +68,42 @@ export async function getAllProducts(
     },
   });
 
-  return products.map((product) => ({
+  // Filter products based on available quantity (only if includeOutOfStock is false)
+  const filteredProducts = includeOutOfStock
+    ? products
+    : products.filter((product) => {
+        // If product has colors
+        if (product.colors && product.colors.length > 0) {
+          // Check if any color has variants (sizes)
+          const hasVariants = product.colors.some(
+            (color) => color.variants && color.variants.length > 0
+          );
+
+          if (hasVariants) {
+            // Product has colors and sizes - check variants quantity
+            const totalVariantQuantity = product.colors.reduce((sum, color) => {
+              const variantSum = color.variants.reduce(
+                (vSum, variant) => vSum + variant.quantity,
+                0
+              );
+              return sum + variantSum;
+            }, 0);
+            return totalVariantQuantity > 0;
+          } else {
+            // Product has colors but no sizes - check colors quantity
+            const totalColorQuantity = product.colors.reduce(
+              (sum, color) => sum + color.quantity,
+              0
+            );
+            return totalColorQuantity > 0;
+          }
+        } else {
+          // Product has no colors - check product quantity
+          return product.quantity > 0;
+        }
+      });
+
+  return filteredProducts.map((product) => ({
     id: product.id,
     productTitle: product.productTitle,
     productPrice: Number(product.productPrice),

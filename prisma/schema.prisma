@@ -45,6 +45,7 @@ model Product {
 
   @@index([categoryId])
   @@index([companyId])
+  @@index([quantity])
   @@map("products")
 }
 
@@ -218,7 +219,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -234,7 +235,7 @@ model User {
   role          Role      @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  Account       Account[]
+  accounts      Account[]
 }
 
 

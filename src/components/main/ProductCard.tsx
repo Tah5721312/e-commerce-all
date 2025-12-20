@@ -70,6 +70,30 @@ const ProductCard = ({
     setImageError(true);
   };
 
+  // Check if product is available (has quantity > 0)
+  const isAvailable = useMemo(() => {
+    // If product has no colors, check product quantity
+    if (!product.colors || product.colors.length === 0) {
+      return (product.quantity || 0) > 0;
+    }
+
+    // If product has colors, check if any color/variant has quantity
+    for (const color of product.colors) {
+      // If color has variants (sizes), check variants quantity
+      if (color.variants && color.variants.length > 0) {
+        const hasAvailableVariant = color.variants.some(
+          (variant) => variant.quantity > 0
+        );
+        if (hasAvailableVariant) return true;
+      } else {
+        // If color has no variants, check color quantity
+        const colorQuantity = (color as any).quantity || 0;
+        if (colorQuantity > 0) return true;
+      }
+    }
+    return false;
+  }, [product]);
+
   return (
     <div className='max-w-[333px] mt-6 group hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden bg-white border border-gray-100'>
       <div
@@ -172,12 +196,19 @@ const ProductCard = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onAddToCart();
+              if (isAvailable) {
+                onAddToCart();
+              }
             }}
-            className='flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-all duration-200 shadow-md hover:shadow-lg capitalize font-medium text-xs sm:text-sm whitespace-nowrap'
+            disabled={!isAvailable}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full transition-all duration-200 shadow-md capitalize font-medium text-xs sm:text-sm whitespace-nowrap ${
+              isAvailable
+                ? 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-lg cursor-pointer'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+            }`}
           >
             <FiShoppingCart className='w-4 h-4' />
-            Add to cart
+            {isAvailable ? 'Add to cart' : 'Out of stock'}
           </button>
 
           <button

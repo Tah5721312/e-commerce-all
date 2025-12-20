@@ -272,41 +272,69 @@ const ProductDetails = ({
         {product.colors && product.colors.length > 0 && (
           <div className='border-t border-gray-200 pt-6'>
             <label className='block text-sm font-semibold text-gray-800 mb-4'>
-              اختر اللون / Select Color
+              اختر اللون
             </label>
             <div className='flex gap-3 flex-wrap'>
-              {product.colors.map((color) => (
-                <button
-                  key={color.id}
-                  onClick={() => {
-                    const newColor = color.id;
-                    setSelectedColor(newColor);
-                    setSelectedSizeId(null);
-                    onSelectionChange?.(newColor, null);
-                  }}
-                  className={`px-4 py-2.5 rounded-lg border-2 transition-all shadow-sm hover:shadow-md ${
-                    selectedColor === color.id
-                      ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200'
-                      : 'border-gray-300 hover:border-gray-400 bg-white'
-                  }`}
-                  style={{
-                    backgroundColor:
-                      selectedColor === color.id
-                        ? color.colorCode + '15'
-                        : 'white',
-                  }}
-                >
-                  <div className='flex items-center gap-2.5'>
-                    <div
-                      className='w-7 h-7 rounded-full border-2 border-gray-300 shadow-sm'
-                      style={{ backgroundColor: color.colorCode }}
-                    />
-                    <span className='text-sm font-medium text-gray-700'>
-                      {color.colorName}
-                    </span>
-                  </div>
-                </button>
-              ))}
+              {product.colors.map((color) => {
+                // Check if color has available quantity
+                const colorQuantity = (color as any).quantity || 0;
+                const hasVariants = color.variants && color.variants.length > 0;
+                const hasAvailableVariant = hasVariants
+                  ? color.variants.some((v) => v.quantity > 0)
+                  : false;
+                const isColorAvailable = hasVariants
+                  ? hasAvailableVariant
+                  : colorQuantity > 0;
+
+                return (
+                  <button
+                    key={color.id}
+                    onClick={() => {
+                      if (isColorAvailable) {
+                        const newColor = color.id;
+                        setSelectedColor(newColor);
+                        setSelectedSizeId(null);
+                        onSelectionChange?.(newColor, null);
+                      }
+                    }}
+                    disabled={!isColorAvailable}
+                    className={`px-4 py-2.5 rounded-lg border-2 transition-all shadow-sm ${
+                      !isColorAvailable
+                        ? 'opacity-50 cursor-not-allowed border-gray-200 bg-gray-50'
+                        : selectedColor === color.id
+                        ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200 hover:shadow-md'
+                        : 'border-gray-300 hover:border-gray-400 bg-white hover:shadow-md'
+                    }`}
+                    style={{
+                      backgroundColor:
+                        !isColorAvailable
+                          ? 'transparent'
+                          : selectedColor === color.id
+                          ? color.colorCode + '15'
+                          : 'white',
+                    }}
+                    title={
+                      !isColorAvailable
+                        ? 'هذا اللون غير متوفر'
+                        : color.colorName
+                    }
+                  >
+                    <div className='flex items-center gap-2.5'>
+                      <div
+                        className={`w-7 h-7 rounded-full border-2 shadow-sm ${
+                          !isColorAvailable
+                            ? 'border-gray-300'
+                            : 'border-gray-300'
+                        }`}
+                        style={{ backgroundColor: color.colorCode }}
+                      />
+                      {/* <span className='text-sm font-medium text-gray-700'>
+                        {color.colorName}
+                      </span> */}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -315,7 +343,7 @@ const ProductDetails = ({
         {selectedColorData && availableSizes.length > 0 && (
           <div className='border-t border-gray-200 pt-6'>
             <label className='block text-sm font-semibold text-gray-800 mb-4'>
-              اختر المقاس / Select Size
+              اختر المقاس 
             </label>
             <div className='flex gap-2.5 flex-wrap'>
               {availableSizes.map((size) => {
@@ -415,19 +443,32 @@ const ProductDetails = ({
                 })()}
               </div>
             ) : (
-              <button
-                onClick={() =>
-                  addToCart(
-                    product,
-                    selectedColor || undefined,
-                    selectedSizeId || undefined
-                  )
-                }
-                className='w-full px-8 py-4 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all duration-200 shadow-lg hover:shadow-xl capitalize flex items-center justify-center gap-3 font-semibold text-base'
-              >
-                <FiShoppingCart className='w-5 h-5' />
-                Add to cart
-              </button>
+              (() => {
+                const availableQuantity = getAvailableQuantity();
+                const isAvailable = availableQuantity !== null && availableQuantity > 0;
+                return (
+                  <button
+                    onClick={() => {
+                      if (isAvailable) {
+                        addToCart(
+                          product,
+                          selectedColor || undefined,
+                          selectedSizeId || undefined
+                        );
+                      }
+                    }}
+                    disabled={!isAvailable}
+                    className={`w-full px-8 py-4 rounded-xl transition-all duration-200 shadow-lg capitalize flex items-center justify-center gap-3 font-semibold text-base ${
+                      isAvailable
+                        ? 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-xl cursor-pointer'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                    }`}
+                  >
+                    <FiShoppingCart className='w-5 h-5' />
+                    {isAvailable ? 'Add to cart' : 'Out of stock'}
+                  </button>
+                );
+              })()
             )
           ) : (
             <div className='px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-xl text-sm text-yellow-700 text-center'>
